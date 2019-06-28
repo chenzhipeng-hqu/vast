@@ -20,6 +20,10 @@
 #ifndef __VAST_TEMPLE_H__
 #define __VAST_TEMPLE_H__
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /***********************************************
                     include
 ***********************************************/
@@ -44,6 +48,10 @@
                    variable
 ***********************************************/
 
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* __VAST_TEMPLE_H__ */
 /**
   * @}
@@ -51,6 +59,6 @@
 
 #endif 
 
-/*************** (C) COPYRIGHT chenzhipeng. Ltd *******END OF FILE******/
+/*************** (C) COPYRIGHT chenzhipeng *******END OF FILE******/
 
 

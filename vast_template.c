@@ -56,7 +56,7 @@ void vast_func(void)
   * @}
   */
 
-/*************** (C) COPYRIGHT chenzhipeng. Ltd *******END OF FILE******/
+/*************** (C) COPYRIGHT chenzhipeng *******END OF FILE******/
 
 
 
