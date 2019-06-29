@@ -22,23 +22,45 @@
 *************************************/
 #include <stdint.h>
 #include <stdbool.h>
+#include "usart.h"
+#include "qpc_common.h"
 
 /*************************************
               define
 *************************************/
-#define 	CLI_PutString(fmt, ...)			do{\
-																				if(echoEnable) \
+//#define 	CLI_PutString(fmt, ...)			do{\
 																					postToDebugLog(fmt, ##__VA_ARGS__);\
 																			}while(0)
 
 /**************************************
               typedef
 **************************************/
+typedef enum
+{
+	CLI_FUNC_INIT,
+	CLI_FUNC_TX,
+	CLI_FUNC_RX_PUSH,
+	CLI_FUNC_RX_POP,
+}CLI_SEL_FUNCx;
+
+typedef struct _EasyKey_InitTypeDef
+{
+	int 	(*Read)	(uint8_t *pData, uint8_t len);
+	int 	(*Write)	(const char *format, ... );
+}CLI_InitTypeDef;
+
+typedef struct _CLI_HandleTypeDef
+{
+	CLI_InitTypeDef	 		Init;
+	uint8_t							(*pCLIProcess)		(struct _CLI_HandleTypeDef *pKey, CLI_SEL_FUNCx selFunc);
+
+}CLI_HandleTypeDef;
+
 typedef struct _CLICmdTypedef
 {
   const char *cmd;
   const char *help;
-  void (*pFun)(int argc, char *argv[]);
+  void (*pFun)(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
   const struct _CLICmdTypedef *child;
 } CLICmdTypedef;
 
@@ -46,17 +68,19 @@ typedef struct _CLICmdTypedef
               variable
 *************************************/
 extern const CLICmdTypedef CLI_CmdTableMain[];
-extern uint8_t echoEnable;
+
 /*************************************
          function prototypes
 *************************************/
-int CLI_Initialize(void);
-int CLI_Handle(void);
-void CLICmd_GotoTree(int argc, char *argv[]);
+int CLI_Initialize(CLI_HandleTypeDef *pCli);
+//int CLI_Handle(void);
+int CLI_Handle(CLI_HandleTypeDef *pCli);
+void CLICmd_GotoTree(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
 uint32_t hex2u32(const char *str);
 uint32_t str2u32(const char *str);
 int32_t str2s32(const char *str);
 float str2float(const char *str);
+int findArgument(char *argvStr, char *argv[], char separationChar);
 
 /**
   * @}
