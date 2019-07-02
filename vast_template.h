@@ -10,15 +10,14 @@
  * 
  ******************************************************************************
  */
-#ifdef     VAST_TEMPLE
     
 /** @addtogroup Project
   * @{
   */ 
 
 /* Define to prevent recursive inclusion */
-#ifndef __VAST_TEMPLE_H__
-#define __VAST_TEMPLE_H__
+#ifndef __VAST_TEMPLATE_H__
+#define __VAST_TEMPLATE_H__
 
 #ifdef __cplusplus
  extern "C" {
@@ -57,7 +56,6 @@
   * @}
   */
 
-#endif 
 
 /*************** (C) COPYRIGHT chenzhipeng *******END OF FILE******/
 
