@@ -21,6 +21,7 @@
 #include <stdint.h>
 #include <vast_cli.h>
 #include "gpio.h"
+#include "vast_malloc.h"
 
 
 /*************************************
@@ -34,19 +35,18 @@
 /*************************************
          function prototypes
 *************************************/
-static void CLICmd_DebugCtrl(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
 static void CLICmd_IwdgCtrl(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
 static void cliCmdReadRegByte(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
 static void cliCmdWriteRegByte(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
 static void cliCmdReadReg(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
 static void cliCmdWriteReg(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
+static void CLICmd_DebugCtrl(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
+static void CLICmd_MemCtrl(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
 
 /*************************************
               variable
 *************************************/
 extern const CLICmdTypedef CLICmd_GpioCtrl[];
-extern const CLICmdTypedef CLICmd_ModbusCtrl[];
-extern const CLICmdTypedef CLICmd_ProtocolCtrl[];
 
 const CLICmdTypedef CLI_CmdTableMain[] =
 {
@@ -57,7 +57,8 @@ const CLICmdTypedef CLI_CmdTableMain[] =
   {"w"		, "write reg:w 0xAddr 0xVal(Word)", cliCmdWriteReg, 0},
   {"gpio"	, "gpio dir", 0, CLICmd_GpioCtrl},
   {"iwdg"	, "iwdg test", CLICmd_IwdgCtrl, 0},
-  {"debug", "debug (all/board/eth/atsx/232/485) 0~5", CLICmd_DebugCtrl, 0},
+  {"debug"	, "debug (all/board/eth/atsx/232/485) 0~5", CLICmd_DebugCtrl, 0},
+  {"mem"	, "mem {print/malloc/free} [size]", CLICmd_MemCtrl, 0},
 
   // last command must be all 0s.
   {0, 0, 0, 0}
@@ -75,7 +76,49 @@ const CLICmdTypedef CLI_CmdTableMain[] =
 void CLICmd_DebugCtrl(CLI_HandleTypeDef *pCli, int argc, char *argv[])
 {
 }
-	
+
+uint8_t *p[10] = {NULL};
+/**
+  * @brief  CLICmd_DebugCtrl
+  * @param
+  * @retval
+  */
+void CLICmd_MemCtrl(CLI_HandleTypeDef *pCli, int argc, char *argv[])
+{
+	if(!stricmp(argv[1], "print"))
+	{
+		vast_getmemtablestatus();
+	}
+	else if(!stricmp(argv[1], "malloc"))
+	{
+		uint8_t i = str2u32(argv[2]);
+		uint32_t size = str2u32(argv[3]);
+
+		if(p[i] == NULL)
+		{
+			p[i] = vast_malloc(size);
+		}
+		else
+		{
+			printf("p[%d]:%p, p[%d]:%d\r\n", i, p[i], i, *p[i]);
+		}
+	}
+	else if(!stricmp(argv[1], "free"))
+	{
+		uint8_t i = str2u32(argv[2]);
+
+		if(p[i] == NULL)
+		{
+			printf("p[%d]:%p, p[%d]:%d\r\n", i, p[i], i, *p[i]);
+		}
+		else
+		{
+			vast_free(p[i]);
+			p[i] = NULL;
+		}
+
+	}
+}
 
 /**
   * @brief  CLICmd_IwdgCtrl

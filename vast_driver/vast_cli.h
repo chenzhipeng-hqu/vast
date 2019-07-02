@@ -75,6 +75,7 @@ uint32_t str2u32(const char *str);
 int32_t str2s32(const char *str);
 float str2float(const char *str);
 int findArgument(char *argvStr, char *argv[], char separationChar);
+int stricmp(const char *dst, const char *src);
 
 /**
   * @}
