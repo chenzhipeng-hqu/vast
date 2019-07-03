@@ -658,6 +658,8 @@ int CLI_Handle(CLI_HandleTypeDef *pCli)
 {	
 	static CLI_State inputState = CLI_NORMAL;
 	char pop_ch = 0;
+
+	pop_ch = pCli->pCLIProcess(pCli, CLI_FUNC_TX_POP);
 	
 //	ring_queue_pop(&RingQueue, &pop_ch, 1);
 	pop_ch = pCli->pCLIProcess(pCli, CLI_FUNC_RX_POP);	

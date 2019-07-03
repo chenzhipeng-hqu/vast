@@ -29,15 +29,21 @@
 /**************************************
               typedef
 **************************************/
+typedef struct __MsgTypedef
+{
+	unsigned int len;
+	char data[1];   //
+}MsgTypedef;
+
 typedef enum
 {
 	CLI_FUNC_INIT,
-	CLI_FUNC_TX,
+	CLI_FUNC_TX_POP,
 	CLI_FUNC_RX_PUSH,
 	CLI_FUNC_RX_POP,
 }CLI_SEL_FUNCx;
 
-typedef struct _EasyKey_InitTypeDef
+typedef struct _CLI_InitTypeDef
 {
 	int 	(*Read)	(uint8_t *pData, uint8_t len);
 	int 	(*Write)	(const char *format, ... );
