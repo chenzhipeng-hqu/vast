@@ -1,5 +1,5 @@
-#include "vast_malloc.h"
 #include <string.h>
+#include <vast_mem.h>
 
 /*分区表的定义*/
 typedef struct  

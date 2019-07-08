@@ -7,11 +7,12 @@
 //用户定义参数
 #define MEMCRC   //屏蔽关闭调试信息
 
-#define malloc  mymalloc
-#define free   	myfree 
-#define realloc myrealloc 
-#define calloc 	mycalloc 
-
+/*
+#define malloc  vast_malloc
+#define free   	vast_free
+#define realloc vast_realloc
+#define calloc 	vast_calloc
+*/
 
 #define MAX_SIZE	  10*1024 			//总字节数 = MAX_BLOCK * MIN_SIZE
 #define MIN_SIZE	  32						//最小分配空间字节大小
@@ -27,7 +28,7 @@
 #ifdef MEMCRC
 #include "usart.h"
 #include "stdio.h"
-void Getmemtablestatus(void);//获取内存表状态
+void vast_getmemtablestatus(void);//获取内存表状态
 #endif
 
 
