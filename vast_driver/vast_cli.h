@@ -31,7 +31,7 @@
 **************************************/
 typedef struct __MsgTypedef
 {
-	unsigned int len;
+	uint16_t len;
 	char data[1];   //
 }MsgTypedef;
 
@@ -45,14 +45,14 @@ typedef enum
 
 typedef struct _CLI_InitTypeDef
 {
-	int 	(*Read)	(uint8_t *pData, uint8_t len);
-	int 	(*Write)	(const char *format, ... );
+	int16_t 	(*Read)	(uint8_t *pData, uint8_t len);
+	int16_t 	(*Write)	(const char *format, ... );
 }CLI_InitTypeDef;
 
 typedef struct _CLI_HandleTypeDef
 {
 	CLI_InitTypeDef	 		Init;
-	uint8_t							(*pCLIProcess)		(struct _CLI_HandleTypeDef *pKey, CLI_SEL_FUNCx selFunc);
+	uint8_t					(*pCLIProcess)		(struct _CLI_HandleTypeDef *pCli, CLI_SEL_FUNCx selFunc);
 
 }CLI_HandleTypeDef;
 
@@ -72,15 +72,15 @@ extern const CLICmdTypedef CLI_CmdTableMain[];
 /*************************************
          function prototypes
 *************************************/
-int CLI_Initialize(CLI_HandleTypeDef *pCli);
+int16_t CLI_Initialize(CLI_HandleTypeDef *pCli);
 //int CLI_Handle(void);
-int CLI_Handle(CLI_HandleTypeDef *pCli);
+int16_t CLI_Handle(CLI_HandleTypeDef *pCli);
 void CLICmd_GotoTree(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
 uint32_t hex2u32(const char *str);
 uint32_t str2u32(const char *str);
 int32_t str2s32(const char *str);
 float str2float(const char *str);
-int findArgument(char *argvStr, char *argv[], char separationChar);
+int16_t findArgument(char *argvStr, char *argv[], char separationChar);
 int stricmp(const char *dst, const char *src);
 
 /**

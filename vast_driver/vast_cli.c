@@ -18,22 +18,38 @@ exp:
 
 CLI_HandleTypeDef	hcli;
 
-int postToDebugLog(const char *format, ... )
+int postToLog(const char *format, ... )
 {
-	char SendBuf[100] = {0};
 	va_list arg;
-	int rv;
-	va_start(arg, format);
-	rv = vsnprintf(SendBuf, 100, format, arg);
-	va_end(arg);
-//	HAL_UART_Transmit_DMA(&huart1, (uint8_t *)SendBuf, rv);
-		HAL_UART_Transmit(&huart1, (uint8_t *)SendBuf, rv, 100);
-//	while(__HAL_UART_GET_FLAG(&huart1, UART_FLAG_TXE) != RESET);
+	int len;
 
+	va_start(arg, format);
+	len = vsnprintf(SendBuf, sizeof(SendBuf), format, arg);
+	va_end(arg);
+
+	if(huart1.gState == HAL_UART_STATE_READY)
+	{
+		memcpy(tx_buff, SendBuf, len);
+		HAL_UART_Transmit_DMA(&huart1, (uint8_t *)tx_buff, len);
+	}
+	else
+	{
+		pMsgPush = (MsgTypedef *)vast_malloc(sizeof(MsgTypedef)+len);
+
+		if(pMsgPush == NULL)
+		{
+			printf("data=NULL!!!\r\n");
+			return 1;
+		}
+
+		pMsgPush->len = len;
+		memcpy(pMsgPush->data, SendBuf, pMsgPush->len);
+		LinkListPush(&UsartSendLinkList, (void *)pMsgPush);
+	}
 	return 0;
 }
 
-uint8_t CliProcess_uart1 (CLI_HandleTypeDef *pKey, CLI_SEL_FUNCx selFunc)
+uint8_t CliProcess_uart1 (CLI_HandleTypeDef *pCli, CLI_SEL_FUNCx selFunc)
 {
 	uint8_t ret = 0;
 
@@ -41,12 +57,23 @@ uint8_t CliProcess_uart1 (CLI_HandleTypeDef *pKey, CLI_SEL_FUNCx selFunc)
 	{
 		case CLI_FUNC_INIT :
 		{
-			vast_ring_queue_init(&RingQueue, 100, NULL);
+			vast_ring_queue_init(&RingQueue, 128, NULL);
 			HAL_UART_Receive_DMA(&huart1, (uint8_t *)RingQueue.data, RingQueue.length);
+
+			pCli->Init.Write("command-line interface initialize ok.\r\n");
 			break;
 		}
-		case CLI_FUNC_TX :
+		case CLI_FUNC_TX_POP :
 		{
+		#if 0
+			if(UsartSendLinkList->len > 0)
+			{
+				LinkListPop(&UsartSendLinkList, (void **)&pMsgPop);
+				memcpy(tx_buff, pMsgPop->data, pMsgPop->len);
+				HAL_UART_Transmit_DMA(&huart1, (uint8_t *)tx_buff, pMsgPop->len);
+				vast_free(pMsgPop);
+			}
+		#endif
 			break;
 		}
 		case CLI_FUNC_RX_PUSH :
@@ -166,7 +193,7 @@ static uint16_t cliCmdLevel = 0;
   * @param  
   * @retval 
   */
-int CLI_Initialize(CLI_HandleTypeDef *pCli)
+int16_t CLI_Initialize(CLI_HandleTypeDef *pCli)
 {
 	if(pCli != NULL)
 	{
@@ -340,7 +367,7 @@ void CLICmd_History(CLI_HandleTypeDef *pCli, int argc, char *argv[])
   * @param  
   * @retval 
   */
-int findArgument(char *argvStr, char *argv[], char separationChar)
+int16_t findArgument(char *argvStr, char *argv[], char separationChar)
 {
 	int argc = 0, idx = 0, argvStrlen = 0;
 	
@@ -654,7 +681,7 @@ uint8_t CLI_LoadHistory(CLI_HandleTypeDef *pCli, uint8_t historyUp)
   * @param  
   * @retval 
   */
-int CLI_Handle(CLI_HandleTypeDef *pCli)
+int16_t CLI_Handle(CLI_HandleTypeDef *pCli)
 {	
 	static CLI_State inputState = CLI_NORMAL;
 	char pop_ch = 0;
