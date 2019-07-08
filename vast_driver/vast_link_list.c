@@ -12,15 +12,16 @@
 char tmp_buf[200];
 #endif
 
-LinkListTypeDef **LinkListInit(LinkListTypeDef **pList)
+int16_t LinkListInit(LinkListTypeDef **pList)
 {
 	(*pList) = (LinkListTypeDef *)malloc(sizeof(LinkListTypeDef));
 	(*pList)->len = 0;
-	(*pList)->lock = LINK_LIST_UNLOCKED;
 	
+	__VAST_UNLOCK((*pList));
+
 	if(*pList == NULL)
 	{
-		return NULL;
+		return VAST_ERROR;
 	}
 	
 	(*pList)->pHeadNode = (*pList)->pTailNode = NULL;
@@ -31,10 +32,10 @@ LinkListTypeDef **LinkListInit(LinkListTypeDef **pList)
 	osDelay(10);
 #endif
 	
-	return pList;
+	return VAST_OK;
 }
 
-int LinkListPush(LinkListTypeDef **pList, const void *pdata)
+int16_t LinkListPush(LinkListTypeDef **pList, const void *pdata)
 {
 	NodeTypeDef *pNode = NULL;
 	
@@ -57,12 +58,13 @@ int LinkListPush(LinkListTypeDef **pList, const void *pdata)
 		}
 	}while(pNode == NULL);
 	
-	while((*pList)->lock == LINK_LIST_LOCKED){
+	if((*pList)->lock == VAST_LOCKED){
 	#if DBG_LINK_LIST_MSG	
 		LinkListDbgMsg(__FILE__, "LinkListPush", __LINE__);
 	#endif
 	}
-	(*pList)->lock = LINK_LIST_LOCKED;
+
+	__VAST_LOCK((*pList));
 	
 #if DBG_LINK_LIST_MSG	
 	
@@ -88,7 +90,8 @@ int LinkListPush(LinkListTypeDef **pList, const void *pdata)
 	}
 		
 	((*pList)->len)++;
-	(*pList)->lock = LINK_LIST_UNLOCKED;
+
+	__VAST_UNLOCK((*pList));
 	
 #if DBG_LINK_LIST_MSG	
 	sprintf(tmp_buf, "push--> pNode = 0x%x, pdata = 0x%x, data=<%s>, len = %d\r\n", (int)(*pList)->pTailNode, (int)(*pList)->pTailNode->data, (char *)(*pList)->pTailNode->data, (*pList)->len);
@@ -98,22 +101,23 @@ int LinkListPush(LinkListTypeDef **pList, const void *pdata)
 	return 0;
 }
 
-NodeTypeDef LinkListPop(LinkListTypeDef **pList, void **pdata)
+int16_t LinkListPop(LinkListTypeDef **pList, void **pdata)
 {
 	NodeTypeDef pNode = {NULL};
 	
 	if((*pList)->pHeadNode == NULL)
 	{
 		*pdata = NULL;
-		return pNode;
+		return VAST_ERROR;
 	}
 		
-	while((*pList)->lock == LINK_LIST_LOCKED){
+	if((*pList)->lock == VAST_LOCKED){
 	#if DBG_LINK_LIST_MSG	
 		LinkListDbgMsg(__FILE__, "LinkListPush", __LINE__);
 	#endif
 	}
-	(*pList)->lock = LINK_LIST_LOCKED;
+
+	__VAST_LOCK((*pList));
 	
 	pNode = *((*pList)->pHeadNode);
 	*pdata = pNode.data;
@@ -141,8 +145,10 @@ NodeTypeDef LinkListPop(LinkListTypeDef **pList, void **pdata)
 	{
 		(*pList)->pTailNode = NULL;
 	}
-	(*pList)->lock = LINK_LIST_UNLOCKED;
-	return pNode;
+
+	__VAST_UNLOCK((*pList));
+
+	return 0;
 }
 
 #if DBG_LINK_LIST_MSG
@@ -155,7 +161,7 @@ __weak int LinkListDbgMsg(char *file, char *function, int line)
 }
 #endif	
 
-int LinkListTestSelf(LinkListTypeDef **pList)
+int16_t LinkListTestSelf(LinkListTypeDef **pList)
 {
 	char *pPush = NULL;
 	char *pPop = NULL;
