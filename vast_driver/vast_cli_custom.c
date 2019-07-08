@@ -20,9 +20,9 @@
 #include <string.h>
 #include <stdint.h>
 #include <vast_cli.h>
+#include <vast_mem.h>
 #include "gpio.h"
-#include "vast_malloc.h"
-
+#include "vast_simulatite_eeprom.h"
 
 /*************************************
               define
@@ -35,11 +35,7 @@
 /*************************************
          function prototypes
 *************************************/
-static void CLICmd_IwdgCtrl(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
-static void cliCmdReadRegByte(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
-static void cliCmdWriteRegByte(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
-static void cliCmdReadReg(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
-static void cliCmdWriteReg(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
+static void CLICmd_ResetCtrl(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
 static void CLICmd_DebugCtrl(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
 static void CLICmd_MemCtrl(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
 
@@ -47,18 +43,18 @@ static void CLICmd_MemCtrl(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
               variable
 *************************************/
 extern const CLICmdTypedef CLICmd_GpioCtrl[];
+extern const CLICmdTypedef cliCmdTableE2prom[];
+extern const CLICmdTypedef cliCmdTableReg[];
 
 const CLICmdTypedef CLI_CmdTableMain[] =
 {
   {"cd"		, "goto dir", CLICmd_GotoTree, 0},
-  {"rb"		, "read reg:rb 0xAddr len(Byte)", cliCmdReadRegByte, 0},
-  {"wb"		, "write reg:wb 0xAddr 0xVal(Byte)", cliCmdWriteRegByte, 0},
-  {"r"		, "read reg:r 0xAddr len(Word)", cliCmdReadReg, 0},
-  {"w"		, "write reg:w 0xAddr 0xVal(Word)", cliCmdWriteReg, 0},
+  {"reg"	, "reg dir", 0, cliCmdTableReg},
   {"gpio"	, "gpio dir", 0, CLICmd_GpioCtrl},
-  {"iwdg"	, "iwdg test", CLICmd_IwdgCtrl, 0},
+  {"reset"	, "reset {iwdg/soft}", CLICmd_ResetCtrl, 0},
   {"debug"	, "debug (all/board/eth/atsx/232/485) 0~5", CLICmd_DebugCtrl, 0},
   {"mem"	, "mem {print/malloc/free} [size]", CLICmd_MemCtrl, 0},
+  {"eep"	, "e2prom dir", 0, cliCmdTableE2prom},
 
   // last command must be all 0s.
   {0, 0, 0, 0}
@@ -125,23 +121,28 @@ void CLICmd_MemCtrl(CLI_HandleTypeDef *pCli, int argc, char *argv[])
   * @param  
   * @retval 
   */
-void CLICmd_IwdgCtrl(CLI_HandleTypeDef *pCli, int argc, char *argv[])
+void CLICmd_ResetCtrl(CLI_HandleTypeDef *pCli, int argc, char *argv[])
 {
   uint32_t ts;
   uint32_t cnt;
   if(argc == 2)
   {
-    if(!strcmp(argv[1], "test"))
-    {
-      cnt = 0;
-      ts = HAL_GetTick();
-      do
-      {
-        while(HAL_GetTick() - ts < cnt);
-        pCli->Init.Write("(%d) ", (unsigned int)(HAL_GetTick() - ts));
-        cnt += 5;
-      }while(1);
-    }
+		if(!stricmp(argv[1], "iwdg"))
+		{
+			cnt = 0;
+			ts = HAL_GetTick();
+			LL_IWDG_ReloadCounter(IWDG);
+			do
+			{
+				while(HAL_GetTick() - ts < cnt);
+				printf("(%d) ", (unsigned int)(HAL_GetTick() - ts));
+				cnt += 10;
+			}while(1);
+		}
+		else if(!stricmp(argv[1], "soft"))
+		{
+			NVIC_SystemReset();
+		}
   }
 }
 
@@ -234,6 +235,20 @@ void cliCmdWriteReg(CLI_HandleTypeDef *pCli, int argc, char *argv[])
   }
 }
 
+
+/**
+  * @brief  CLICmd_GpioCtrl
+  * @param
+  * @retval
+  */
+const CLICmdTypedef cliCmdTableReg[] =
+{
+	{"rb"		, "read reg:rb 0xAddr len(Byte)", cliCmdReadRegByte, 0},
+	{"wb"		, "write reg:wb 0xAddr 0xVal(Byte)", cliCmdWriteRegByte, 0},
+	{"r"		, "read reg:r 0xAddr len(Word)", cliCmdReadReg, 0},
+	{"w"		, "write reg:w 0xAddr 0xVal(Word)", cliCmdWriteReg, 0},
+	{0, 0, 0, 0}
+};
 //------------------------------------------------------------------------------
 //-   custom command functions. GPIO
 //------------------------------------------------------------------------------
@@ -376,6 +391,95 @@ const CLICmdTypedef CLICmd_GpioCtrl[] =
   {"pio", "pin set in/out{}/altfun{}<>/analog none/pullUp/pullDown funNum {openDrain/pushPull}:\r\n\tpio (a-k) (0-f) (i/oo/op/fo/fp/a) (n/u/d) [0-16]", cliCmdGpioFun, 0},
   {"p", "set/get port:p (a-k) (0-f) [1/0]", cliCmdGpioPort, 0},
   // last command must be all 0s.
+  {0, 0, 0, 0}
+};
+
+/**
+  * @brief  CLICmd_GpioCtrl
+  * @param
+  * @retval
+  */
+void cliCmdE2promDispVirt(CLI_HandleTypeDef *pCli, int argc, char *argv[])
+{
+	uint16_t VarData = 0;
+
+	for(uint16_t i=0; i<NB_OF_VAR; i++)
+	{
+		VarData = 0;
+
+		if((EE_ReadVariable(VirtTab[i].addr,  &VarData)) != HAL_OK)
+		{
+//			printf("EE_ReadVariable (%s) error\r\n", VirtTab[i].help);
+		}
+
+		pCli->Init.Write("VirtTab[%d]: data:0x%04x, %s\r\n", i, VarData, VirtTab[i].help);
+
+	}
+}
+
+/**
+  * @brief  CLICmd_GpioCtrl
+  * @param
+  * @retval
+  */
+void cliCmdE2promReadByte(CLI_HandleTypeDef *pCli, int argc, char *argv[])
+{
+	uint16_t VarData = 0;
+  uint16_t virtId = str2u32(argv[1]);
+
+	if((EE_ReadVariable(VirtTab[virtId].addr,  &VarData)) != HAL_OK)
+	{
+		pCli->Init.Write("EE_ReadVariable (%s) error\r\n", VirtTab[virtId].help);
+	}
+	else
+	{
+		pCli->Init.Write("R: data:0x%04x, %s\r\n", VarData, VirtTab[virtId].help);
+	}
+}
+
+/**
+  * @brief  CLICmd_GpioCtrl
+  * @param
+  * @retval
+  */
+void cliCmdE2promWriteByte(CLI_HandleTypeDef *pCli, int argc, char *argv[])
+{
+	uint16_t VarData = 0;
+  uint16_t virtId = str2u32(argv[1]);
+  uint16_t writeData = str2u32(argv[2]);
+
+  if((EE_ReadVariable(VirtTab[virtId].addr,  &VarData)) != HAL_OK)
+	{
+	  pCli->Init.Write("EE_ReadVariable (%s) error\r\n", VirtTab[virtId].help);
+	}
+
+	if(VarData != writeData)
+	{
+		if(EE_WriteVariable(VirtTab[virtId].addr, writeData) != HAL_OK)
+		{
+			pCli->Init.Write("EE_WriteVariable (%s) error\r\n", VirtTab[virtId].help);
+		}
+		else
+		{
+			pCli->Init.Write("W: %s: 0x%x\r\n", VirtTab[virtId].help, writeData);
+		}
+	}
+	else
+	{
+		pCli->Init.Write("W: 0x%x: %s\r\n", VarData, VirtTab[virtId].help);
+	}
+}
+
+/**
+  * @brief  CLICmd_GpioCtrl
+  * @param
+  * @retval
+  */
+const CLICmdTypedef cliCmdTableE2prom[] =
+{
+  {"?", "display virtAddr", cliCmdE2promDispVirt, 0},
+  {"r", "read virtId", cliCmdE2promReadByte, 0},
+  {"w", "write virtId data", cliCmdE2promWriteByte, 0},
   {0, 0, 0, 0}
 };
 

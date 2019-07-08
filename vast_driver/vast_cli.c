@@ -560,7 +560,8 @@ uint8_t CLI_Tab(CLI_HandleTypeDef *pCli)
 {
 //	CLI_PutString("%c%c", ASCII_CR, ASCII_LF);
 	pCli->Init.Write("%c%c", ASCII_CR, ASCII_LF);
-  CLI_Execute(pCli, "ls");
+  //CLI_Execute(pCli, "ls");
+  CLICmd_List(pCli);
 	CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx] = ASCII_NULL;
 //	CLI_PutString("%c%c%s", ASCII_CMD, ASCII_SPACE, CLI_Buffer[g_CLI_CurrentIdx]);
 	pCli->Init.Write("%c%c%s", ASCII_CMD, ASCII_SPACE, CLI_Buffer[g_CLI_CurrentIdx]);
