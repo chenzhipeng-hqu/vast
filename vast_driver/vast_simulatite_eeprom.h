@@ -98,6 +98,7 @@
  	NODE_ID,
  	BOX_ID_INC,
  	IWDG_RESET_TIMES,
+
  	NB_OF_VAR
  }NB_OF_VAR_e;
 

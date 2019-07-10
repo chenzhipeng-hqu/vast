@@ -62,6 +62,8 @@ uint16_t EE_Init(void)
   uint32_t SectorError = 0;
   FLASH_EraseInitTypeDef pEraseInit;
 
+  HAL_FLASH_Unlock();
+
   /* Get Page0 status */
   PageStatus0 = (*(__IO uint16_t*)PAGE0_BASE_ADDRESS);
   /* Get Page1 status */
@@ -291,6 +293,8 @@ uint16_t EE_Init(void)
       break;
   }
 
+  HAL_FLASH_Lock();
+
   return HAL_OK;
 }
 
@@ -352,6 +356,7 @@ uint16_t EE_ReadVariable(uint16_t VirtAddress, uint16_t* Data)
   uint16_t AddressValue = 0x5555, ReadStatus = 1;
   uint32_t Address = EEPROM_START_ADDRESS, PageStartAddress = EEPROM_START_ADDRESS;
 
+  HAL_FLASH_Unlock();
   /* Get active Page for read operation */
   ValidPage = EE_FindValidPage(READ_FROM_VALID_PAGE);
 
@@ -391,6 +396,7 @@ uint16_t EE_ReadVariable(uint16_t VirtAddress, uint16_t* Data)
     }
   }
 
+  HAL_FLASH_Lock();
   /* Return ReadStatus value: (0: variable exist, 1: variable doesn't exist) */
   return ReadStatus;
 }
@@ -409,6 +415,8 @@ uint16_t EE_WriteVariable(uint16_t VirtAddress, uint16_t Data)
 {
   uint16_t Status = 0;
 
+  HAL_FLASH_Unlock();
+
   /* Write the variable virtual address and value in the EEPROM */
   Status = EE_VerifyPageFullWriteVariable(VirtAddress, Data);
 
@@ -419,6 +427,7 @@ uint16_t EE_WriteVariable(uint16_t VirtAddress, uint16_t Data)
     Status = EE_PageTransfer(VirtAddress, Data);
   }
 
+  HAL_FLASH_Lock();
   /* Return last operation status */
   return Status;
 }

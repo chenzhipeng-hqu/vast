@@ -50,6 +50,8 @@ int16_t vast_ring_flash_initialize(void)
 	int16_t ret = VAST_OK;
 	uint32_t nowAddr = 0;
 
+	HAL_FLASH_Unlock();
+
 	nowAddr = (*(volatile uint32_t *)PAGE_BASE_ADDRESS);
 
 	if(nowAddr == 0xffffffff)
@@ -93,6 +95,8 @@ int16_t vast_ring_flash_initialize(void)
 		printf("nextAddr=%#lx\r\n", nextAddr);
 	}
 
+	HAL_FLASH_Lock();
+
     return ret;
 }
 
@@ -107,6 +111,8 @@ int16_t vast_ring_flash_store(uint8_t *dat, uint16_t len)
 	uint32_t nowAddr = nextAddr;
 
 	lastAddr = nextAddr;
+
+	HAL_FLASH_Unlock();
 
 	if (nowAddr + len >= PAGE_END_ADDRESS)
 	{
@@ -147,6 +153,8 @@ int16_t vast_ring_flash_store(uint8_t *dat, uint16_t len)
 
 	nextAddr = nowAddr;
 
+	HAL_FLASH_Lock();
+
     return ret;
 }
 
@@ -167,61 +175,36 @@ int16_t vast_ring_flash_read(uint8_t *dat, uint8_t size)
 
 	read_len = ((len-4) > size) ? size : (len-4);
 
+	HAL_FLASH_Unlock();
+
 	for(i=0; i<read_len; i++)
 	{
 		dat[i] = (*(volatile uint8_t *)(lastAddr+i+4));
 	}
 
+	HAL_FLASH_Lock();
 	return i;
 }
 /*
-uint32_t save_script(uint32_t *NextAddr)
+int main(int argc, char *argv[])
 {
-	uint32_t size, RecAddr;
-	uint16_t next_addr[2];
-
-	FLASH_EraseInitTypeDef f;
-	uint32_t PageError = 0;
-
-	have_start = 0;
-	printf("flash write start...\r\n");
-
-	RecAddr = nextsricpt_addr;
-
-//	RecAddr = STM32_FLASH_END - 100;		// xxx need to delete
-
-	printf("RecAddr is %#x\r\n", RecAddr);
-	// һ��ָ��Ĵ�С
-	size = ((u32)script_sum * sizeof(struct scriptInfo)) + 4;
-
-	if (RecAddr + size >= STM32_FLASH_END)
+	if( vast_ring_flash_initialize() != HAL_OK)
 	{
-		// д���ˣ�����ȫ��
-		printf("flash full,ready to erase...\r\n");
-		HAL_FLASH_Unlock();
-		f.TypeErase = FLASH_TYPEERASE_PAGES;
-		f.PageAddress = FLASH_SAVE_ADDR;
-		f.NbPages = FLASH_SAVE_SECTOR;
-		HAL_FLASHEx_Erase(&f, &PageError);
-		HAL_FLASH_Lock();
-
-		RecAddr = FLASH_SAVE_ADDR;
-		printf("RecAddr return to %#x\r\n", FLASH_SAVE_ADDR);
+		DBG_INFO(DBG_ERROR, "vast_ring_flash_initialize error.\r\n");
 	}
 
-	*NextAddr = RecAddr + size;
+	uint8_t buff_array[32] = {0}, read_len = 0;
+	read_len = vast_ring_flash_read(buff_array, sizeof(buff_array));
 
-	printf("NextAddr is %#x\r\n", *NextAddr);
+	DBG_ARRAY(DBG_DEBUG, "buff_array: ", "\r\n", (char *)buff_array, read_len);
 
-	next_addr[0] = *NextAddr & 0x0000ffff;
-	next_addr[1] = (*NextAddr >> 16) & 0x0000ffff;
+	uint8_t test_array2[] = {0x1D, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C};
+	vast_ring_flash_store(test_array2, sizeof(test_array2));
 
-	STMFLASH_Write_NoCheck(RecAddr, (u16*)next_addr, 2);
-	STMFLASH_Write_NoCheck(RecAddr + 4, (u16*)script_buffer, (size - 4) / 2);
-
-	printf("flash write ok\r\n");
-
-	return RecAddr;
+	while(1)
+	{
+	}
+	return 0;
 }
 */
 /**
