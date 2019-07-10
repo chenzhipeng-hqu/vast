@@ -26,6 +26,7 @@
 /***********************************************
                     include
 ***********************************************/
+#include "vast_common.h"
 
 /***********************************************
                     define
@@ -78,149 +79,175 @@
 
 
 #define DBG_PRINTF_TASK(level, fmt, ...)    do{ \
-																							if( level <= me->dbgLevel) {\
-																								switch (level) {\
-																									case E_DBG_CRISIS: {\
-																											postToDebugLog(FONT_MAGENTA "[%s][%s]: " fmt RESET_COLOR, #level, __FUNCTION__, ##__VA_ARGS__);\
-																											break;\
-																									}\
-																									case E_DBG_ERROR: {\
-																											postToDebugLog(FONT_RED "[%08d][%s][%s]: " fmt RESET_COLOR, osKernelSysTick(), #level, __FUNCTION__, ##__VA_ARGS__);\
-																											break;\
-																									}\
-																									case E_DBG_WARNING: {\
-																											postToDebugLog(FONT_YELLOW "[%08d][%s][%s]: " fmt RESET_COLOR, osKernelSysTick(), #level, __FUNCTION__, ##__VA_ARGS__);\
-																											break;\
-																									}\
-																									case E_DBG_INFO: {\
-																											postToDebugLog(FONT_GREEN "[%08d][%s]: " fmt RESET_COLOR, osKernelSysTick(), #level, ##__VA_ARGS__);\
-																											break;\
-																									}\
-																									case E_DBG_DEBUG: {\
-																											postToDebugLog(FONT_CYAN "[%08d][%s]: " fmt RESET_COLOR, osKernelSysTick(), #level, ##__VA_ARGS__);\
-																											break;\
-																									}\
-																									case E_DBG_QPSIG: {\
-																											if((e->sig == Q_EMPTY_SIG)\
-																												| (e->sig == TIME_TICK_SIG)\
-																												| (e->sig == SOCK_ACCEPT_TIMEOUT_SIG)\
-																												| (e->sig == SOCKET_DISPATCH_TIMEOUT_SIG)\
-																												| (e->sig == SOCK_RX_TIMEOUT_SIG)\
-																												| (e->sig == SET_LINK_TIMEOUT_SIG)\
-																												| (e->sig == ATSX_POW_TIMEOUT_SIG)\
-																												| (e->sig == LWIP_RX_READY_SIG)\
-																												| (e->sig == PHASE_DET_SIG)\
-																												| (e->sig == KEY_TIMEOUT_SIG)\
-																												| (e->sig == TEST_TIMEOUT_SIG) ){\
-																											}else {\
-																												postToDebugLog(FONT_BLUE "[%08d][%s][%s]: " fmt RESET_COLOR, osKernelSysTick(), #level, __FUNCTION__, ##__VA_ARGS__);\
-																											}\
-																											break;\
-																									}\
-																									default: {\
-																											break;    \
-																									}\
-																								}\
-																							}\
-																						}while(0)
+												if( level <= pLog->Init.dbgLevel) {\
+													switch (level) {\
+														case E_DBG_CRISIS: {\
+															hlog.WriteLog(FONT_MAGENTA "[%s][%s]: " fmt RESET_COLOR, #level, __FUNCTION__, ##__VA_ARGS__);\
+																break;\
+														}\
+														case E_DBG_ERROR: {\
+															hlog.WriteLog(FONT_RED "[%08d][%s][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, __FUNCTION__, ##__VA_ARGS__);\
+																break;\
+														}\
+														case E_DBG_WARNING: {\
+															hlog.WriteLog(FONT_YELLOW "[%08d][%s][%s]: " fmt RESET_COLOR, osKernehlog.TicklSysTick(), #level, __FUNCTION__, ##__VA_ARGS__);\
+																break;\
+														}\
+														case E_DBG_INFO: {\
+																hlog.WriteLog(FONT_GREEN "[%08d][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, ##__VA_ARGS__);\
+																break;\
+														}\
+														case E_DBG_DEBUG: {\
+															hlog.WriteLog(FONT_CYAN "[%08d][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, ##__VA_ARGS__);\
+																break;\
+														}\
+														case E_DBG_QPSIG: {\
+															hlog.WriteLog(FONT_BLUE "[%08d][%s][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, __FUNCTION__, ##__VA_ARGS__);\
+																}\
+																break;\
+														}\
+														default: {\
+																break;    \
+														}\
+													}\
+												}\
+											}while(0)
 
 #define DBG_LOG(level, fmt, ...)     do{ \
-																				if( level <= dbgLevel) {\
-																					switch (level) {\
-																						case E_DBG_CRISIS: {\
-																								postToDebugLog(FONT_MAGENTA "[%s][%s]: " fmt RESET_COLOR, #level, __FUNCTION__, ##__VA_ARGS__);\
-																								break;\
-																						}\
-																						case E_DBG_ERROR: {\
-																								postToDebugLog(FONT_RED "[%08d][%s][%s]: " fmt RESET_COLOR, osKernelSysTick(), #level, __FUNCTION__, ##__VA_ARGS__);\
-																								break;\
-																						}\
-																						case E_DBG_WARNING: {\
-																								postToDebugLog(FONT_YELLOW "[%08d][%s][%s]: " fmt RESET_COLOR, osKernelSysTick(), #level, __FUNCTION__, ##__VA_ARGS__);\
-																								break;\
-																						}\
-																						case E_DBG_INFO: {\
-																								postToDebugLog(FONT_GREEN "[%08d][%s]: " fmt RESET_COLOR, osKernelSysTick(), #level, ##__VA_ARGS__);\
-																								break;\
-																						}\
-																						case E_DBG_DEBUG: {\
-																								postToDebugLog(FONT_CYAN "[%08d][%s]: " fmt RESET_COLOR, osKernelSysTick(), #level, ##__VA_ARGS__);\
-																								break;\
-																						}\
-																						default: {\
-																								break;    \
-																						}\
-																					}\
-																				}\
-																			}while(0)
+										if( level <= hlog.dbgLevel) {\
+											switch (level) {\
+												case DBG_CRISIS: {\
+													hlog.WriteLog(FONT_MAGENTA "[%s][%s]: " fmt RESET_COLOR, #level, __FUNCTION__, ##__VA_ARGS__);\
+														break;\
+												}\
+												case DBG_ERROR: {\
+													hlog.WriteLog(FONT_RED "[%08d][%s][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, __FUNCTION__, ##__VA_ARGS__);\
+														break;\
+												}\
+												case DBG_WARNING: {\
+													hlog.WriteLog(FONT_YELLOW "[%08d][%s][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, __FUNCTION__, ##__VA_ARGS__);\
+														break;\
+												}\
+												case DBG_INFO: {\
+													hlog.WriteLog(FONT_GREEN "[%08d][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, ##__VA_ARGS__);\
+														break;\
+												}\
+												case DBG_DEBUG: {\
+													hlog.WriteLog(FONT_CYAN "[%08d][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, ##__VA_ARGS__);\
+														break;\
+												}\
+												default: {\
+														break;    \
+												}\
+											}\
+										}\
+									}while(0)
 
 #define DBG_INFO(level, fmt, ...)     do{ \
-																				if( level <= dbgLevel) {\
-																					switch (level) {\
-																						case E_DBG_CRISIS: {\
-																								postToDebugLog(FONT_MAGENTA fmt RESET_COLOR, ##__VA_ARGS__);\
-																								break;\
-																						}\
-																						case E_DBG_ERROR: {\
-																								postToDebugLog(FONT_RED fmt RESET_COLOR, ##__VA_ARGS__);\
-																								break;\
-																						}\
-																						case E_DBG_WARNING: {\
-																								postToDebugLog(FONT_YELLOW fmt RESET_COLOR, ##__VA_ARGS__);\
-																								break;\
-																						}\
-																						case E_DBG_INFO: {\
-																								postToDebugLog(FONT_GREEN fmt RESET_COLOR, ##__VA_ARGS__);\
-																								break;\
-																						}\
-																						case E_DBG_DEBUG: {\
-																								postToDebugLog(FONT_CYAN fmt RESET_COLOR, ##__VA_ARGS__);\
-																								break;\
-																						}\
-																						default: {\
-																								break;    \
-																						}\
-																					}\
-																				}\
-																			}while(0)
+										if( level <= hlog.dbgLevel) {\
+											switch (level) {\
+												case DBG_CRISIS: {\
+													hlog.WriteLog(FONT_MAGENTA fmt RESET_COLOR, ##__VA_ARGS__);\
+														break;\
+												}\
+												case DBG_ERROR: {\
+													hlog.WriteLog(FONT_RED fmt RESET_COLOR, ##__VA_ARGS__);\
+														break;\
+												}\
+												case DBG_WARNING: {\
+													hlog.WriteLog(FONT_YELLOW fmt RESET_COLOR, ##__VA_ARGS__);\
+														break;\
+												}\
+												case DBG_INFO: {\
+													hlog.WriteLog(FONT_GREEN fmt RESET_COLOR, ##__VA_ARGS__);\
+														break;\
+												}\
+												case DBG_DEBUG: {\
+													hlog.WriteLog(FONT_CYAN fmt RESET_COLOR, ##__VA_ARGS__);\
+														break;\
+												}\
+												default: {\
+														break;    \
+												}\
+											}\
+										}\
+									}while(0)
 
 #define DBG_ARRAY(level, aHEAD, aTAIL, aARRAY, nLEN)		do{ \
-																													if(level <= dbgLevel) {\
-																														switch (level) {\
-																															case E_DBG_DEBUG: {\
-																																	arrayPostToDebugLog(FONT_CYAN aHEAD, aTAIL RESET_COLOR, aARRAY, nLEN);\
-																																	break;\
-																															}\
-																															default: {\
-																																	break;    \
-																															}\
-																														}\
-																													}\
-																												}while(0)
+																if(level <= hlog.dbgLevel) {\
+																	switch (level) {\
+																		case DBG_DEBUG: {\
+																				vast_log_array(FONT_CYAN aHEAD, aTAIL RESET_COLOR, aARRAY, nLEN);\
+																				break;\
+																		}\
+																		default: {\
+																				break;    \
+																		}\
+																	}\
+																}\
+															}while(0)
 
-#define     ASSERT(test_, err_exe) 				do{ \
-																						if((test_) == 0) {\
-																							printf("\033[15;31m Assertion failed in %s:%d\033[0m \r\n", __FILE__, __LINE__);\
-																							err_exe;\
-																						}\
-																					}while(0)
+#define     ASSERT(test_, err_exe) 			do{ \
+												if((test_) == 0) {\
+													printf("\033[15;31m Assertion failed in %s:%d\033[0m \r\n", __FILE__, __LINE__);\
+													err_exe;\
+												}\
+											}while(0)
+
+#define		BUFF_LEN_MAX 		128
 
 /***********************************************
                     typedef
 ***********************************************/
 enum DBG_LEVEL{
-	E_DBG_CRISIS,
-	E_DBG_ERROR,
-	E_DBG_WARNING,
-	E_DBG_INFO,
-	E_DBG_DEBUG,
-	E_DBG_QPSIG,
-	E_DBG_MAX
+	DBG_CRISIS,
+	DBG_ERROR,
+	DBG_WARNING,
+	DBG_INFO,
+	DBG_DEBUG,
+	DBG_QPSIG,
+	DBG_MAX
 };
+
+typedef enum
+{
+	LOG_FUNC_INIT,
+	LOG_FUNC_TX_POP,
+	LOG_FUNC_RX_PUSH,
+	LOG_FUNC_RX_POP,
+}LOG_SEL_FUNCx;
+
+typedef int16_t (*WriteLogFunc)( const char *format, ... );
+typedef uint32_t (*LogTickFunc)(void);
+
+typedef struct _Log_InitTypeDef
+{
+	uint16_t 	year;
+	uint8_t 	month;
+	uint8_t 	day;
+	uint8_t 	hour;
+	uint8_t 	min;
+	uint8_t 	sec;
+}Log_InitTypeDef;
+
+typedef struct _Log_HandleTypeDef
+{
+	Log_InitTypeDef	 		Init;
+	uint8_t 				dbgLevel;
+	int16_t 				(*Read)		(uint8_t *pData, uint8_t len);
+	WriteLogFunc 			WriteLog;
+	LogTickFunc	 			Tick;
+	uint8_t					(*pLogProcess)		(struct _Log_HandleTypeDef *pLog, LOG_SEL_FUNCx selFunc);
+
+}Log_HandleTypeDef;
 
 /***********************************************
                function prototypes
 ***********************************************/
+int16_t vast_log_initialize(WriteLogFunc writeLogFunc, LogTickFunc tickFunc);
+int16_t vast_log_printDate(void);
+int16_t vast_log_setLevel(uint8_t dbg_level);
+int16_t vast_log_array(const char *head_buff, const char *tail_buff, const char *pArray, uint16_t size);
 
 /***********************************************
 	      		    inline
@@ -229,7 +256,9 @@ enum DBG_LEVEL{
 /***********************************************
                    variable
 ***********************************************/
-extern int dbgLevel;
+extern const char buildDate[];
+extern const char buildTime[];
+extern Log_HandleTypeDef 	hlog;
 
 #ifdef __cplusplus
 }

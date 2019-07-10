@@ -26,8 +26,12 @@
 /***********************************************
                     include
 ***********************************************/
+#include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <stdbool.h>
+#include <stddef.h>
+#include <string.h>
 
 /***********************************************
                     define
