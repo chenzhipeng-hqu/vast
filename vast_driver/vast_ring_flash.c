@@ -45,14 +45,43 @@ static uint32_t nextAddr = 0, lastAddr = 0;
   * @param
   * @retval
   */
+int16_t vast_ring_flash_clear(void)
+{
+	int16_t ret = VAST_OK;
+
+	HAL_FLASH_Unlock();
+
+	FLASH_EraseInitTypeDef pEraseInit;
+	uint32_t PageError = 0;
+
+	pEraseInit.TypeErase = TYPEERASE_SECTORS;
+	pEraseInit.Sector = PAGE_ID;
+	pEraseInit.NbSectors = 1;
+	pEraseInit.VoltageRange = VOLTAGE_RANGE;
+
+	ret = HAL_FLASHEx_Erase(&pEraseInit, &PageError);
+
+	HAL_FLASH_Lock();
+
+	lastAddr = PAGE_BASE_ADDRESS;
+	nextAddr = PAGE_BASE_ADDRESS;
+
+    return ret;
+}
+
+/**
+  * @brief  vast_ring_flash_initialize.
+  * @param
+  * @retval
+  */
 int16_t vast_ring_flash_initialize(void)
 {
 	int16_t ret = VAST_OK;
 	uint32_t nowAddr = 0;
 
 	HAL_FLASH_Unlock();
-
 	nowAddr = (*(volatile uint32_t *)PAGE_BASE_ADDRESS);
+	HAL_FLASH_Lock();
 
 	if(nowAddr == 0xffffffff)
 	{
@@ -61,41 +90,37 @@ int16_t vast_ring_flash_initialize(void)
 	}
 	else
 	{
-		while (nowAddr != 0xffffffff)
+		HAL_FLASH_Unlock();
+
+		while ((nowAddr != 0xffffffff))
 		{
 			lastAddr = nextAddr;
 			nextAddr = nowAddr;
 
-			if(nowAddr > PAGE_END_ADDRESS)
+			if((nowAddr > PAGE_END_ADDRESS) || (nowAddr < PAGE_BASE_ADDRESS))
 			{
-				FLASH_EraseInitTypeDef pEraseInit;
-				uint32_t PageError = 0;
-
-				pEraseInit.TypeErase = TYPEERASE_SECTORS;
-				pEraseInit.Sector = PAGE_ID;
-				pEraseInit.NbSectors = 1;
-				pEraseInit.VoltageRange = VOLTAGE_RANGE;
-
-				ret = HAL_FLASHEx_Erase(&pEraseInit, &PageError);
+				ret = vast_ring_flash_clear();
 				/* If erase operation was failed, a Flash error code is returned */
 				if (ret != HAL_OK)
 				{
 					return ret;
 				}
 
-				lastAddr = nextAddr;
-				nextAddr = PAGE_BASE_ADDRESS;
-				ret = VAST_ERROR;
 				break;
 			}
 
 			nowAddr = (*(volatile uint32_t *)nextAddr);
 		}
+		HAL_FLASH_Lock();
 
-		printf("nextAddr=%#lx\r\n", nextAddr);
 	}
 
-	HAL_FLASH_Lock();
+	if((nextAddr&0x03) != 0)
+	{
+		nextAddr = (nextAddr&0xfffffffc) + 4;
+	}
+
+	printf("nextAddr=%#lx\r\n", nextAddr);
 
     return ret;
 }
@@ -108,58 +133,103 @@ int16_t vast_ring_flash_initialize(void)
 int16_t vast_ring_flash_store(uint8_t *dat, uint16_t len)
 {
 	int16_t ret = VAST_OK;
-	uint32_t nowAddr = nextAddr;
+	uint32_t nowAddr = 0, u32Data = 0;
+	uint32_t *pData = 0;
+	uint8_t i = 0;
 
 	lastAddr = nextAddr;
 
-	HAL_FLASH_Unlock();
+	//DBG_LOG(DBG_DEBUG, "1. nowAddr=%#lx, nextAddr=%#lx \r\n", nowAddr, nextAddr);
 
-	if (nowAddr + len >= PAGE_END_ADDRESS)
+	ASSERT(len < PAGE_SIZE,
+			return VAST_ERROR);
+
+	if (nextAddr + len >= PAGE_END_ADDRESS)
 	{
-		FLASH_EraseInitTypeDef pEraseInit;
-		uint32_t PageError = 0;
+		printf("%#lX + %d >= %#lX! \r\n", nextAddr, len, PAGE_END_ADDRESS);
 
-		pEraseInit.TypeErase = TYPEERASE_SECTORS;
-		pEraseInit.Sector = PAGE_ID;
-		pEraseInit.NbSectors = 1;
-		pEraseInit.VoltageRange = VOLTAGE_RANGE;
+		nextAddr = PAGE_BASE_ADDRESS;
 
-		ret = HAL_FLASHEx_Erase(&pEraseInit, &PageError);
+		ret = vast_ring_flash_clear();
 		/* If erase operation was failed, a Flash error code is returned */
 		if (ret != HAL_OK)
 		{
 			return ret;
 		}
-
-		nextAddr = PAGE_BASE_ADDRESS;
 	}
 
-	ret = HAL_FLASH_Program(TYPEPROGRAM_WORD, nowAddr, (uint32_t)(nowAddr+len+4));
+	nowAddr = nextAddr;
+
+	HAL_FLASH_Unlock();
+
+	nextAddr = nowAddr + len + 0x4;
+
+	if((nextAddr&0x03) != 0)
+	{
+		nextAddr = (nextAddr&0xfffffffc) + 0x4;
+	}
+
+	//DBG_LOG(DBG_DEBUG, "2. nowAddr=%#lx, nextAddr=%#lx \r\n", nowAddr, nextAddr);
+
+	ret = HAL_FLASH_Program(TYPEPROGRAM_WORD, nowAddr, (uint32_t)(nextAddr));
 	if (ret != HAL_OK)
 	{
+		printf("nowAddr=%#lx, nextAddr=%#lx \r\n", nowAddr, nextAddr);
 		return ret;
 	}
 
 	nowAddr = nowAddr + 4;
 
-	for(uint8_t i=0; i<len; i++)
+	//DBG_LOG(DBG_DEBUG, "3. nowAddr=%#lx, nextAddr=%#lx \r\n", nowAddr, nextAddr);
+#if 1
+	for(i=0; i<(len/4); i++,nowAddr+=4)
 	{
-		HAL_FLASH_Program(FLASH_TYPEPROGRAM_BYTE, nowAddr, dat[i]);
-		nowAddr++;
+		pData = (uint32_t *)&dat[i*4];
+		u32Data = (uint32_t)(*pData);
+		//printf("u32Data=%#lx, pData=%#x\r\n", u32Data, pData);
+		HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, nowAddr, (uint32_t)(u32Data));
 	}
 
+	//DBG_LOG(DBG_DEBUG, "4. nowAddr=%#lx, nextAddr=%#lx \r\n", nowAddr, nextAddr);
 
+	for(i=i*4; i<len; i++,nowAddr++)
+	{
+		HAL_FLASH_Program(FLASH_TYPEPROGRAM_BYTE, nowAddr, dat[i]);
+	}
+#else
+	for(i=0; i<len; i++,nowAddr++)
+	{
+		HAL_FLASH_Program(FLASH_TYPEPROGRAM_BYTE, nowAddr, dat[i]);
+	}
+#endif
+
+	//printf("2. nowAddr=%#lx, nextAddr=%#lx \r\n", nowAddr, nextAddr);
+
+/*	if((nowAddr&0x03) != 0)
+	{
+		nowAddr = (nowAddr&0xfffffffc) + 0x4;
+	}
+
+	//printf("3. nowAddr=%#lx, nextAddr=%#lx \r\n", nowAddr, nextAddr);
+
+	ret = HAL_FLASH_Program(TYPEPROGRAM_WORD, nextAddr, (uint32_t)(nowAddr));
+	if (ret != HAL_OK)
+	{
+		printf("nowAddr=%#lx, nextAddr=%#lx \r\n", nowAddr, nextAddr);
+		return ret;
+	}
 	//printf("nowAddr=%lx, nextAddr+len=%lx \r\n", nowAddr, (nextAddr+len+4));
 
 	nextAddr = nowAddr;
 
+*/
 	HAL_FLASH_Lock();
 
     return ret;
 }
 
 /**
-  * @brief  vast_ring_flash_store.
+  * @brief  vast_ring_flash_read.
   * @param
   * @retval
   */

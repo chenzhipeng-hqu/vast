@@ -867,7 +867,7 @@ int32_t str2s32(const char *str)
 float str2float(const char *str)
 {
   const char *pCh = str;
-#if 1
+#if 0
   int32_t data = 0;
   int32_t fractional = 0;
   uint32_t flag = 0;
