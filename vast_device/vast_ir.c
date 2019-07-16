@@ -90,7 +90,7 @@ const IR_FuncList_t IR_FuncList[] = { 	//don't change sequence, add after last
 int InfraRed_RX_Init(void)
 {
 	uint8_t IR_Typex;
-	IR_Obj.IRType = IRType_RC6;
+	IR_Obj.IRType = IRType_NEC;
 	
 	for (IR_Typex=0; IR_Typex<sizeof(IR_FuncList)/sizeof(IR_FuncList[0]); IR_Typex++)
 	{
@@ -198,7 +198,36 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 		}
 	}
 }
+#if 0
+int main(int argc, char *argv[])
+{
 
+	MX_TIM2_Init(); // PB10 TIM2_CH3
+	HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_3);
+	InfraRed_RX_Init();
+
+	while(1)
+	{
+		if(IR_Obj.state & CAPTURE_STAT_CAPTURE_DONE)
+		{
+			for(i=0; i<IR_Obj.len; i++)
+			{
+					printf("IR_Obj[%d]: %d, %d, len=%d\r\n", i,
+							IR_Obj.rx_buf[i].timer, IR_Obj.rx_buf[i].pin_state, IR_Obj.len);
+
+			}
+
+			InfraRed_RX_Calculate();
+
+			printf("IR_Obj: 0x%04X, 0x%02X, 0x%02X\r\n",
+					IR_Obj.value.address, IR_Obj.value.command, IR_Obj.value.command_check);
+
+			IR_Obj.len = 0;
+		}
+	}
+	return 0;
+}
+#endif
 /**
   * @}
   */

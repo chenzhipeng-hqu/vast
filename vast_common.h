@@ -48,6 +48,8 @@
 
 #define READ_BIT(REG, BIT)   			((REG) & (BIT))
 
+#define CHECK_BIT(x ,y) 				(!(!(x & 1<< y)))  //check whether the y bit of x is 1;
+
 #define CLEAR_REG(REG)        			((REG) = (0x0))
 
 #define WRITE_REG(REG, VAL)   			((REG) = (VAL))
@@ -57,6 +59,15 @@
 #define MODIFY_REG(REG, CLEARMASK, SETMASK)  WRITE_REG((REG), (((READ_REG(REG)) & (~(CLEARMASK))) | (SETMASK)))
 
 #define POSITION_VAL(VAL)     			(__CLZ(__RBIT(VAL)))
+
+
+#define __VAST_ABS(x)   				((x)>0?(x):(0-x))
+
+#define __VAST_GET_SIGN(x) 				((x)>=0?(1):0)  //get sign
+
+#define __VAST_SWAP(x, y)				do{x = x + y; y = x - y; x = x - y;}while(0)
+
+#define	__VAST_IS2N(x)					((x & (x - 1))? 0 : 1)    //Is it some power of 2
 
 #define __VAST_LOCK(__HANDLE__)      	do{                                        \
 										  if((__HANDLE__)->lock == VAST_LOCKED)   \
@@ -72,6 +83,8 @@
 #define __VAST_UNLOCK(__HANDLE__)     	do{                                       \
 											(__HANDLE__)->lock = (int)VAST_UNLOCKED;    \
 										}while (0U)
+
+#define	__VAST_LIMIT(x, x_min, x_max)	((x>x_max)?(x = x_max):((x<x_min)?(x = x_min):x))
 
 /***********************************************
                     typedef

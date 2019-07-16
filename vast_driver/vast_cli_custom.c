@@ -19,10 +19,11 @@
 *************************************/
 #include <string.h>
 #include <stdint.h>
-#include <vast_cli.h>
-#include <vast_mem.h>
+#include "vast_cli.h"
+#include "vast_mem.h"
 #include "gpio.h"
 #include "vast_simulatite_eeprom.h"
+#include "vast_ir.h"
 
 /*************************************
               define
@@ -45,6 +46,7 @@ static void CLICmd_MemCtrl(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
 extern const CLICmdTypedef CLICmd_GpioCtrl[];
 extern const CLICmdTypedef cliCmdTableE2prom[];
 extern const CLICmdTypedef cliCmdTableReg[];
+extern const CLICmdTypedef CLICmd_IRCtrl[];
 
 const CLICmdTypedef CLI_CmdTableMain[] =
 {
@@ -55,6 +57,7 @@ const CLICmdTypedef CLI_CmdTableMain[] =
   {"debug"	, "debug (all/board/eth/atsx/232/485) 0~5", CLICmd_DebugCtrl, 0},
   {"mem"	, "mem {print/malloc/free} [size]", CLICmd_MemCtrl, 0},
   {"eep"	, "e2prom dir", 0, cliCmdTableE2prom},
+  {"ir"		, "ir dir", 0, CLICmd_IRCtrl},
 
   // last command must be all 0s.
   {0, 0, 0, 0}
@@ -480,6 +483,50 @@ const CLICmdTypedef cliCmdTableE2prom[] =
   {"?", "display virtAddr", cliCmdE2promDispVirt, 0},
   {"r", "read virtId", cliCmdE2promReadByte, 0},
   {"w", "write virtId data", cliCmdE2promWriteByte, 0},
+  {0, 0, 0, 0}
+};
+
+//------------------------------------------------------------------------------
+//-   custom command functions. ir
+//------------------------------------------------------------------------------
+void cliCmdIrSetup(CLI_HandleTypeDef *pCli,int argc, char *argv[])
+{
+  uint8_t protocal;
+
+  if(argc > 0)
+  {
+    protocal = str2u32(argv[1]);
+    InfraRed_RX_ChangeProtocol(protocal);
+    pCli->Init.Write("set ir %d\n", protocal);
+  }
+}
+
+void cliCmdIrSend(CLI_HandleTypeDef *pCli,int argc, char *argv[])
+{
+  uint16_t head;
+  uint16_t code;
+  uint16_t check;
+
+  if(argc > 3)
+  {
+    head = hex2u32(argv[1]);
+    code = hex2u32(argv[2]);
+    check = hex2u32(argv[3]);
+   // io_irSend(head, code, check);
+    pCli->Init.Write("send ir 0x%04X, 0x%X, 0x%X\n", head, code, check);
+  }
+}
+
+/**
+  * @brief  CLICmd_IRCtrl
+  * @param
+  * @retval
+  */
+const CLICmdTypedef CLICmd_IRCtrl[] =
+{
+  {"s", "s protocal(1:NEC/2:RC5/3:RC6/4:RCA/7:SONY/11:MI/14:SAMSUNG/15:PANASONIC) Exp:s 1", cliCmdIrSetup, 0},
+//  {"t", "t head code check", cliCmdIrSend, 0},
+	// last command must be all 0s.
   {0, 0, 0, 0}
 };
 

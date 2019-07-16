@@ -1,8 +1,9 @@
 
 
-#ifndef		__INFRA_RED_H__   
-#define		__INFRA_RED_H__ 
+#ifndef		__VAST_IR_H__
+#define		__VAST_IR_H__
 
+#include "vast_common.h"
 #include "stm32f4xx_hal.h"
 
 
@@ -12,11 +13,11 @@ typedef enum _IRType_e  //don't change sequence, add after last, before IRType_M
 	IRType_NEC,
 	IRType_RC5,// PHILIPS
 	IRType_RC6,
-  IRType_RCA,// THOMSON
-  IRType_JVC,
-  IRType_TRC,
-  IRType_SONY,
-  IRType_SHARP,
+	IRType_RCA,// THOMSON
+	IRType_JVC,
+	IRType_TRC,
+	IRType_SONY,
+	IRType_SHARP,
 	IRType_MIT,
 	IRType_KONK,
 	IRType_MI,
@@ -48,14 +49,14 @@ typedef struct _IR_BufTypeDef
 }IR_BufTypeDef;
 
 
-#define	CAPTURE_STAT_IDLE 							(0)
-#define	CAPTURE_STAT_CAPTURE_HEAD_FLAG	(1<<6)
+#define	CAPTURE_STAT_IDLE 						(0)
+#define	CAPTURE_STAT_CAPTURE_HEAD_FLAG			(1<<6)
 #define CAPTURE_STAT_CAPTURE_DONE				(1<<7)
-#define CAPTURE_STAT_CAPTURE_TIMES			(0x0f)
+#define CAPTURE_STAT_CAPTURE_TIMES				(0x0f)
 
 typedef struct _IR_TypeDef
 {
-	__IO uint8_t state;   // bit7: 捕获完成标志，bit6：是否捕获到高电平，bit5：捕获到高电平之后的下降沿标志，bit4~0：捕获高电平定时器溢出的次数
+	__IO uint8_t state;   // bit7: capture complete锛宐it6锛歩s_capture_high, bit5:falling flag after high level, bit4~0: hight_level timer overflow times
 	__IO IR_BufTypeDef rx_buf[100];
 	__IO uint8_t len;
 	IR_DataTypeDef value;
