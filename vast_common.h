@@ -84,11 +84,20 @@
 											(__HANDLE__)->lock = (int)VAST_UNLOCKED;    \
 										}while (0U)
 
-#define	__VAST_LIMIT(x, x_min, x_max)	((x>x_max)?(x = x_max):((x<x_min)?(x = x_min):x))
+#define	__VAST_LIMIT(x, x_min, x_max)	((x > x_max) ? (x = x_max) : ((x < x_min) ? (x = x_min) : x))
+
+#if (defined(__GNUC__) || defined(__SUNPRO_CC) || defined (__SUNPRO_C)) && defined(CJSON_API_VISIBILITY)
+#define VAST_PUBLIC(type)   __attribute__((visibility("default"))) type
+#else
+#define VAST_PUBLIC(type) type
+#endif
 
 /***********************************************
                     typedef
 ***********************************************/
+
+ typedef short int VAST_BOOL;
+
  /**
    * @brief  VAST Lock structures definition
    */
@@ -122,7 +131,7 @@
 ***********************************************/
 
 #ifdef __cplusplus
-}
+ }
 #endif
 
 #endif /*__VAST_COMMON_H__*/
