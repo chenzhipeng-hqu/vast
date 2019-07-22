@@ -24,6 +24,8 @@
 #include "gpio.h"
 #include "vast_simulatite_eeprom.h"
 #include "vast_ir.h"
+#include "vast_ring_flash.h"
+#include <string.h>
 
 /*************************************
               define
@@ -47,6 +49,7 @@ extern const CLICmdTypedef CLICmd_GpioCtrl[];
 extern const CLICmdTypedef cliCmdTableE2prom[];
 extern const CLICmdTypedef cliCmdTableReg[];
 extern const CLICmdTypedef CLICmd_IRCtrl[];
+extern const CLICmdTypedef CLICmd_StoreCtrl[];
 
 const CLICmdTypedef CLI_CmdTableMain[] =
 {
@@ -58,6 +61,7 @@ const CLICmdTypedef CLI_CmdTableMain[] =
   {"mem"	, "mem {print/malloc/free} [size]", CLICmd_MemCtrl, 0},
   {"eep"	, "e2prom dir", 0, cliCmdTableE2prom},
   {"ir"		, "ir dir", 0, CLICmd_IRCtrl},
+  {"store"	, "store dir", 0, CLICmd_StoreCtrl},
 
   // last command must be all 0s.
   {0, 0, 0, 0}
@@ -528,6 +532,120 @@ const CLICmdTypedef CLICmd_IRCtrl[] =
 //  {"t", "t head code check", cliCmdIrSend, 0},
 	// last command must be all 0s.
   {0, 0, 0, 0}
+};
+
+
+//------------------------------------------------------------------------------
+//-   custom command functions. store
+//------------------------------------------------------------------------------
+/**
+  * @brief  cliCmdStoreWrite
+  * @param
+  * @retval
+  */
+void cliCmdStoreWrite(CLI_HandleTypeDef *pCli, int argc, char *argv[])
+{
+	uint8_t ret = VAST_OK;
+	uint32_t len = 0;
+	uint8_t *p = NULL;
+
+	printf("t1:%ld\r\n", HAL_GetTick());
+	if(argc > 2)
+	{
+		len = str2u32(argv[2]);
+		p = (uint8_t *)vast_malloc(len);
+
+		if(p != NULL)
+		{
+			memset((void *)p, str2u32(argv[1]), len);
+
+			ret = vast_ring_flash_store((uint8_t *)p, len);
+
+			if(ret != VAST_OK)
+			{
+				pCli->Init.Write("vast_ring_flash_store ret=%d\r\n", ret);
+			}
+
+			vast_free(p);
+		}
+		else
+		{
+			printf("p == NULL\r\n");
+		}
+
+	}
+	else if(argc > 1)
+	{
+		ret = vast_ring_flash_store((uint8_t *)argv[1], strlen(argv[1]));
+
+		if(ret != VAST_OK)
+		{
+			pCli->Init.Write("vast_ring_flash_store ret=%d\r\n", ret);
+		}
+	}
+	printf("t2:%ld\r\n", HAL_GetTick());
+}
+
+/**
+  * @brief  cliCmdStoreRead
+  * @param
+  * @retval
+  */
+
+void cliCmdStoreRead(CLI_HandleTypeDef *pCli, int argc, char *argv[])
+{
+	uint8_t ret = VAST_OK;
+	uint16_t read_len = 0;
+	static uint8_t buff_array2[10240] = {0};
+
+	read_len = vast_ring_flash_read(buff_array2, sizeof(buff_array2));
+	buff_array2[read_len] = 0;
+	DBG_LOG(DBG_INFO, "read from flash [%d][%s]", read_len, (char *)buff_array2);
+	DBG_ARRAY(DBG_DEBUG, "->(", "\b)\r\n", (char *)buff_array2, read_len);
+
+	if(ret != VAST_OK)
+	{
+		pCli->Init.Write("vast_ring_flash_store ret=%d\r\n", ret);
+	}
+}
+
+/**
+  * @brief  cliCmdStoreRead
+  * @param
+  * @retval
+  */
+
+void cliCmdStoreInfo(CLI_HandleTypeDef *pCli, int argc, char *argv[])
+{
+	uint32_t lastAddr = vast_ring_flash_get_last_addr();
+	uint32_t nextAddr = vast_ring_flash_get_next_addr();
+	pCli->Init.Write("lastAddr=%#lx, nextAddr=%#lx, len=%d\r\n", lastAddr, nextAddr, nextAddr-lastAddr);
+}
+
+/**
+  * @brief  cliCmdStoreRead
+  * @param
+  * @retval
+  */
+
+void cliCmdStorePrint(CLI_HandleTypeDef *pCli, int argc, char *argv[])
+{
+	vast_ring_flash_print();
+}
+
+/**
+  * @brief  CLICmd_StoreCtrl
+  * @param
+  * @retval
+  */
+const CLICmdTypedef CLICmd_StoreCtrl[] =
+{
+	{"i", "i:info", cliCmdStoreInfo, 0},
+	{"p", "p:print", cliCmdStorePrint, 0},
+	{"w", "w data [size]", cliCmdStoreWrite, 0},
+	{"r", "r", cliCmdStoreRead, 0},
+	// last command must be all 0s.
+	{0, 0, 0, 0}
 };
 
 /************************ (C) COPYRIGHT chenzhipeng *****END OF FILE****/
