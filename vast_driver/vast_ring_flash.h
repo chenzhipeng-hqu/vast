@@ -57,8 +57,11 @@
                function prototypes
 ***********************************************/
  int16_t vast_ring_flash_initialize(void);
- int16_t vast_ring_flash_store(uint8_t *dat, uint16_t len);
- int16_t vast_ring_flash_read(uint8_t *dat, uint8_t size);
+ uint32_t vast_ring_flash_store(uint8_t *dat, uint32_t len);
+ uint32_t vast_ring_flash_read(uint8_t *dat, uint32_t size);
+ uint32_t vast_ring_flash_get_next_addr(void);
+ uint32_t vast_ring_flash_get_last_addr(void);
+ int16_t vast_ring_flash_print(void);
 
 /***********************************************
 	      		    inline
