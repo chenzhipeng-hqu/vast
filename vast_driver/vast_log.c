@@ -110,7 +110,7 @@ static char write_buff[128] = {0};
   */
 int16_t vast_log_array(const char *head_buff, const char *tail_buff, const char *pArray, uint16_t size)
 {
-	uint8_t i = 0, len_tmp = 0, len = 0;
+	uint16_t i = 0, len_tmp = 0, len = 0;
 
 	len = snprintf(&write_buff[0], BUFF_LEN_MAX, "%s", head_buff);
 
@@ -118,6 +118,13 @@ int16_t vast_log_array(const char *head_buff, const char *tail_buff, const char 
 	{
 		len_tmp = len;
 		len += snprintf(&write_buff[len], BUFF_LEN_MAX-len_tmp, "%02x ", pArray[i]);
+
+		if(len >= BUFF_LEN_MAX-1)
+		{
+			hlog.WriteLog("%s", write_buff);
+			len = len_tmp = 0;
+			//break;
+		}
 	}
 
 	len += snprintf(&write_buff[len], BUFF_LEN_MAX, "%s", tail_buff);
