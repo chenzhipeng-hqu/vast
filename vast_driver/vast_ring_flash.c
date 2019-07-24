@@ -35,7 +35,7 @@
 /***********************************************
                    variable
 ***********************************************/
-static uint32_t nextAddr = PAGE_BASE_ADDRESS, lastAddr = PAGE_BASE_ADDRESS;
+static uint32_t nextAddr = PAGE_BASE_ADDRESS+4, lastAddr = PAGE_BASE_ADDRESS+4;
 
 /***********************************************
                    function
@@ -48,6 +48,9 @@ static uint32_t nextAddr = PAGE_BASE_ADDRESS, lastAddr = PAGE_BASE_ADDRESS;
 int16_t vast_ring_flash_clear(void)
 {
 	int16_t ret = VAST_OK;
+	uint32_t erase_times = 0;
+
+	erase_times = (*(volatile uint32_t *)PAGE_BASE_ADDRESS) + 1;
 
 	HAL_FLASH_Unlock();
 
@@ -61,10 +64,12 @@ int16_t vast_ring_flash_clear(void)
 
 	ret = HAL_FLASHEx_Erase(&pEraseInit, &PageError);
 
+	ret = HAL_FLASH_Program(TYPEPROGRAM_WORD, PAGE_BASE_ADDRESS, (uint32_t)(erase_times));
+
 	HAL_FLASH_Lock();
 
-	lastAddr = PAGE_BASE_ADDRESS;
-	nextAddr = PAGE_BASE_ADDRESS;
+	lastAddr = PAGE_BASE_ADDRESS+4;
+	nextAddr = PAGE_BASE_ADDRESS+4;
 
     return ret;
 }
@@ -80,17 +85,21 @@ int16_t vast_ring_flash_initialize(void)
 	uint32_t nowAddr = 0;
 
 	//HAL_FLASH_Unlock();
-	nowAddr = (*(volatile uint32_t *)PAGE_BASE_ADDRESS);
+	nowAddr = (*(volatile uint32_t *)(PAGE_BASE_ADDRESS));
 	//HAL_FLASH_Lock();
 
 	if(nowAddr == 0xffffffff)
 	{
 		//lastAddr = PAGE_BASE_ADDRESS;
 		//nextAddr = PAGE_BASE_ADDRESS;
+		HAL_FLASH_Unlock();
+		ret = HAL_FLASH_Program(TYPEPROGRAM_WORD, PAGE_BASE_ADDRESS, (uint32_t)(1));
+		HAL_FLASH_Lock();
 	}
 	else
 	{
 		//HAL_FLASH_Unlock();
+		nowAddr = (*(volatile uint32_t *)(PAGE_BASE_ADDRESS+4));
 
 		while ((nowAddr != 0xffffffff))
 		{
@@ -251,8 +260,10 @@ int16_t vast_ring_flash_print(void)
 	uint32_t len = 0;
 	uint32_t i = 0;
 
-	u32_nowAddr = u32_lastAddr = PAGE_BASE_ADDRESS;
+	u32_nowAddr = u32_lastAddr = PAGE_BASE_ADDRESS + 4;
 	u32_nowAddr = (*(volatile uint32_t *)u32_lastAddr);
+
+	DBG_INFO(DBG_DEBUG, "erase times: %d\r\n", (*(volatile uint8_t *)(PAGE_BASE_ADDRESS)));
 
 	while ((u32_nowAddr != 0xffffffff))
 	{
