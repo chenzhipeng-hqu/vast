@@ -633,20 +633,23 @@ void cliCmdStoreInfo(CLI_HandleTypeDef *pCli, int argc, char *argv[])
 
 	int16_t ret = VAST_OK;
 	uint8_t *p = NULL;
+	uint32_t len = 5000;
 
-	p = (uint8_t *)vast_malloc(5000);
+	p = (uint8_t *)vast_malloc(len);
 
 	if(p != NULL)
 	{
-		memset((void *)p, 0x30, 5000);
-		ret = vast_store_write(0, (uint8_t *)p, 5000);
+		for (uint8_t i=0; i<1; i++)
+		{
+			memset((void *)p, 0x30, len);
+			ret = vast_store_write(0, (uint8_t *)p, len);
 
-		memset((void *)p, 0x31, 5000);
-		ret = vast_store_write(1, (uint8_t *)p, 5000);
+			memset((void *)p, 0x31, len);
+			ret = vast_store_write(1, (uint8_t *)p, len);
 
-		memset((void *)p, 0x32, 5000);
-		ret = vast_store_write(2, (uint8_t *)p, 5000);
-
+			memset((void *)p, 0x32, len);
+			ret = vast_store_write(2, (uint8_t *)p, len);
+		}
 		vast_free(p);
 	}
 	else
