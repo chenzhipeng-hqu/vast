@@ -45,7 +45,7 @@ static uint32_t nextAddr = PAGE_BASE_ADDRESS+4, lastAddr = PAGE_BASE_ADDRESS+4;
   * @param
   * @retval
   */
-int16_t vast_ring_flash_clear(void)
+static int16_t vast_ring_flash_clear(void)
 {
 	int16_t ret = VAST_OK;
 	uint32_t erase_times = 0;

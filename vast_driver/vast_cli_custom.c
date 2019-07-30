@@ -25,6 +25,7 @@
 #include "vast_simulatite_eeprom.h"
 #include "vast_ir.h"
 #include "vast_ring_flash.h"
+#include "vast_store.h"
 #include <string.h>
 
 /*************************************
@@ -545,21 +546,25 @@ const CLICmdTypedef CLICmd_IRCtrl[] =
   */
 void cliCmdStoreWrite(CLI_HandleTypeDef *pCli, int argc, char *argv[])
 {
-	uint8_t ret = VAST_OK;
+	uint8_t ret = VAST_OK, type = 0;
 	uint32_t len = 0;
 	uint8_t *p = NULL;
 
 	printf("t1:%ld\r\n", HAL_GetTick());
-	if(argc > 2)
+
+	type = str2u32(argv[1]);
+
+	if(argc > 3)
 	{
-		len = str2u32(argv[2]);
+		len = str2u32(argv[3]);
 		p = (uint8_t *)vast_malloc(len);
 
 		if(p != NULL)
 		{
-			memset((void *)p, str2u32(argv[1]), len);
+			memset((void *)p, str2u32(argv[2]), len);
 
-			ret = vast_ring_flash_store((uint8_t *)p, len);
+			//ret = vast_ring_flash_store((uint8_t *)p, len);
+			ret = vast_store_write(type, (uint8_t *)p, len);
 
 			if(ret != VAST_OK)
 			{
@@ -574,9 +579,10 @@ void cliCmdStoreWrite(CLI_HandleTypeDef *pCli, int argc, char *argv[])
 		}
 
 	}
-	else if(argc > 1)
+	else if(argc > 2)
 	{
-		ret = vast_ring_flash_store((uint8_t *)argv[1], strlen(argv[1]));
+		//ret = vast_ring_flash_store((uint8_t *)argv[2], strlen(argv[2]));
+		ret = vast_store_write(type, (uint8_t *)argv[2], strlen(argv[2]));
 
 		if(ret != VAST_OK)
 		{
@@ -594,13 +600,15 @@ void cliCmdStoreWrite(CLI_HandleTypeDef *pCli, int argc, char *argv[])
 
 void cliCmdStoreRead(CLI_HandleTypeDef *pCli, int argc, char *argv[])
 {
-	uint8_t ret = VAST_OK;
-	uint16_t read_len = 0;
+	uint8_t ret = VAST_OK, type = 0;
 	static uint8_t buff_array2[10240] = {0};
+	uint16_t read_len;
 
-	read_len = vast_ring_flash_read(buff_array2, sizeof(buff_array2));
+	type = str2u32(argv[1]);
+	//read_len = vast_ring_flash_read(buff_array2, sizeof(buff_array2));
+	read_len = vast_store_read(type, buff_array2, sizeof(buff_array2));
 	buff_array2[read_len] = 0;
-	DBG_LOG(DBG_INFO, "read from flash [%d][%s]", read_len, (char *)buff_array2);
+	DBG_LOG(DBG_INFO, "read from flash [%d][%d][%s]", type, read_len, (char *)buff_array2);
 	DBG_ARRAY(DBG_DEBUG, "->(", "\b)\r\n", (char *)buff_array2, read_len);
 
 	if(ret != VAST_OK)
@@ -610,27 +618,68 @@ void cliCmdStoreRead(CLI_HandleTypeDef *pCli, int argc, char *argv[])
 }
 
 /**
-  * @brief  cliCmdStoreRead
+  * @brief  cliCmdStoreInfo
   * @param
   * @retval
   */
 
 void cliCmdStoreInfo(CLI_HandleTypeDef *pCli, int argc, char *argv[])
 {
-	uint32_t lastAddr = vast_ring_flash_get_last_addr();
-	uint32_t nextAddr = vast_ring_flash_get_next_addr();
+	/*uint32_t lastAddr = vast_ring_flash_get_last_addr();
+	uint32_t nextAddr = vast_ring_flash_get_next_addr();*/
+	uint32_t lastAddr = vast_store_get_last_addr();
+	uint32_t nextAddr = vast_store_get_next_addr();
 	pCli->Init.Write("lastAddr=%#lx, nextAddr=%#lx, len=%d\r\n", lastAddr, nextAddr, nextAddr-lastAddr);
+
+	int16_t ret = VAST_OK;
+	uint8_t *p = NULL;
+
+	p = (uint8_t *)vast_malloc(5000);
+
+	if(p != NULL)
+	{
+		memset((void *)p, 0x30, 5000);
+		ret = vast_store_write(0, (uint8_t *)p, 5000);
+
+		memset((void *)p, 0x31, 5000);
+		ret = vast_store_write(1, (uint8_t *)p, 5000);
+
+		memset((void *)p, 0x32, 5000);
+		ret = vast_store_write(2, (uint8_t *)p, 5000);
+
+		vast_free(p);
+	}
+	else
+	{
+		printf("p == NULL\r\n");
+	}
 }
 
 /**
-  * @brief  cliCmdStoreRead
+  * @brief  cliCmdStorePrint
   * @param
   * @retval
   */
 
 void cliCmdStorePrint(CLI_HandleTypeDef *pCli, int argc, char *argv[])
 {
-	vast_ring_flash_print();
+	uint8_t type = 0, isDetail = 0, isPrintHex = 0;
+
+	type = str2u32(argv[1]);
+	isDetail = str2u32(argv[2]);
+	isPrintHex = str2u32(argv[3]);
+	vast_store_print(type, isDetail, isPrintHex);
+}
+
+/**
+  * @brief  cliCmdStorePrint
+  * @param
+  * @retval
+  */
+
+void cliCmdStoreReset(CLI_HandleTypeDef *pCli, int argc, char *argv[])
+{
+	vast_store_reset();
 }
 
 /**
@@ -641,8 +690,9 @@ void cliCmdStorePrint(CLI_HandleTypeDef *pCli, int argc, char *argv[])
 const CLICmdTypedef CLICmd_StoreCtrl[] =
 {
 	{"i", "i:info", cliCmdStoreInfo, 0},
-	{"p", "p:print", cliCmdStorePrint, 0},
-	{"w", "w data [size]", cliCmdStoreWrite, 0},
+	{"p", "p:print type isDetail isPrintHex", cliCmdStorePrint, 0},
+	{"reset", "reset", cliCmdStoreReset, 0},
+	{"w", "w type data [size]", cliCmdStoreWrite, 0},
 	{"r", "r", cliCmdStoreRead, 0},
 	// last command must be all 0s.
 	{0, 0, 0, 0}

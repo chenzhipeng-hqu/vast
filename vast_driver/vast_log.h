@@ -173,6 +173,34 @@
 										}\
 									}while(0)
 
+#define DBG_PRINT(level, fmt, ...)  do{ \
+										switch (level) {\
+											case DBG_CRISIS: {\
+												hlog.WriteLog(FONT_MAGENTA "[%s][%s]: " fmt RESET_COLOR, #level, __FUNCTION__, ##__VA_ARGS__);\
+													break;\
+											}\
+											case DBG_ERROR: {\
+												hlog.WriteLog(FONT_RED "[%08d][%s][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, __FUNCTION__, ##__VA_ARGS__);\
+													break;\
+											}\
+											case DBG_WARNING: {\
+												hlog.WriteLog(FONT_YELLOW "[%08d][%s][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, __FUNCTION__, ##__VA_ARGS__);\
+													break;\
+											}\
+											case DBG_INFO: {\
+												hlog.WriteLog(FONT_GREEN "[%08d][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, ##__VA_ARGS__);\
+													break;\
+											}\
+											case DBG_DEBUG: {\
+												hlog.WriteLog(FONT_CYAN "[%08d][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, ##__VA_ARGS__);\
+													break;\
+											}\
+											default: {\
+													break;    \
+											}\
+										}\
+									}while(0)
+
 #define DBG_ARRAY(level, aHEAD, aTAIL, aARRAY, nLEN)		do{ \
 																if(level <= hlog.dbgLevel) {\
 																	switch (level) {\
