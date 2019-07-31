@@ -292,42 +292,31 @@ static int16_t vast_store_findAddress (uint32_t blockAddr, uint32_t *pNextAddr, 
 
 	nextAddrOffset = __STORE_GET_NEXT_ADDR(vast_store_readWord(blockAddr+4));
 
-/*	if(nextAddrOffset == EMPTY_ADDR)
+	while ((nextAddrOffset != EMPTY_ADDR))
 	{
-		ret = vast_store_setBlockStatus (BLOCK0_START_ADDRESS, VALID_BLOCK);
-		ret = vast_store_setBlockStatus (BLOCK1_START_ADDRESS, BACKUP_BLOCK);
-	}
-	else*/
-	{
-		//nextAddrOffset = __STORE_GET_NEXT_ADDR(vast_store_readWord(blockAddr+4));
-
-		while ((nextAddrOffset != EMPTY_ADDR))
+		if((nextAddrOffset < (BLOCK_SIZE)) && (nextAddrOffset > (lastAddrOffset)))
 		{
-			if((nextAddrOffset < (BLOCK_SIZE)) && (nextAddrOffset > (lastAddrOffset)))
-			{
-				id = __STORE_GET_IDL(vast_store_readWord(*pNextAddr)) | (__STORE_GET_IDH(vast_store_readWord((*pNextAddr)+4)) << 8);
-				storeType = __STORE_GET_TYPE(vast_store_readWord(*pNextAddr));
+			id = __STORE_GET_IDL(vast_store_readWord(*pNextAddr)) | (__STORE_GET_IDH(vast_store_readWord((*pNextAddr)+4)) << 8);
+			storeType = __STORE_GET_TYPE(vast_store_readWord(*pNextAddr));
 
-				if((storeType < STORE_TYPE_MAX) & (StoreDataTable[storeType].id < id))
-				{
-					VAST_STORE_DBG_LOG(DBG_DEBUG, "addr:%#lx, type=%d, id=%#lx, len=%d\r\n", *pNextAddr, storeType, id, *pNextAddr-(*pLastAddr)-12);
-					StoreDataTable[storeType].id = id;
-				}
-
-				lastAddrOffset = nextAddrOffset;
-				*pLastAddr = *pNextAddr;
-				*pNextAddr = nextAddrOffset + blockAddr;
-			}
-			else
+			if((storeType < STORE_TYPE_MAX) & (StoreDataTable[storeType].id < id))
 			{
-				VAST_STORE_DBG_LOG(DBG_WARNING, "nextAddr=%#lx\r\n", *pNextAddr);
-				nextAddrOffset = nextAddrOffset + 4;
-				*pNextAddr = nextAddrOffset + blockAddr;
+				VAST_STORE_DBG_LOG(DBG_DEBUG, "addr:%#lx, type=%d, id=%#lx, len=%d\r\n", *pNextAddr, storeType, id, *pNextAddr-(*pLastAddr)-12);
+				StoreDataTable[storeType].id = id;
 			}
 
-			nextAddrOffset = __STORE_GET_NEXT_ADDR(vast_store_readWord(*pNextAddr));
+			lastAddrOffset = nextAddrOffset;
+			*pLastAddr = *pNextAddr;
+			*pNextAddr = nextAddrOffset + blockAddr;
+		}
+		else
+		{
+			VAST_STORE_DBG_LOG(DBG_WARNING, "nextAddr=%#lx\r\n", *pNextAddr);
+			nextAddrOffset = nextAddrOffset + 4;
+			*pNextAddr = nextAddrOffset + blockAddr;
 		}
 
+		nextAddrOffset = __STORE_GET_NEXT_ADDR(vast_store_readWord(*pNextAddr));
 	}
 
 	if((*pNextAddr&0x03) != 0)
@@ -401,7 +390,7 @@ static int16_t vast_store_writeToBackupBlock(Store_TypeTypeDef type, uint8_t *da
 {
 	int16_t ret = VAST_OK;
 	uint8_t storeTypeCnt = STORE_TYPE_LOG, tmpType, isNeedChangeBlockStatus = 0;
-	uint32_t i = 0, lenAllType = 0, nowAddr, tmpLastAddrValid, tmpNowAddrValid, lastAddrBackup = 0, tmpLen;
+	uint32_t i = 0, lenAllType = 0, nowAddr, tmpNowAddrValid, lastAddrBackup = 0, tmpLen;
 	uint16_t crc16[STORE_TYPE_MAX] = {0};
 	uint32_t lastAddrValid[STORE_TYPE_MAX] = {0}, aLen[STORE_TYPE_MAX] = {0};
 	uint32_t validAddr = 0xFFFFF, backupAddr = 0xFFFFF;
@@ -411,7 +400,6 @@ static int16_t vast_store_writeToBackupBlock(Store_TypeTypeDef type, uint8_t *da
 	tmpNowAddrValid = hstore.lastAddrVaild;
 
 	do {
-
 		tmpType = __STORE_GET_TYPE(vast_store_readWord(tmpNowAddrValid));
 		tmpLen = __STORE_GET_LEN(vast_store_readWord(tmpNowAddrValid + 8));
 
@@ -436,8 +424,7 @@ static int16_t vast_store_writeToBackupBlock(Store_TypeTypeDef type, uint8_t *da
 
 	if ((hstore.nextAddrBackUp-backupAddr) + lenAllType >= BLOCK_SIZE)
 	{
-		printf("%#lX + %ld >= %#lX! \r\n", hstore.nextAddrBackUp, lenAllType, BLOCK_SIZE);
-
+		VAST_STORE_DBG_LOG(DBG_INFO, "backupBlock:%#lX + %ld >= %#lX! exchange store block\r\n", hstore.nextAddrBackUp, lenAllType, BLOCK_SIZE);
 		ret = vast_store_setBlockStatus (backupAddr, VALID_BLOCK);
 		vast_store_findAddress(backupAddr, &hstore.nextAddrBackUp, &hstore.lastAddrBackUp);
 
@@ -447,7 +434,7 @@ static int16_t vast_store_writeToBackupBlock(Store_TypeTypeDef type, uint8_t *da
 
 	for (storeTypeCnt=STORE_TYPE_LOG; storeTypeCnt<STORE_TYPE_MAX; storeTypeCnt++)
 	{
-		if (lastAddrValid[tmpType] != 0)
+		if (lastAddrValid[storeTypeCnt] != 0)
 		{
 			// 3. store type id crc len data to backup block
 			lastAddrBackup = hstore.lastAddrBackUp;
@@ -461,12 +448,12 @@ static int16_t vast_store_writeToBackupBlock(Store_TypeTypeDef type, uint8_t *da
 
 			//store type & idL & nextAddrOffset
 			vast_store_writeWord(nowAddr, __STORE_SET_TYPE(storeTypeCnt)
-													| __STORE_SET_IDL(StoreDataTable[storeTypeCnt].id-1)
+													| __STORE_SET_IDL(StoreDataTable[storeTypeCnt].id)
 													|  __STORE_SET_NEXT_ADDR((hstore.nextAddrBackUp-backupAddr)));
 			nowAddr = nowAddr + 4;
 
 			//store idH & lastAddrOffset
-			vast_store_writeWord(nowAddr, __STORE_SET_IDH(StoreDataTable[storeTypeCnt].id-1)
+			vast_store_writeWord(nowAddr, __STORE_SET_IDH(StoreDataTable[storeTypeCnt].id)
 													|  __STORE_SET_LAST_ADDR((lastAddrBackup-backupAddr)));
 			nowAddr = nowAddr + 4;
 
@@ -474,9 +461,9 @@ static int16_t vast_store_writeToBackupBlock(Store_TypeTypeDef type, uint8_t *da
 			vast_store_writeWord(nowAddr, __STORE_SET_CRC(crc16[storeTypeCnt])
 													|  __STORE_SET_LEN(aLen[storeTypeCnt]));
 
-			if(__STORE_SET_LEN(aLen[storeTypeCnt]) > (BLOCK_SIZE/STORE_TYPE_MAX))
+			if( (aLen[storeTypeCnt] <= 0) | (__STORE_SET_LEN(aLen[storeTypeCnt]) > (BLOCK_SIZE/STORE_TYPE_MAX)))
 			{
-				VAST_STORE_DBG_LOG(DBG_DEBUG, "backupBlockAddr:%#lx, len:%ld\r\n", backupAddr, __STORE_SET_LEN(aLen[storeTypeCnt]));
+				VAST_STORE_DBG_LOG(DBG_ERROR, "backupBlockAddr:%#lx, len:%ld\r\n", backupAddr, __STORE_SET_LEN(aLen[storeTypeCnt]));
 			}
 
 			nowAddr += 4;
@@ -543,7 +530,6 @@ int16_t vast_store_initialize(void)
 int32_t vast_store_write(Store_TypeTypeDef type, uint8_t *dat, uint32_t len)
 {
 	int16_t ret = VAST_OK;
-	uint32_t nowAddr = 0, lastAddr = 0;
 	uint32_t validAddr = 0xFFFFF, backupAddr = 0xFFFFF;
 
 	ASSERT(len < (BLOCK_SIZE/STORE_TYPE_MAX),
@@ -556,7 +542,7 @@ int32_t vast_store_write(Store_TypeTypeDef type, uint8_t *dat, uint32_t len)
 
 	if ((hstore.nextAddrVaild-validAddr) + len >= BLOCK_SIZE)
 	{
-		VAST_STORE_DBG_LOG(DBG_INFO, "%#lX + %ld >= %#lX! \r\n", hstore.nextAddrVaild, len, BLOCK_SIZE);
+		VAST_STORE_DBG_LOG(DBG_INFO, "validBlock:%#lX + %ld >= %#lX! store to backup block\r\n", hstore.nextAddrVaild, len, BLOCK_SIZE);
 
 		vast_store_writeToBackupBlock(type, dat, len);
 	}
