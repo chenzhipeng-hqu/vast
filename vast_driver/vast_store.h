@@ -57,10 +57,6 @@ be done by word  */
 
 #define BLOCK(x)              	(x)
 
-#define 	VALID_BLOCK     	(0x00U)
-#define 	BACKUP_BLOCK    	(0x01U)
-#define 	EMPTY_BLOCK     	(0xFFU)
-
 #define 	EMPTY_ADDR     		(0xFFFFFU)
 
  /*BLOCK*/
@@ -98,7 +94,6 @@ be done by word  */
 ***********************************************/
  typedef struct
  {
- 	uint32_t id;
  	const char  *help;
  }Store_DataTypeDef;
 

@@ -124,9 +124,9 @@ int main(int argc, char *argv[])
 /*************************************
               define
 *************************************/
-#define 	CLI_BUFFER_SIZE   	32
+#define 	CLI_BUFFER_SIZE   	64
 #define 	CLI_HISTORY_SIZE  	9
-#define 	CLI_CMD_TREE_LEVEL 	4
+#define 	CLI_CMD_TREE_LEVEL 	3
 
 #define 	ASCII_NULL  			0x00
 #define 	ASCII_CANCEL 			0x03
@@ -814,7 +814,7 @@ uint32_t str2u32(const char *str)
   const char *pCh = str;
   uint32_t data = 0;
 	
-#if 1
+#if 0
   if(pCh[1] == 'x' || pCh[1] == 'X')
   {
     return hex2u32(str);
@@ -839,9 +839,9 @@ uint32_t str2u32(const char *str)
   }
 #else	
 	if(strstr(pCh, "0x") != NULL || strstr(pCh, "0X") != NULL)
-			sscanf(pCh, "%x", &data);
+			sscanf(pCh, "%lx", &data);
 	else
-			sscanf(pCh, "%d", &data);
+			sscanf(pCh, "%ld", &data);
 #endif
 	
   return data;

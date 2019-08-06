@@ -24,14 +24,15 @@
 /***********************************************
                     define
 ***********************************************/
-#define 	VALID_BLOCK     	(0x00U)
-#define 	BACKUP_BLOCK    	(0x01U)
-#define 	EMPTY_BLOCK     	(0xFFU)
+#define 	VALID_BLOCK     	(0x8U)
+#define 	BACKUP_BLOCK    	(0xCU)
+#define 	SWAP_BLOCK    		(0xEU)
+#define 	EMPTY_BLOCK     	(0xFU)
 
-#define 	VAST_STORE_DBG_LOG(level, fmt, ...) 	do{\
-														if(level <= hstore.dbgLevel){\
-															DBG_PRINT(level, fmt, __VA_ARGS__);\
-														}\
+#define 	VAST_STORE_DBG_LOG(level, fmt, ...) 	do{											\
+														if(level <= hstore.dbgLevel){			\
+															DBG_PRINT(level, fmt, __VA_ARGS__);	\
+														}										\
 													}while(0)
 
 /***********************************************
@@ -43,6 +44,7 @@ typedef struct{
 	uint32_t lastAddrVaild;
 	uint32_t nextAddrBackUp;
 	uint32_t lastAddrBackUp;
+	uint32_t id[STORE_TYPE_MAX];
 }Store_HandleTypedef;
 
 /***********************************************
@@ -71,7 +73,7 @@ static Store_HandleTypedef hstore = {0};
   * @param
   * @retval
   */
-static uint8_t vast_store_readByte (uint32_t addr)
+static inline uint8_t vast_store_readByte (uint32_t addr)
 {
 	return (uint8_t)(*(volatile uint32_t *)addr);
 }
@@ -81,7 +83,7 @@ static uint8_t vast_store_readByte (uint32_t addr)
   * @param
   * @retval
   */
-static uint32_t vast_store_readWord (uint32_t addr)
+static inline uint32_t vast_store_readWord (uint32_t addr)
 {
 	return (uint32_t)(*(volatile uint32_t *)addr);
 }
@@ -91,7 +93,7 @@ static uint32_t vast_store_readWord (uint32_t addr)
   * @param
   * @retval
   */
-static void vast_store_readBuff (uint32_t addr, uint8_t *pData, uint32_t len)
+static inline void vast_store_readBuff (uint32_t addr, uint8_t *pData, uint32_t len)
 {
 	uint32_t i = 0;
 
@@ -106,7 +108,7 @@ static void vast_store_readBuff (uint32_t addr, uint8_t *pData, uint32_t len)
   * @param
   * @retval
   */
-static int16_t vast_store_writeByte (uint32_t addr, uint8_t pData)
+static inline int16_t vast_store_writeByte (uint32_t addr, uint8_t pData)
 {
 	HAL_StatusTypeDef ret = HAL_OK;
 
@@ -122,7 +124,7 @@ static int16_t vast_store_writeByte (uint32_t addr, uint8_t pData)
   * @param
   * @retval
   */
-static int16_t vast_store_writeWord (uint32_t addr, uint32_t data)
+static inline int16_t vast_store_writeWord (uint32_t addr, uint32_t data)
 {
 	HAL_StatusTypeDef ret = HAL_OK;
 
@@ -299,10 +301,10 @@ static int16_t vast_store_findAddress (uint32_t blockAddr, uint32_t *pNextAddr, 
 			id = __STORE_GET_IDL(vast_store_readWord(*pNextAddr)) | (__STORE_GET_IDH(vast_store_readWord((*pNextAddr)+4)) << 8);
 			storeType = __STORE_GET_TYPE(vast_store_readWord(*pNextAddr));
 
-			if((storeType < STORE_TYPE_MAX) & (StoreDataTable[storeType].id < id))
+			if((storeType < STORE_TYPE_MAX) /*& (hstore.id[storeType] < id)*/)
 			{
 				VAST_STORE_DBG_LOG(DBG_DEBUG, "addr:%#lx, type=%d, id=%#lx, len=%d\r\n", *pNextAddr, storeType, id, *pNextAddr-(*pLastAddr)-12);
-				StoreDataTable[storeType].id = id;
+				hstore.id[storeType] = id;
 			}
 
 			lastAddrOffset = nextAddrOffset;
@@ -349,18 +351,18 @@ static int16_t vast_store_writeToBlock(uint32_t blockAddr, uint32_t *pNextAddr, 
 		(*pNextAddr) = ((*pNextAddr)&0xfffffffc) + 4;
 	}
 
-	StoreDataTable[type].id++;
+	hstore.id[type]++;
 	//1. store type & idL & nextAddrOffset
-	VAST_STORE_DBG_LOG(DBG_DEBUG, "nowAddr:%#x, type:%#x, idL:%#x, nextAddr:%#x\r\n", (*pNextAddr), __STORE_SET_TYPE(type), __STORE_SET_IDL(StoreDataTable[type].id), __STORE_SET_NEXT_ADDR((*pNextAddr)-blockAddr));
+	VAST_STORE_DBG_LOG(DBG_DEBUG, "nowAddr:%#x, type:%#x, idL:%#x, nextAddr:%#x\r\n", (*pNextAddr), __STORE_SET_TYPE(type), __STORE_SET_IDL(hstore.id[type]), __STORE_SET_NEXT_ADDR((*pNextAddr)-blockAddr));
 	vast_store_writeWord(nowAddr, __STORE_SET_TYPE(type)
-											| __STORE_SET_IDL(StoreDataTable[type].id)
+											| __STORE_SET_IDL(hstore.id[type])
 											|  __STORE_SET_NEXT_ADDR((((*pNextAddr)-blockAddr))));
 	nowAddr = nowAddr + 4;
 
 	//2. store idH & lastAddrOffset
-	VAST_STORE_DBG_LOG(DBG_DEBUG, "idH:%#lx, lastAddr:%#x\r\n", __STORE_SET_IDH(StoreDataTable[type].id), __STORE_SET_LAST_ADDR((lastAddr-blockAddr)));
+	VAST_STORE_DBG_LOG(DBG_DEBUG, "idH:%#lx, lastAddr:%#x\r\n", __STORE_SET_IDH(hstore.id[type]), __STORE_SET_LAST_ADDR((lastAddr-blockAddr)));
 
-	vast_store_writeWord(nowAddr, __STORE_SET_IDH(StoreDataTable[type].id)
+	vast_store_writeWord(nowAddr, __STORE_SET_IDH(hstore.id[type])
 											|  __STORE_SET_LAST_ADDR((lastAddr-blockAddr)));
 
 	nowAddr = nowAddr + 4;
@@ -448,12 +450,12 @@ static int16_t vast_store_writeToBackupBlock(Store_TypeTypeDef type, uint8_t *da
 
 			//store type & idL & nextAddrOffset
 			vast_store_writeWord(nowAddr, __STORE_SET_TYPE(storeTypeCnt)
-													| __STORE_SET_IDL(StoreDataTable[storeTypeCnt].id)
+													| __STORE_SET_IDL(hstore.id[storeTypeCnt])
 													|  __STORE_SET_NEXT_ADDR((hstore.nextAddrBackUp-backupAddr)));
 			nowAddr = nowAddr + 4;
 
 			//store idH & lastAddrOffset
-			vast_store_writeWord(nowAddr, __STORE_SET_IDH(StoreDataTable[storeTypeCnt].id)
+			vast_store_writeWord(nowAddr, __STORE_SET_IDH(hstore.id[storeTypeCnt])
 													|  __STORE_SET_LAST_ADDR((lastAddrBackup-backupAddr)));
 			nowAddr = nowAddr + 4;
 
@@ -519,6 +521,8 @@ int16_t vast_store_initialize(void)
 
 	vast_store_findAddress(backupAddr, &hstore.nextAddrBackUp, &hstore.lastAddrBackUp);
 
+	VAST_STORE_DBG_LOG(DBG_INFO, "max size for store per data is %d bytes\r\n", BLOCK_SIZE/STORE_TYPE_MAX);
+
     return ret;
 }
 
@@ -582,6 +586,12 @@ int32_t vast_store_read(Store_TypeTypeDef type, uint8_t *dat, uint32_t size)
 	{
 		lastAddr = __STORE_GET_LAST_ADDR(vast_store_readWord(lastAddr + 4)) + validAddr;
 		type_tmp = __STORE_GET_TYPE(vast_store_readWord(lastAddr));
+
+		if((lastAddr == validAddr+4) & (type_tmp != type)) {
+			validAddr = backupAddr;
+			lastAddr = hstore.lastAddrBackUp;
+			type_tmp = __STORE_GET_TYPE(vast_store_readWord(lastAddr));
+		}
 	}
 
 	// 2. read len
@@ -629,7 +639,7 @@ int16_t vast_store_print(Store_TypeTypeDef type, uint8_t isDetail, uint8_t isPri
 			crc16 = __STORE_GET_CRC(vast_store_readWord(u32_lastAddr + 8));
 			id = __STORE_GET_IDL(vast_store_readWord(u32_lastAddr)) | (__STORE_GET_IDH(vast_store_readWord(u32_lastAddr+4)) << 8);
 
-			if((type == type_tmp) | (type == STORE_TYPE_MAX))
+			if((type == type_tmp) | (type >= STORE_TYPE_MAX))
 			{
 				DBG_INFO(DBG_DEBUG, "[%#lx](type:%d, id=%#05lx, len=%06d, crc16=%#x): ", u32_lastAddr, type_tmp, id, len, crc16);
 
@@ -701,18 +711,19 @@ int16_t vast_store_reset(void)
 /*
 int main(int argc, char *argv[])
 {
-	if( vast_ring_flash_initialize() != HAL_OK)
-	{
-		DBG_INFO(DBG_ERROR, "vast_ring_flash_initialize error.\r\n");
+	int ret = vast_store_initialize();
+
+	if(ret != VAST_OK){
+		printf("%s,%d, ret=%d\r\n", __FUNCTION__, __LINE__, ret);
 	}
 
 	uint8_t buff_array[32] = {0}, read_len = 0;
-	read_len = vast_ring_flash_read(buff_array, sizeof(buff_array));
+	read_len = vast_store_write(STORE_TYPE_LOG, buff_array, sizeof(buff_array));
 
 	DBG_ARRAY(DBG_DEBUG, "buff_array: ", "\r\n", (char *)buff_array, read_len);
 
-	uint8_t test_array2[] = {0x1D, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C};
-	vast_ring_flash_store(test_array2, sizeof(test_array2));
+	uint8_t readBuff[10] = {0};
+	ret = vast_store_read(STORE_TYPE_LOG, readBuff, sizeof(readBuff));
 
 	while(1)
 	{

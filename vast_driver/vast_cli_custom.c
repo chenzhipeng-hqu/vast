@@ -600,16 +600,30 @@ void cliCmdStoreWrite(CLI_HandleTypeDef *pCli, int argc, char *argv[])
 
 void cliCmdStoreRead(CLI_HandleTypeDef *pCli, int argc, char *argv[])
 {
-	uint8_t ret = VAST_OK, type = 0;
+	uint8_t ret = VAST_OK, type = 0, isDetail = 0, isPrintHex = 0;
 	static uint8_t buff_array2[10240] = {0};
 	uint16_t read_len;
 
 	type = str2u32(argv[1]);
+	isDetail = str2u32(argv[2]);
+	isPrintHex = str2u32(argv[3]);
 	//read_len = vast_ring_flash_read(buff_array2, sizeof(buff_array2));
 	read_len = vast_store_read(type, buff_array2, sizeof(buff_array2));
 	buff_array2[read_len] = 0;
-	DBG_LOG(DBG_INFO, "read from flash [%d][%d][%s]", type, read_len, (char *)buff_array2);
-	DBG_ARRAY(DBG_DEBUG, "->(", "\b)\r\n", (char *)buff_array2, read_len);
+
+	DBG_LOG(DBG_INFO, "read from flash [%d][%d]", type, read_len, (char *)buff_array2);
+
+	if(isDetail == 1)
+	{
+		DBG_INFO(DBG_DEBUG, "[%s]", (char *)buff_array2);
+	}
+
+	if(isPrintHex == 1)
+	{
+		DBG_ARRAY(DBG_DEBUG, "->(", "\b)", (char *)buff_array2, read_len);
+	}
+
+	DBG_INFO(DBG_INFO, "\r\n");
 
 	if(ret != VAST_OK)
 	{
@@ -649,6 +663,11 @@ void cliCmdStoreInfo(CLI_HandleTypeDef *pCli, int argc, char *argv[])
 
 			memset((void *)p, 0x32, len);
 			ret = vast_store_write(2, (uint8_t *)p, len);
+
+			if(ret != VAST_OK)
+			{
+				pCli->Init.Write("%s, ret=%d\r\n", __FUNCTION__, ret);
+			}
 		}
 		vast_free(p);
 	}
@@ -694,9 +713,9 @@ const CLICmdTypedef CLICmd_StoreCtrl[] =
 {
 	{"i", "i:info", cliCmdStoreInfo, 0},
 	{"p", "p:print type isDetail isPrintHex", cliCmdStorePrint, 0},
-	{"reset", "reset", cliCmdStoreReset, 0},
-	{"w", "w type data [size]", cliCmdStoreWrite, 0},
-	{"r", "r", cliCmdStoreRead, 0},
+	{"R", "R:reset", cliCmdStoreReset, 0},
+	{"w", "w:write type data [size]", cliCmdStoreWrite, 0},
+	{"r", "r:read type isDetail isPrintHex", cliCmdStoreRead, 0},
 	// last command must be all 0s.
 	{0, 0, 0, 0}
 };
