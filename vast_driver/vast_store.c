@@ -422,7 +422,7 @@ static int16_t vast_store_writeToBackupBlock(Store_TypeTypeDef type, uint8_t *da
 
 		//tmpNowAddrValid = tmpLastAddrValid;
 
-	}while( storeTypeCnt != (STORE_TYPE_MAX-1) );
+	}while ((storeTypeCnt != (STORE_TYPE_MAX-1)) & ((tmpNowAddrValid-validAddr) > 4) );
 
 	if ((hstore.nextAddrBackUp-backupAddr) + lenAllType >= BLOCK_SIZE)
 	{
@@ -579,8 +579,17 @@ int32_t vast_store_read(Store_TypeTypeDef type, uint8_t *dat, uint32_t size)
 	vast_store_findValidBlock(&validAddr, &backupAddr);
 
 	// 1. read lastAddr & type
-	type_tmp = __STORE_GET_TYPE(vast_store_readWord(hstore.lastAddrVaild));
-	lastAddr = hstore.lastAddrVaild;
+	if(hstore.lastAddrVaild != hstore.nextAddrVaild)
+	{
+		type_tmp = __STORE_GET_TYPE(vast_store_readWord(hstore.lastAddrVaild));
+		lastAddr = hstore.lastAddrVaild;
+	}
+	else
+	{
+		type_tmp = __STORE_GET_TYPE(vast_store_readWord(hstore.lastAddrBackUp));
+		lastAddr = hstore.lastAddrBackUp;
+		validAddr = backupAddr;
+	}
 
 	while(type_tmp != type)
 	{

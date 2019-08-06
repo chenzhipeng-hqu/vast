@@ -543,7 +543,7 @@ void *vast_realloc(void *ptr, MEM_UINT nbytes)
 			if(nbytes >= length)
 			{				
 				dst = vast_malloc(nbytes);			//内存分配(外部调用)
-				memcpy(dst, ptr, length );				
+				memcpy((void *)dst, (void *)ptr, length);
 				vast_free(ptr);  					//内存释放(外部调用)
 				return (void*)dst;				
 			}
