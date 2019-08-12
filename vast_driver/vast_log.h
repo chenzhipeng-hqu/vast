@@ -216,9 +216,9 @@
 															}while(0)
 
 #ifdef NDEBUG
-	#define     ASSERT(test_, err_exe) 			((void)0)
+	#define     ASSERT(test_, err_exe) 		((void)0)
 #else
-	#define     ASSERT(test_, err_exe) 			do{ \
+	#define     ASSERT(test_, err_exe) 		do{ \
 												if((test_) == 0) {\
 													printf("\033[15;31m Assertion failed in %s:%d\033[0m \r\n", __FILE__, __LINE__);\
 													err_exe;\
