@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <string.h>
 //#include <utils.h>
 #include "log2.h"
 #include "kfifo.h"

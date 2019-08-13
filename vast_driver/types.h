@@ -15,7 +15,7 @@ typedef long            base_t;      /* Nbit CPU related date type */
 typedef unsigned long   ubase_t;     /* Nbit unsigned CPU related data type */
 
 typedef ubase_t         sig_t;
-typedef ubase_t         time_t;
+//typedef ubase_t         time_t;
 typedef base_t          err_t;
 typedef base_t          off_t;
 

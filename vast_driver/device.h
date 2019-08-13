@@ -61,23 +61,17 @@ enum SWITCH_CTRL
 {
   CTRL_ON,
 	CTRL_OFF,
+	CTRL_NORMAL,
 	CTRL_ON_OFF,
 	CTRL_BACKLIGHT,
 	CTRL_RGB,
 	CTRL_MODE_RGB,
 };
 
-enum RELAY_CTRL
-{
-  CTRL_RELAY_ON,
-	CTRL_RELAY_OFF,
-	KEY_PRESS,
-	KEY_UP,
-};
 
 typedef struct device device_t;
 
-struct device_ops
+typedef struct device_ops
 {
     err_t(*init)(device_t *dev);
     err_t(*open)(device_t *dev, uint16_t oflag);
@@ -86,7 +80,7 @@ struct device_ops
     size_t (*peek)(device_t *dev, off_t pos, void *buffer, size_t size);
     size_t (*write)(device_t *dev, off_t pos, const void *buffer, size_t size);
     err_t(*ctrl)(device_t *dev, uint8_t cmd, void *args);
-};
+}device_ops_t;
 
 #define ARGS2U80(args) (get_bits((u32)(args), 0,  7))
 #define ARGS2U81(args) (get_bits((u32)(args), 8,  15))

@@ -145,11 +145,11 @@ void   *os_memmove(void *dest, const void *src, size_t n);
 int32_t os_memcmp(const void *cs, const void *ct, size_t count);
 uint32_t os_strcasecmp(const char *a, const char *b);
 
-#define memset    os_memset
-#define memcpy    os_memcpy
+//#define memset    os_memset
+//#define memcpy    os_memcpy
 
 #define strncmp   os_strncmp
-#define strcmp    os_strcmp
+//#define strcmp    os_strcmp
 #define strlen    os_strlen
 #define strdup    os_strdup
 

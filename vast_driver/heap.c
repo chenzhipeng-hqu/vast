@@ -1,6 +1,6 @@
 //#include <config.h>
 #include <utils.h>
-//#include <port.h>
+#include <vast_third/croutine/port.h>
 #include "heap.h"
 
 #define heapMINIMUM_BLOCK_SIZE  ((size_t)(xHeapStructSize << 1))

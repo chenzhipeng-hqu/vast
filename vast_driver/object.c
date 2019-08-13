@@ -1,4 +1,5 @@
 //#include <printk.h>
+#include <string.h>
 #include <types.h>
 #include <utils.h>
 #include <vast_third/croutine/port.h>

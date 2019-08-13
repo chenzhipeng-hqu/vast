@@ -29,12 +29,6 @@
 /**************************************
               typedef
 **************************************/
-typedef struct __MsgTypedef
-{
-	uint16_t len;
-	char data[1];   //
-}MsgTypedef;
-
 typedef enum
 {
 	CLI_FUNC_INIT,

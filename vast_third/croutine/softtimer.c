@@ -1,9 +1,8 @@
 //#include <config.h>
 #include <utils.h>
-#include <port.h>
+#include <vast_third/croutine/port.h>
 //#include <printk.h>
-#include <jiffies.h>
-#include <croutine.h>
+#include <vast_third/croutine/jiffies.h>
 //#include <board.h>
 #include <init.h>
 #include "softtimer.h"
@@ -42,6 +41,23 @@ void soft_timer_mod(struct soft_timer *st, time_t expires)
     exit_critical();
 }
 
+void soft_timer_task(void)
+{
+	struct soft_timer *iter, *n;
+
+	list_for_each_entry_safe(iter, n, &timer_list, entry)
+	{
+		if (time_after_eq(jiffies, iter->expires))
+		{
+			soft_timer_del(iter);
+
+			if (iter->cb)
+				iter->cb(iter);
+		}
+	}
+}
+
+#if 0
 static void soft_timer_task_callback(struct task_ctrl_blk *tcb, ubase_t data)
 {
     tSTART(tcb);
@@ -75,3 +91,4 @@ int setup_soft_timer_service(void)
     return 0;
 }
 core_initcall(setup_soft_timer_service);
+#endif

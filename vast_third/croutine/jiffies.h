@@ -1,7 +1,8 @@
 #ifndef _JIFFIES_H_
 #define _JIFFIES_H_
 
-#include <config.h>
+//#include <config.h>
+#include <sys/_timeval.h>
 /*
  *  These inlines deal with timer wrapping correctly. You are
  *  strongly encouraged to use them
@@ -32,8 +33,9 @@
  * Have the 32 bit jiffies value wrap 5 minutes after boot
  * so jiffies wrap bugs show up earlier.
  */
-#define INITIAL_JIFFIES ((unsigned long)(unsigned int) (-300*configHZ))
+#define	configHZ 1000
+#define INITIAL_JIFFIES ((unsigned long)(unsigned int) (0))
 
-extern volatile unsigned long jiffies;
+extern volatile time_t jiffies;
 
 #endif

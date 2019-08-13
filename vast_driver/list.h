@@ -1,7 +1,7 @@
 #ifndef _KLIST_H_
 #define _KLIST_H_
 
-#include <types.h>
+//#include <types.h>
 #include <utils.h>
 
 
