@@ -16,7 +16,7 @@ typedef unsigned long   ubase_t;     /* Nbit unsigned CPU related data type */
 
 typedef ubase_t         sig_t;
 //typedef ubase_t         time_t;
-typedef base_t          err_t;
+typedef int          	err_t;
 typedef base_t          off_t;
 
 typedef uint8_t         u8;
@@ -26,47 +26,27 @@ typedef int8_t          s8;
 typedef int16_t         s16;
 typedef int32_t         s32;
 
+typedef short int VAST_BOOL;
+
+/**
+  * @brief  VAST Lock structures definition
+  */
+typedef enum
+{
+	VAST_UNLOCKED 	= 0x00U,
+	VAST_LOCKED 	= 0x01U
+}lock_t;
+
+/**
+  * @brief  HAL Status structures definition
+  */
 enum
 {
-    SIG_ALARM = 1 << 0,
-    SIG_DATA  = 1 << 1,
-    SIG_KEY   = 1 << 2,
-
-    SIG_USR1  = 1 << 8,
-    SIG_USR2  = 1 << 9,
-};
-
-typedef enum
-{
-    COLOR_R,
-    COLOR_G,
-    COLOR_B,
-    COLOR_NR,
-} color_t;
-
-typedef enum
-{
-    DIR_L,          /* left  */
-    DIR_R,          /* right */
-    DIR_NR,
-} dir_t;
-
-typedef struct 
-{
-    size_t len;
-    void *data;
-} data_t;
-
-typedef struct list_head
-{
-    struct list_head *next, *prev;
-} list_t;
-
-typedef struct object
-{
-    const char *name;
-    struct list_head entry;
-} object_t;
+	VAST_OK   		= 0x00U,
+	VAST_ERROR    	= 0x01U,
+	VAST_BUSY     	= 0x02U,
+	VAST_TIMEOUT  	= 0x03U
+} ;
 
 /**
  * block device geometry structure

@@ -26,6 +26,7 @@
 /***********************************************
                     include
 ***********************************************/
+#include "vast_core/device.h"
 
 /***********************************************
                     define
@@ -34,10 +35,30 @@
 /***********************************************
                     typedef
 ***********************************************/
+ struct _led_device_t;
+
+ typedef struct _led_ops_t
+ {
+	err_t (*on)		(struct _led_device_t *);
+	err_t (*off)	(struct _led_device_t *);
+	err_t (*toggle)	(struct _led_device_t *);
+ }led_ops_t;
+
+ typedef struct _led_device_t
+ {
+ 	device_t 			parent;
+ 	const led_ops_t  	*ops;
+ 	struct soft_timer 	tmr;
+ 	uint8_t				status:1;
+ 	uint8_t				flash_cnt:3;
+ 	uint8_t				mode:4;
+
+ }led_device_t;
 
 /***********************************************
                function prototypes
 ***********************************************/
+err_t led_device_register(led_device_t *led, const char *name, uint32_t flag, void *data);
 
 /***********************************************
 	      		    inline

@@ -1,8 +1,10 @@
-#ifndef _JIFFIES_H_
-#define _JIFFIES_H_
+#ifndef _SOFTTIMER_H_
+#define _SOFTTIMER_H_
 
-//#include <config.h>
+#include <vast_core/types.h>
+#include <vast_core/list.h>
 #include <sys/_timeval.h>
+
 /*
  *  These inlines deal with timer wrapping correctly. You are
  *  strongly encouraged to use them
@@ -33,9 +35,23 @@
  * Have the 32 bit jiffies value wrap 5 minutes after boot
  * so jiffies wrap bugs show up earlier.
  */
-#define	configHZ 1000
 #define INITIAL_JIFFIES ((unsigned long)(unsigned int) (0))
 
+typedef struct soft_timer
+{
+    struct list_head    entry;
+    time_t              expires;
+    ubase_t    			data;
+    void (*cb)(struct soft_timer *st);
+}soft_timer_t;
+
 extern volatile time_t jiffies;
+
+void soft_timer_add(struct soft_timer *st);
+void soft_timer_del(struct soft_timer *st);
+void soft_timer_mod(struct soft_timer *st, time_t expires);
+
+int setup_soft_timer_service(void);
+void soft_timer_task(void);
 
 #endif

@@ -48,7 +48,8 @@ static void kfifo_copy_in(struct __kfifo *fifo, const void *src,
         size *= esize;
         len *= esize;
     }
-    l = min(len, size - off);
+//    l = min(len, size - off);
+    l = __VAST_MIN_LIMIT(size - off, len);
 
     memcpy((uint8_t *)fifo->data + off, src, l);
     memcpy(fifo->data, (uint8_t *)src + l, len - l);
@@ -82,7 +83,8 @@ static void kfifo_copy_out(struct __kfifo *fifo, void *dst,
         size *= esize;
         len *= esize;
     }
-    l = min(len, size - off);
+//    l = min(len, size - off);
+    l = __VAST_MIN_LIMIT(size - off, len);
 
     memcpy(dst, (uint8_t *)fifo->data + off, l);
     memcpy((uint8_t *)dst + l, fifo->data, len - l);

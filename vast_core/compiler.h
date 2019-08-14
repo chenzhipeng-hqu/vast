@@ -21,6 +21,7 @@
 //# define inline                         static inline
 
 #elif defined (__GNUC__)                /* GNU GCC Compiler */
+# define USING_NEWLIB
 # ifdef USING_NEWLIB
 #  include <stdarg.h>
 # else

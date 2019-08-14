@@ -1,21 +1,29 @@
-//#include <printk.h>
+
+
 #include <string.h>
-#include <types.h>
-#include <utils.h>
+#include <vast_core/types.h>
+#include <vast_core/utils.h>
 #include <vast_third/croutine/port.h>
-#include "list.h"
-#include "object.h"
+#include "vast_core/list.h"
+#include "vast_core/object.h"
 
 static LIST_HEAD(object_list);
 
-void object_attach(object_t *o, const char *name)
+err_t object_attach(object_t *o, const char *name)
 {
     OS_CPU_SR cpu_sr;
-    o->name = name;
+    err_t ret = 1;
 
-	enter_critical();
-    list_add_tail(&o->entry, &object_list);
-    exit_critical();
+	if(NULL == object_find(name))
+	{
+	    o->name = name;
+		enter_critical();
+	    list_add_tail(&o->entry, &object_list);
+	    exit_critical();
+	    ret = 0;
+	}
+
+	return ret;
 }
 
 void object_detach(struct object *o)

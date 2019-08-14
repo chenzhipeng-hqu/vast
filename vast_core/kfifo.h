@@ -55,6 +55,7 @@
 #include <stddef.h>
 //#include <utils.h>
 #include <errno.h>
+#include <vast_common.h>
 //#include <linux/scatterlist.h>
 
 struct __kfifo
@@ -143,7 +144,7 @@ struct kfifo_rec_ptr_2 __STRUCT_KFIFO_PTR(unsigned char, 2, void);
     struct __kfifo *__kfifo = &__tmp->kfifo; \
     __kfifo->in = 0; \
     __kfifo->out = 0; \
-    __kfifo->mask = __is_kfifo_ptr(__tmp) ? 0 : array_size(__tmp->buf) - 1;\
+    __kfifo->mask = __is_kfifo_ptr(__tmp) ? 0 : __VAST_DIM(__tmp->buf) - 1;\
     __kfifo->esize = sizeof(*__tmp->buf); \
     __kfifo->data = __is_kfifo_ptr(__tmp) ?  NULL : __tmp->buf; \
 })
@@ -165,7 +166,7 @@ struct kfifo_rec_ptr_2 __STRUCT_KFIFO_PTR(unsigned char, 2, void);
             .out    = 0, \
             .mask   = __is_kfifo_ptr(&(fifo)) ? \
                   0 : \
-                  array_size((fifo).buf) - 1, \
+				  __VAST_DIM((fifo).buf) - 1, \
             .esize  = sizeof(*(fifo).buf), \
             .data   = __is_kfifo_ptr(&(fifo)) ? \
                 NULL : \

@@ -1,19 +1,19 @@
-#include <types.h>
-#include <utils.h>
+#include <vast_core/types.h>
+#include <vast_core/utils.h>
 //#include <os.h>
 //#include <printk.h>
 //#include <syserr.h>
-#include "list.h"
-#include "device.h"
+#include "vast_core/list.h"
+#include "vast_core/device.h"
 
 device_t *device_find(const char *name)
 {
     return (device_t *)object_find(name);
 }
 
-void device_register(device_t *dev, const char *name, uint16_t flags)
+err_t device_register(device_t *dev, const char *name, uint16_t flags)
 {
-    object_attach((object_t *)dev, name);
+    return object_attach((object_t *)dev, name);
 }
 
 void device_unregister(device_t *dev)

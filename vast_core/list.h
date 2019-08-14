@@ -2,7 +2,7 @@
 #define _KLIST_H_
 
 //#include <types.h>
-#include <utils.h>
+#include <vast_core/utils.h>
 
 
 #define LIST_POISON1  (0)
@@ -22,6 +22,11 @@
 
 #define LIST_HEAD(name) \
     struct list_head name = LIST_HEAD_INIT(name)
+
+typedef struct list_head
+{
+    struct list_head *next, *prev;
+} list_t;
 
 static inline void INIT_LIST_HEAD(struct list_head *list)
 {

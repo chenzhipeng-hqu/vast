@@ -1,7 +1,10 @@
-#include <utils.h>
+
+#include <string.h>
+#include <vast_core/utils.h>
 #include <vast_third/croutine/port.h>
-#include <init.h>
-#include "alloter.h"
+#include <vast_core/init.h>
+#include "vast_core/alloter.h"
+#include "vast_common.h"
 
 static struct
 {
@@ -102,7 +105,8 @@ err_t chn_put(chn_slot_t *chn,  const void *data, size_t len)
 
         k = chn->rx & BLOCK_MASK;
         k = BLOCK_MASK - k;
-        k = min(len, k);
+//        k = min(len, k);
+        k = __VAST_MIN_LIMIT(k, len);
         memcpy(&mem_pool_man.buffer[chn->rx], (u8 *)data + i, k);
         len -= k;
         chn->rx += k;
@@ -169,8 +173,10 @@ err_t chn_get(chn_slot_t *chn,  void *data, size_t len)
         //some space free
         k = chn->tx & BLOCK_MASK;
         k = BLOCK_MASK - k;
-        k = min(len, k);
-        k = min(k, chn->data_cnt);
+//        k = min(len, k);
+        k = __VAST_MIN_LIMIT(k, len);
+//        k = min(k, chn->data_cnt);
+        k = __VAST_MIN_LIMIT(chn->data_cnt, k);
         memcpy((u8 *)data + i, &mem_pool_man.buffer[chn->tx], k);
         len -= k;
         chn->tx += k;

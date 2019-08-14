@@ -1,10 +1,11 @@
 #ifndef __DEVICE_H__
 #define __DEVICE_H__
 
-#include <types.h>
-//#include <config.h>
-#include <kfifo.h>
-#include "object.h"
+#include <vast_config.h>
+#include "vast_core/softtimer.h"
+#include <vast_core/types.h>
+#include <vast_core/kfifo.h>
+#include "vast_core/object.h"
 
 /**
  * device (I/O) class type
@@ -49,9 +50,6 @@ enum device_class_type
 #define RTC_CTRL_ADD_ALARM            0x04
 #define RTC_CTRL_DEL_ALARM            0x05
 
-
-
-
 enum KEY_CTRL
 {
     KEY_CTRL_GET_KEY,
@@ -62,12 +60,12 @@ enum SWITCH_CTRL
   CTRL_ON,
 	CTRL_OFF,
 	CTRL_NORMAL,
+	CTRL_EMCY,
 	CTRL_ON_OFF,
 	CTRL_BACKLIGHT,
 	CTRL_RGB,
 	CTRL_MODE_RGB,
 };
-
 
 typedef struct device device_t;
 
@@ -82,10 +80,10 @@ typedef struct device_ops
     err_t(*ctrl)(device_t *dev, uint8_t cmd, void *args);
 }device_ops_t;
 
-#define ARGS2U80(args) (get_bits((u32)(args), 0,  7))
-#define ARGS2U81(args) (get_bits((u32)(args), 8,  15))
-#define ARGS2U82(args) (get_bits((u32)(args), 16, 23))
-#define ARGS2U83(args) (get_bits((u32)(args), 24, 31))
+#define ARGS2U80(args) (__VAST_GET_BITS((u32)(args), 0,  7))
+#define ARGS2U81(args) (__VAST_GET_BITS((u32)(args), 8,  15))
+#define ARGS2U82(args) (__VAST_GET_BITS((u32)(args), 16, 23))
+#define ARGS2U83(args) (__VAST_GET_BITS((u32)(args), 24, 31))
 
 struct device
 {
@@ -104,7 +102,7 @@ struct device
 
 
 device_t *device_find(const char *name);
-void     device_register(device_t *dev, const char *name, uint16_t flags);
+err_t    device_register(device_t *dev, const char *name, uint16_t flags);
 void     device_unregister(device_t *dev);
 err_t    device_open(device_t *dev, uint16_t oflag);
 err_t    device_close(device_t *dev);

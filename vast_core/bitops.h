@@ -1,8 +1,8 @@
 #ifndef _LINUX_BITOPS_H
 #define _LINUX_BITOPS_H
 
-#include <types.h>
-#include <utils.h>
+#include <vast_core/types.h>
+#include <vast_core/utils.h>
 
 #define BITS_PER_BYTE 8
 #define BITS_PER_LONG 32

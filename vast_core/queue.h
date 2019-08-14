@@ -26,7 +26,7 @@
 /***********************************************
                     include
 ***********************************************/
-#include "vast_common.h"
+#include "vast_core/types.h"
 
 /***********************************************
                     define
@@ -37,13 +37,13 @@
 ***********************************************/
 
  typedef struct {
- 	int head;
- 	int tail;
- 	int length;
- 	Vast_LockTypedef lock;
- 	char queue_type;
- 	char queue_name[15];
- 	void *data;
+	size_t 	head;
+ 	size_t 	tail;
+ 	size_t 	length;
+ 	lock_t 	lock;
+ 	char 	type;
+ 	char 	name[15];
+ 	void 	*data;
  }RingQueueTypedef;
 
 /***********************************************

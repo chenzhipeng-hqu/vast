@@ -1,11 +1,15 @@
 //#include <config.h>
-#include <utils.h>
+#include <stdio.h>
+#include <vast_core/utils.h>
 #include <vast_third/croutine/port.h>
 //#include <printk.h>
-#include <vast_third/croutine/jiffies.h>
+//#include <vast_core/jiffies.h>
 //#include <board.h>
-#include <init.h>
-#include "softtimer.h"
+#include <vast_core/init.h>
+#include "vast_core/softtimer.h"
+
+
+volatile time_t jiffies = INITIAL_JIFFIES;
 
 
 static LIST_HEAD(timer_list);
@@ -51,8 +55,13 @@ void soft_timer_task(void)
 		{
 			soft_timer_del(iter);
 
+			time_t start_jiffies = jiffies;
+
 			if (iter->cb)
 				iter->cb(iter);
+
+			if(jiffies - start_jiffies > 1)
+				printf("soft time task spent %ldms at %#lx\r\n", (uint32_t)(jiffies-start_jiffies), (uint32_t)iter->cb);
 		}
 	}
 }

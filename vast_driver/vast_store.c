@@ -19,6 +19,7 @@
                     include
 ***********************************************/
 #include <stdarg.h>
+#include "vast_core/utils.h"
 #include "vast_store.h"
 
 /***********************************************

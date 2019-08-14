@@ -1,7 +1,7 @@
 #ifndef _ALLOTER_H_
 #define _ALLOTER_H_
 
-#include <types.h>
+#include <vast_core/types.h>
 
 #define BUF_SZ  2048
 

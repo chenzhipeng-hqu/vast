@@ -20,7 +20,8 @@
 ***********************************************/
 #include <stdlib.h>
 #include <string.h>
-#include "vast_ring_queue.h"
+#include "vast_core/utils.h"
+#include <vast_core/queue.h>
 
 /***********************************************
                     define

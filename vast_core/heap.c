@@ -1,5 +1,5 @@
 //#include <config.h>
-#include <utils.h>
+#include <vast_core/utils.h>
 #include <vast_third/croutine/port.h>
 #include "heap.h"
 
@@ -30,7 +30,6 @@ void *os_malloc(size_t xWantedSize)
 {
     BlockLink_t *pxBlock, *pxPreviousBlock, *pxNewBlockLink;
     void *pvReturn = NULL;
-
     {
         /* If this is the first call to malloc then the heap will require
         initialisation to setup the list of free blocks. */

@@ -27,7 +27,7 @@
                     include
 ***********************************************/
 #include "vast_common.h"
-#include "vast_driver/device.h"
+#include "vast_core/device.h"
 
 /***********************************************
                     define
