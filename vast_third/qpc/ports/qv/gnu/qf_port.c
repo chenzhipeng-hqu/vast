@@ -35,13 +35,15 @@
 
 #include "stm32f4xx.h"  /* CMSIS-compliant header file for the MCU used */
 #include "vast_core/softtimer.h"
+#include "vast_core/init.h"
+#include "../qpc_task/qpc_common.h"
 
 /* add other drivers if necessary... */
 
 //Q_DEFINE_THIS_FILE
 
 /* ISRs defined in this BSP ------------------------------------------------*/
-void SysTick_Handler(void);
+//void SysTick_Handler(void);
 
 /* Local-scope defines -----------------------------------------------------*/
 
@@ -89,6 +91,23 @@ void USART2_IRQHandler(void) {
 #else
 
 #endif
+
+/* QF init ============================================================*/
+int QF_init_bsp(void)
+{
+	static QSubscrList 					subscrSto[MAX_PUB_SIG];
+	static QF_MPOOL_EL(QEvt) 			smlPoolSto[256]; /* small pool */
+
+	QF_init(); /* initialize the framework */
+
+	QF_psInit(subscrSto, Q_DIM(subscrSto));
+
+	QF_poolInit(smlPoolSto, sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
+
+	return 0;
+}
+
+qf_initcall(QF_init_bsp);
 
 /* QF callbacks ============================================================*/
 void QF_onStartup(void) {
