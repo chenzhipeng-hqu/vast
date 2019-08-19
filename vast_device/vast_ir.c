@@ -45,6 +45,7 @@ extern int InfraRed_RX_RC5_Init(IR_TypeDef *pIR_Obj);
 extern int InfraRed_RX_RC6_Init(IR_TypeDef *pIR_Obj);
 extern int InfraRed_RX_RCA_Init(IR_TypeDef *pIR_Obj);
 extern int InfraRed_RX_MI_Init(IR_TypeDef *pIR_Obj);
+extern int InfraRed_RX_TOSHIBA_Init(IR_TypeDef *pIR_Obj);
 
 /*************************************
               variable
@@ -72,6 +73,7 @@ const IR_FuncList_t IR_FuncList[] = { 	//don't change sequence, add after last
 //	{IRType_TOP, 				NULL},
 	{IRType_SAMSUNG, 		InfraRed_RX_SAMSUNG_Init},
 	{IRType_PANASONIC, 	InfraRed_RX_PANASONIC_Init},
+	{IRType_TOSHIBA, 	InfraRed_RX_TOSHIBA_Init},
 	
 };
 /*

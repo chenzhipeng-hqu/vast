@@ -25,6 +25,7 @@ typedef enum _IRType_e  //don't change sequence, add after last, before IRType_M
 	IRType_TOP,
 	IRType_SAMSUNG,
 	IRType_PANASONIC,
+	IRType_TOSHIBA,
 
 	IRType_MAX,
 }IRType_e;
