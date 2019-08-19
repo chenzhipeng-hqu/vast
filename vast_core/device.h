@@ -142,9 +142,9 @@ void     device_set_owner(device_t *dev, const void *owner);
 #endif
 
 #ifdef configUSING_I2C
-#include "drivers/i2c/i2c.h"
-#include "drivers/i2c/i2c_dev.h"
-#include "drivers/i2c/i2c-bit-ops.h"
+#include "../vast/vast_driver/i2c.h"
+#include "vast/vast_driver/i2c_dev.h"
+#include "vast/vast_driver/i2c-bit-ops.h"
 #endif
 
 #ifdef configUSING_RX8025
