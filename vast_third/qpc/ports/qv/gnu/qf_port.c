@@ -96,7 +96,7 @@ void USART2_IRQHandler(void) {
 int QF_init_bsp(void)
 {
 	static QSubscrList 					subscrSto[MAX_PUB_SIG];
-	static QF_MPOOL_EL(QEvt) 			smlPoolSto[256]; /* small pool */
+	static QF_MPOOL_EL(QEvt) 			smlPoolSto[256] __attribute__ ((section (".ccmram"))); /* small pool */
 
 	QF_init(); /* initialize the framework */
 
