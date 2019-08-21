@@ -237,7 +237,7 @@ static int16_t vast_store_setBlockStatus (uint32_t blockAddr, uint8_t blockStatu
 	//status = __STORE_GET_STATUS(value);
 	erase_times = __STORE_GET_ERASE_TIMES(value);
 
-	vast_store_erase(blockAddr);
+	ret = vast_store_erase(blockAddr);
 
 	erase_times++;
 	ret = vast_store_writeWord (blockAddr, __STORE_SET_STATUS(blockStatus) | __STORE_SET_ERASE_TIMES(erase_times));
@@ -258,18 +258,29 @@ static int16_t vast_store_findValidBlock (uint32_t *pValidAddr, uint32_t *pBacku
 	block0Status = __STORE_GET_STATUS(vast_store_readWord(BLOCK0_START_ADDRESS));
 	block1Status = __STORE_GET_STATUS(vast_store_readWord(BLOCK1_START_ADDRESS));
 
-	if ((block0Status == VALID_BLOCK) && (block1Status == BACKUP_BLOCK))
+	if (block0Status == VALID_BLOCK)
 	{
+		if(block1Status != BACKUP_BLOCK)
+		{
+			ret = vast_store_setBlockStatus (BLOCK1_START_ADDRESS, BACKUP_BLOCK);
+		}
+
 		*pValidAddr = BLOCK0_START_ADDRESS;
 		*pBackupAddr = BLOCK1_START_ADDRESS;
 	}
-	else if ((block0Status == BACKUP_BLOCK) && (block1Status == VALID_BLOCK))
+	else if ((block1Status == VALID_BLOCK))
 	{
+		if(block0Status != BACKUP_BLOCK)
+		{
+			ret = vast_store_setBlockStatus (BLOCK0_START_ADDRESS, BACKUP_BLOCK);
+		}
+
 		*pValidAddr = BLOCK1_START_ADDRESS;
 		*pBackupAddr = BLOCK0_START_ADDRESS;
 	}
 	else
 	{
+		VAST_STORE_DBG_LOG(DBG_INFO, "block0Status=%#X, block1Status=%#X \r\n", block0Status, block1Status);
 		ret = vast_store_setBlockStatus (BLOCK0_START_ADDRESS, VALID_BLOCK);
 		ret = vast_store_setBlockStatus (BLOCK1_START_ADDRESS, BACKUP_BLOCK);
 
@@ -523,6 +534,7 @@ int16_t vast_store_initialize(void)
 
 	hstore.dbgLevel = DBG_DEBUG;
 
+#if 1
 	vast_store_findValidBlock(&validAddr, &backupAddr);
 
 	VAST_STORE_DBG_LOG(DBG_DEBUG, "validBlockAddr:%#lx, erase:%#lx\r\n", validAddr, __STORE_GET_ERASE_TIMES(vast_store_readWord(validAddr)));
@@ -533,8 +545,149 @@ int16_t vast_store_initialize(void)
 	vast_store_findAddress(backupAddr, &hstore.nextAddrBackUp, &hstore.lastAddrBackUp);
 
 	VAST_STORE_DBG_LOG(DBG_INFO, "max size for store per data is %d bytes\r\n", BLOCK_SIZE/STORE_TYPE_MAX);
+#else
+	uint8_t block0Status = 0, block1Status = 0;
+	uint32_t erase_times = 0, value = 0;
 
+	block0Status = __STORE_GET_STATUS(vast_store_readWord(BLOCK0_START_ADDRESS));
+	block1Status = __STORE_GET_STATUS(vast_store_readWord(BLOCK1_START_ADDRESS));
+
+	if( (block0Status == VALID_BLOCK) & (block1Status == BACKUP_BLOCK)){
+		ret = vast_store_findAddress(BLOCK0_START_ADDRESS, &hstore.nextAddrVaild, &hstore.lastAddrVaild);
+
+	}else if( (block0Status == BACKUP_BLOCK) & (block1Status == VALID_BLOCK)){
+
+	}else {
+		ret = vast_store_setBlockStatus(BLOCK0_START_ADDRESS, VALID_BLOCK);
+		ret = vast_store_setBlockStatus(BLOCK1_START_ADDRESS, BACKUP_BLOCK);
+		ret = vast_store_findAddress(BLOCK0_START_ADDRESS, &hstore.nextAddrVaild, &hstore.lastAddrVaild);
+	}
+
+	ret = vast_store_findAddress(validAddr, &hstore.nextAddrVaild, &hstore.lastAddrVaild);
+
+	switch(block0Status)
+	{
+		case EMPTY_BLOCK:
+		{
+			ret = vast_store_verifyFullyErased(BLOCK0_START_ADDRESS);
+
+			if(VAST_OK != ret)
+			{
+				ret = vast_store_erase(BLOCK0_START_ADDRESS);
+			}
+
+			if(block1Status == VALID_BLOCK)
+			{
+				// find nextAddrVaild
+				vast_store_findAddress(BLOCK1_START_ADDRESS, &hstore.nextAddrVaild, &hstore.lastAddrVaild);
+			}
+			else
+			{
+				ret = vast_store_setBlockStatus(BLOCK1_START_ADDRESS, VALID_BLOCK);
+			}
+			break;
+		}
+		case VALID_BLOCK:
+			break;
+		case RECEIVE_BLOCK:
+			break;
+		default:
+			break;
+	}
+#endif
     return ret;
+}
+
+static int16_t vast_store_swapBlock(Store_TypeTypeDef type, uint8_t *dat, uint32_t len)
+{
+	int16_t ret = VAST_OK;
+	uint8_t storeTypeCnt = STORE_TYPE_LOG, tmpType = 0;
+	uint32_t id, i = 0, nowAddr, tmpNowAddrValid, lastAddrBackup = 0, tmpLen, nextAddrBackUp, lastAddrBackUp;
+	uint16_t crc16 = 0;
+	uint32_t erase_times = 0, value = 0;
+	uint32_t validAddr = 0xFFFFF, backupAddr = 0xFFFFF;
+
+	vast_store_findValidBlock(&validAddr, &backupAddr);
+
+	lastAddrBackUp = backupAddr;
+	nextAddrBackUp = backupAddr + 4;
+	vast_store_writeToBlock(backupAddr, &nextAddrBackUp, &lastAddrBackUp, type, dat, len);
+
+	tmpNowAddrValid = hstore.lastAddrVaild;
+
+	do {
+		tmpType = __STORE_GET_TYPE(vast_store_readWord(tmpNowAddrValid));
+		id = __STORE_GET_IDL(vast_store_readWord(tmpNowAddrValid)) | (__STORE_GET_IDH(vast_store_readWord((tmpNowAddrValid)+4)) << 8);
+
+		if ( (type != tmpType) && (hstore.id[tmpType] == id))
+		{
+			tmpLen = __STORE_GET_LEN(vast_store_readWord(tmpNowAddrValid + 8));
+
+			// 3. store type id crc len data to backup block
+			lastAddrBackup = lastAddrBackUp;
+			nowAddr = lastAddrBackUp = nextAddrBackUp;
+			nextAddrBackUp = nextAddrBackUp + tmpLen + 12;
+
+			if((nextAddrBackUp&0x03) != 0)
+			{
+				nextAddrBackUp = (nextAddrBackUp&0xfffffffc) + 4;
+			}
+
+			//store type & idL & nextAddrOffset
+			vast_store_writeWord(nowAddr, __STORE_SET_TYPE(tmpType)
+													| __STORE_SET_IDL(hstore.id[tmpType])
+													|  __STORE_SET_NEXT_ADDR((nextAddrBackUp-backupAddr)));
+			nowAddr = nowAddr + 4;
+
+			//store idH & lastAddrOffset
+			vast_store_writeWord(nowAddr, __STORE_SET_IDH(hstore.id[tmpType])
+													|  __STORE_SET_LAST_ADDR((lastAddrBackup-backupAddr)));
+			nowAddr = nowAddr + 4;
+
+			//store crc & len
+			crc16 = __STORE_GET_CRC(vast_store_readWord(tmpNowAddrValid + 8));
+			vast_store_writeWord(nowAddr, __STORE_SET_CRC(crc16)
+													|  __STORE_SET_LEN(tmpLen));
+
+			if( (tmpLen <= 0) | (__STORE_SET_LEN(tmpLen) > (BLOCK_SIZE/STORE_TYPE_MAX)))
+			{
+				VAST_STORE_DBG_LOG(DBG_ERROR, "backupBlockAddr:%#lx, len:%ld\r\n", backupAddr, __STORE_SET_LEN(tmpLen));
+			}
+
+			nowAddr += 4;
+
+			// 4. store data to backup block
+			for (i=0; i<tmpLen; i+=4)
+			{
+				vast_store_writeWord(nowAddr+i, vast_store_readWord(tmpNowAddrValid+i+12));
+			}
+
+			storeTypeCnt++;
+		}
+
+		tmpNowAddrValid = __STORE_GET_LAST_ADDR(vast_store_readWord(tmpNowAddrValid + 4));
+
+		if( tmpNowAddrValid < 4)
+		{
+			break;
+		}
+		else
+		{
+			tmpNowAddrValid = tmpNowAddrValid + validAddr;
+		}
+
+	}while ((storeTypeCnt != (STORE_TYPE_MAX-1)) & ((tmpNowAddrValid-validAddr) >= 4) );
+
+	value = vast_store_readWord(backupAddr);
+	erase_times = __STORE_GET_ERASE_TIMES(value);
+	ret = vast_store_writeWord (backupAddr, __STORE_SET_STATUS(VALID_BLOCK) | __STORE_SET_ERASE_TIMES(erase_times));
+
+	vast_store_setBlockStatus(validAddr, BACKUP_BLOCK);
+
+	__VAST_SWAP(hstore.nextAddrVaild, nextAddrBackUp);
+	__VAST_SWAP(hstore.lastAddrVaild, lastAddrBackUp);
+
+	return ret;
 }
 
 /**
@@ -561,7 +714,11 @@ int32_t vast_store_write(Store_TypeTypeDef type, uint8_t *dat, uint32_t len)
 	{
 		VAST_STORE_DBG_LOG(DBG_INFO, "validBlock:%#lX + %ld >= %#lX! store to backup block\r\n", hstore.nextAddrVaild, len, BLOCK_SIZE);
 
+#if 0
 		vast_store_writeToBackupBlock(type, dat, len);
+#else
+		vast_store_swapBlock(type, dat, len);
+#endif
 	}
 	else
 	{
