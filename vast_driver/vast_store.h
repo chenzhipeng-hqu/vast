@@ -75,7 +75,7 @@ be done by word  */
 #define __STORE_GET_LEN(x)                		(uint16_t)((x) & 0xFFFF)
 
  /*BLOCK*/
-#define __STORE_SET_STATUS(x)                   (uint8_t)(((x) & 0xF) << 28)     //
+#define __STORE_SET_STATUS(x)                   (uint32_t)(((x) & 0x0F) << 28)     //
 #define __STORE_SET_ERASE_TIMES(x)              (uint32_t)(((x) & 0xFFFFFF))   //
 
  /*data0*/
