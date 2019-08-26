@@ -79,31 +79,35 @@
 
 
 #define DBG_PRINTF_TASK(level, fmt, ...)    do{ \
-												if( level <= pLog->Init.dbgLevel) {\
+												if( level <= me->dbgLevel) {\
 													switch (level) {\
-														case E_DBG_CRISIS: {\
+														case DBG_CRISIS: {\
 															hlog.WriteLog(FONT_MAGENTA "[%s][%s]: " fmt RESET_COLOR, #level, __FUNCTION__, ##__VA_ARGS__);\
 																break;\
 														}\
-														case E_DBG_ERROR: {\
+														case DBG_ERROR: {\
 															hlog.WriteLog(FONT_RED "[%08d][%s][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, __FUNCTION__, ##__VA_ARGS__);\
 																break;\
 														}\
-														case E_DBG_WARNING: {\
-															hlog.WriteLog(FONT_YELLOW "[%08d][%s][%s]: " fmt RESET_COLOR, osKernehlog.TicklSysTick(), #level, __FUNCTION__, ##__VA_ARGS__);\
+														case DBG_WARNING: {\
+															hlog.WriteLog(FONT_YELLOW "[%08d][%s][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, __FUNCTION__, ##__VA_ARGS__);\
 																break;\
 														}\
-														case E_DBG_INFO: {\
+														case DBG_INFO: {\
 																hlog.WriteLog(FONT_GREEN "[%08d][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, ##__VA_ARGS__);\
 																break;\
 														}\
-														case E_DBG_DEBUG: {\
+														case DBG_DEBUG: {\
 															hlog.WriteLog(FONT_CYAN "[%08d][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, ##__VA_ARGS__);\
 																break;\
 														}\
-														case E_DBG_QPSIG: {\
-															hlog.WriteLog(FONT_BLUE "[%08d][%s][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, __FUNCTION__, ##__VA_ARGS__);\
-																}\
+														case DBG_QPSIG: {\
+															if((e->sig == Q_EMPTY_SIG)\
+																| (e->sig == TIME_TICK_SIG)\
+																| (e->sig == TEST_TIMEOUT_SIG) ){\
+															}else {\
+																hlog.WriteLog(FONT_BLUE "[%08d][%s][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, __FUNCTION__, ##__VA_ARGS__);\
+															}\
 																break;\
 														}\
 														default: {\

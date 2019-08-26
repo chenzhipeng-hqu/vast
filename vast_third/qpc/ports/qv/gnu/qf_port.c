@@ -96,13 +96,15 @@ void USART2_IRQHandler(void) {
 int QF_init_bsp(void)
 {
 	static QSubscrList 					subscrSto[MAX_PUB_SIG];
-	static QF_MPOOL_EL(QEvt) 			smlPoolSto[256] __attribute__ ((section (".ccmram"))); /* small pool */
+	static QF_MPOOL_EL(DebugLevelEvt) 	smlPoolSto[256] __attribute__ ((section (".ccmram"))); /* small pool */
 
 	QF_init(); /* initialize the framework */
 
 	QF_psInit(subscrSto, Q_DIM(subscrSto));
 
 	QF_poolInit(smlPoolSto, sizeof(smlPoolSto), sizeof(smlPoolSto[0]));
+
+	Test_Ctor(1);
 
 	return 0;
 }
@@ -170,7 +172,10 @@ void Q_onAssert(char const *module, int loc) {
     (void)module;
     (void)loc;
     QS_ASSERTION(module, loc, (uint32_t)10000U); /* report assertion to QS */
-    NVIC_SystemReset();
+//    NVIC_SystemReset();
+    printf("%s %d, %d\r\n" ,module, loc, QF_getPoolMin(1));
+//    printf("%s %d, %d,%d,%d\r\n" ,module, loc, QF_getPoolMin(1), QF_getPoolMin(2), QF_getPoolMin(3));
+   // while(1);
 }
 
 /* QS callbacks ============================================================*/

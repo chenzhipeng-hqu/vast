@@ -396,6 +396,7 @@ static int16_t vast_store_writeToBlock(uint32_t blockAddr, uint32_t *pNextAddr, 
 
 	return ret;
 }
+#if 0
 /**
   * @brief  vast_store_writeToBackupBlock.
   * @param
@@ -521,7 +522,7 @@ static int16_t vast_store_writeToBackupBlock(Store_TypeTypeDef type, uint8_t *da
 
 	return ret;
 }
-
+#endif
 /**
   * @brief  vast_ring_flash_initialize.
   * @param
@@ -739,12 +740,17 @@ int32_t vast_store_read(Store_TypeTypeDef type, uint8_t *dat, uint32_t size)
 	uint8_t type_tmp = STORE_TYPE_MAX;
 	uint32_t validAddr = 0xFFFFF, backupAddr = 0xFFFFF;
 
-	len = hstore.nextAddrVaild - hstore.lastAddrVaild - 12;
+	//len = hstore.nextAddrVaild - hstore.lastAddrVaild - 12;
 
-	ASSERT(((len > 0) | (size > 0) | (type < STORE_TYPE_MAX)),
-		DBG_LOG(DBG_ERROR, "nextAddr=%#lx, lastAddr=%#lx, size=%d\r\n", hstore.nextAddrVaild, hstore.lastAddrVaild, size);
+	ASSERT(((size > 0) & (type < STORE_TYPE_MAX)),
+		DBG_LOG(DBG_ERROR, "nextAddr=%#lx, lastAddr=%#lx, type=%d, size=%d\r\n", hstore.nextAddrVaild, hstore.lastAddrVaild, type, size);
 		return 0
 			);
+
+	if(hstore.id[type] <= 0)
+	{
+		return 0;
+	}
 
 	vast_store_findValidBlock(&validAddr, &backupAddr);
 

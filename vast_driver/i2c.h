@@ -2,6 +2,7 @@
 #define __I2C_H__
 
 #include <vast_core/types.h>
+#include <vast_core/device.h>
 
 #ifdef __cplusplus
 extern "C" {

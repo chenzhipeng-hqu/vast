@@ -2982,6 +2982,7 @@ CJSON_PUBLIC(void) cJSON_test(void)
 	cJSON *  	STUDENT1=cJSON_CreateObject();
 	cJSON *  	STUDENT2=cJSON_CreateObject();
 	cJSON *  	STUDENT3=cJSON_CreateObject();
+	cJSON *  	STUDENT4=cJSON_CreateObject();
 	char*       out;
 
 	cJSON_AddItemToObject(STUDENT1, "name", cJSON_CreateString("小明"));
@@ -2990,9 +2991,12 @@ CJSON_PUBLIC(void) cJSON_test(void)
 	cJSON_AddItemToObject(STUDENT2, "age", cJSON_CreateNumber(14));
 	cJSON_AddItemToObject(STUDENT3, "name", cJSON_CreateString("小强"));
 	cJSON_AddItemToObject(STUDENT3, "age", cJSON_CreateNumber(16.5));
+	cJSON_AddItemToObject(STUDENT4, "name", cJSON_CreateString("小东"));
+	cJSON_AddItemToObject(STUDENT4, "age", cJSON_CreateNumber(18));
 	cJSON_AddItemToArray(AAA,STUDENT1);
 	cJSON_AddItemToArray(AAA,STUDENT2);
 	cJSON_AddItemToArray(AAA,STUDENT3);
+	cJSON_InsertItemInArray(AAA, 0, STUDENT4);
 	cJSON_AddItemToObject(AA, "class_number", cJSON_CreateNumber(1));
 	cJSON_AddItemToObject(AA, "students", AAA);
 	cJSON_AddItemToObject(A, "class", AA);
@@ -3021,7 +3025,7 @@ CJSON_PUBLIC(void) cJSON_test(void)
 		n=cJSON_GetArraySize(AAA);                  //获得数组成员个数
 		printf("arr_num=%u \r\n",n);
 
-//		HAL_Delay(50);
+		HAL_Delay(50);
 		for(uint16_t i=0; i<n; i++)                     //从成员0到成员2，依次打印
 		{
 			AAAA=cJSON_GetArrayItem(AAA,i);      //成员1的cJOSN_Object
@@ -3036,7 +3040,7 @@ CJSON_PUBLIC(void) cJSON_test(void)
 				name=NAME->valuestring;
 				printf("student%u_name=%s \r\n",i,name);
 			}
-//			HAL_Delay(50);
+			HAL_Delay(50);
 			AGE=cJSON_GetObjectItem(AAAA,"age");
 			if(AGE==NULL)
 			{
@@ -3048,7 +3052,7 @@ CJSON_PUBLIC(void) cJSON_test(void)
 				double age2=AGE->valuedouble;
 				printf("student%u_age=%u, %g\r\n",i,age,age2);
 			}
-//			HAL_Delay(50);
+			HAL_Delay(50);
 		}
 	}
 

@@ -176,7 +176,7 @@ err_t led_device_register(led_device_t *led, const char *name, uint32_t flag, vo
 	dev->ops 		= &led_ops;
 	dev->user_data	= data;
 
-	return device_register(&led->parent, name, flag);
+	return device_register(dev, name, flag);
 }
 
 /**

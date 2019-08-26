@@ -2,6 +2,7 @@
 #define _HEAP_H_
 
 #include <vast_core/types.h>
+#include <vast_bsp/vast_config.h>
 
 #ifndef configTOTAL_HEAP_SIZE
 #define configTOTAL_HEAP_SIZE   (1024u*2)
