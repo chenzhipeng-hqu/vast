@@ -3,7 +3,7 @@
 #define __INA219_H__
 
 #include "stm32f4xx_hal.h"
-#include "i2c.h"
+#include "vast_driver/i2c.h"
 
 //#define INA219_I2C_PORT                   GPIOB
 //#define INA219_I2C_GPIO_CLOCK            RCC_APB2Periph_GPIOB
@@ -148,7 +148,7 @@ typedef struct
 typedef struct
 {
 //	I2C_HandleTypeDef *pI2cx;  //i2c interface
-	
+	struct i2c_bus_device *i2c_bus;
 	uint16_t 	Addr;
 	uint16_t	ShuntR;		//uint�� m��  ��������
 	uint16_t	CurrentLSB;  //unit: uA
@@ -157,6 +157,43 @@ typedef struct
 	INA219_DATA data;
 }INA219_HandleTypeDef;
 
+struct _ina219_device_t;
+
+typedef struct _ina219_init_t
+{
+	uint16_t rnf;
+	uint16_t bus_vol;
+	uint16_t pga;
+	uint16_t badc;
+	uint16_t sadc;
+	uint16_t work_mode;
+	uint16_t addr;
+	uint16_t i_lsb;
+}ina219_init_t;
+
+typedef struct _ina219_ops_t
+{
+	err_t	(*init)		(struct _ina219_device_t *ina219, ina219_init_t *args);
+	size_t 	(*read)		(struct _ina219_device_t *ina219, uint8_t reg, uint16_t *dat);
+	size_t 	(*write)	(struct _ina219_device_t *ina219, uint8_t reg, uint16_t dat);
+}ina219_ops_t;
+
+typedef struct _ina219_device_t
+{
+	struct device 		parent;
+ 	const ina219_ops_t 	*ops;
+	uint16_t 			addr;
+//	uint16_t			rnf;		//uint: mΩ RNF:sampling resistor
+	uint16_t			i_lsb;  	//unit: uA
+}ina219_device_t;
+
+enum INA219_CTRL
+{
+    GET_SHUNT_VOL,
+    GET_CURRENT,
+    GET_VOLTAGE,
+    GET_POWER,
+};
 
 extern INA219_struct ina219Obj;
 
@@ -172,6 +209,9 @@ extern uint32_t ina219_GetCurrent_uA(INA219_HandleTypeDef *ina219x);
 extern uint16_t ina219_GetPower_mW(INA219_HandleTypeDef *ina219x);
 extern void INA219_Get_All_Value(INA219_HandleTypeDef *ina219x);
 extern void INA219_Config(INA219_HandleTypeDef *ina219 );
+
+
+err_t ina219_device_register(ina219_device_t *ina219, const char *name, uint32_t flag, void *data);
 
 #endif
 

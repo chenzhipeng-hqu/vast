@@ -57,7 +57,7 @@ enum KEY_CTRL
 
 enum SWITCH_CTRL
 {
-  CTRL_ON,
+	CTRL_ON,
 	CTRL_OFF,
 	CTRL_NORMAL,
 	CTRL_EMCY,
@@ -142,9 +142,13 @@ void     device_set_owner(device_t *dev, const void *owner);
 #endif
 
 #ifdef configUSING_I2C
-#include "../vast/vast_driver/i2c.h"
-#include "vast/vast_driver/i2c_dev.h"
-#include "vast/vast_driver/i2c-bit-ops.h"
+#include "vast_driver/i2c.h"
+#include "vast_driver/i2c_dev.h"
+#include "vast_driver/i2c-bit-ops.h"
+#endif
+
+#ifdef configUSING_INA219
+#include "vast_device/ina219.h"
 #endif
 
 #ifdef configUSING_RX8025
