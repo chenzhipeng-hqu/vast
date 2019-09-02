@@ -6,7 +6,7 @@
 typedef int (*initcall_t)(void);
 
 #define __define_initcall(fn, id) \
-    static const initcall_t __initcall_##fn##id __attribute__((unused)) \
+    static const initcall_t __initcall_##fn##id __attribute__((used)) \
     __attribute__((__section__("initcall" #id "init"))) = fn;
 
 

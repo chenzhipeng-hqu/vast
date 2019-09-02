@@ -406,7 +406,7 @@ __kfifo_int_must_check_helper( \
             (__tmp->buf) \
             )[__kfifo->in & __tmp->kfifo.mask] = \
                 *(typeof(__tmp->type))&__val; \
-            smp_wmb(); \
+            /*smp_wmb();*/ \
             __kfifo->in++; \
         } \
     } \
@@ -444,7 +444,7 @@ __kfifo_uint_must_check_helper( \
                 ((typeof(__tmp->type))__kfifo->data) : \
                 (__tmp->buf) \
                 )[__kfifo->out & __tmp->kfifo.mask]; \
-            smp_wmb(); \
+            /*smp_wmb();*/ \
             __kfifo->out++; \
         } \
     } \
@@ -483,7 +483,7 @@ __kfifo_uint_must_check_helper( \
                 ((typeof(__tmp->type))__kfifo->data) : \
                 (__tmp->buf) \
                 )[__kfifo->out & __tmp->kfifo.mask]; \
-            smp_wmb(); \
+            /*smp_wmb();*/ \
         } \
     } \
     __ret; \
