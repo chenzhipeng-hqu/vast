@@ -1,7 +1,7 @@
 #ifndef __DEVICE_H__
 #define __DEVICE_H__
 
-#include <vast_config.h>
+#include "vast_config.h"
 #include "vast_core/softtimer.h"
 #include <vast_core/types.h>
 #include <vast_core/kfifo.h>
@@ -38,6 +38,8 @@ enum device_class_type
 #define DEVICE_CTRL_GET_INT          0x12
 #define DEVICE_CTRL_SET_TX_INT       0x13       /* enable transmit irq */
 #define DEVICE_CTRL_CLR_TX_INT       0x14       /* disable transmit irq */
+#define DEVICE_CTRL_ADD_OUT          0x15       /* add fifo out */
+#define DEVICE_CTRL_INT_PRIO      	 0x16       /* modify Priority */
 
 #define DEVICE_CTRL_BLK_GETGEOME     0x10       /**< get geometry information   */
 #define DEVICE_CTRL_BLK_SYNC         0x11       /**< flush data to block device */
@@ -118,7 +120,7 @@ void     device_set_owner(device_t *dev, const void *owner);
 #endif
 
 #ifdef configUSING_SERIAL
-#include "drivers/serial.h"
+#include "vast_driver/vast_serial.h"
 #endif
 
 #ifdef configUSING_KEY

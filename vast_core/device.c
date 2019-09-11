@@ -1,6 +1,6 @@
 #include <vast_core/types.h>
 #include <vast_core/utils.h>
-//#include <os.h>
+#include <vast_third/croutine/croutine.h>
 //#include <printk.h>
 //#include <syserr.h>
 #include "vast_core/list.h"
@@ -43,8 +43,8 @@ err_t device_open(device_t *dev, uint16_t oflag)
 
     if (!ret)
     {
-//        if (oflag & DEVICE_FLAG_FASYNC)
-//            dev->owner = task_get_current_task_handle();
+        if (oflag & DEVICE_FLAG_FASYNC)
+            dev->owner = task_get_current_task_handle();
 
         dev->open_flag = oflag;
         dev->flag |= DEVICE_FLAG_OPENED;

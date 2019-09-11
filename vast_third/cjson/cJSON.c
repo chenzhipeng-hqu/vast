@@ -2972,6 +2972,7 @@ CJSON_PUBLIC(void) cJSON_free(void *object)
     global_hooks.deallocate(object);
 }
 
+#include "stm32f4xx_hal.h"
 CJSON_PUBLIC(void) cJSON_test(void)
 {
 	printf("cJSON_Version: %s\r\n", cJSON_Version());

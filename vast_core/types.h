@@ -7,7 +7,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-
 #define SIZE_1K         (1024u)
 #define SIZE_1M         (1024*1024u)
 
@@ -57,4 +56,11 @@ struct device_blk_geometry
     uint32_t bytes_per_sector;                       /**< number of bytes per sector */
     uint32_t block_size;                             /**< number of bytes to erase one block */
 };
+
+typedef struct _data_t
+{
+	size_t 		len;
+	uint8_t		buf[0];
+}data_t;
+
 #endif  /* end of _TYPES_H */

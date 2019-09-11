@@ -37,6 +37,8 @@
 #include "vast_core/softtimer.h"
 #include "vast_core/init.h"
 #include "../qpc_task/qpc_common.h"
+#include "vast_third/croutine/croutine.h"
+//#include "stm32f4xx_ll_usart.h"
 
 /* add other drivers if necessary... */
 
@@ -160,7 +162,11 @@ void QV_onIdle(void) { /* CATION: called with interrupts DISABLED, NOTE01 */
 #else
     QF_INT_ENABLE(); /* just enable interrupts */
 
-    soft_timer_task();
+    //soft_timer_task();
+    task_schedule();
+
+    /*LL_USART_TransmitData8(USART1, 'A');*/
+    /*while(!LL_USART_IsActiveFlag_TXE(USART1));*/
 #endif
 }
 

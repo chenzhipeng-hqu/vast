@@ -98,7 +98,7 @@
 																break;\
 														}\
 														case DBG_DEBUG: {\
-															hlog.WriteLog(FONT_CYAN "[%08d][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, ##__VA_ARGS__);\
+															hlog.WriteLog("[%08d][%s]: " fmt, hlog.Tick(), #level, ##__VA_ARGS__);\
 																break;\
 														}\
 														case DBG_QPSIG: {\
@@ -137,7 +137,7 @@
 														break;\
 												}\
 												case DBG_DEBUG: {\
-													hlog.WriteLog(FONT_CYAN "[%08d][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, ##__VA_ARGS__);\
+													hlog.WriteLog("[%08d][%s]: " fmt, hlog.Tick(), #level, ##__VA_ARGS__);\
 														break;\
 												}\
 												default: {\
@@ -167,7 +167,7 @@
 														break;\
 												}\
 												case DBG_DEBUG: {\
-													hlog.WriteLog(FONT_CYAN fmt RESET_COLOR, ##__VA_ARGS__);\
+													hlog.WriteLog(fmt, ##__VA_ARGS__);\
 														break;\
 												}\
 												default: {\
@@ -196,7 +196,7 @@
 													break;\
 											}\
 											case DBG_DEBUG: {\
-												hlog.WriteLog(FONT_CYAN "[%08d][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, ##__VA_ARGS__);\
+												hlog.WriteLog("[%08d][%s]: " fmt, hlog.Tick(), #level, ##__VA_ARGS__);\
 													break;\
 											}\
 											default: {\
@@ -209,7 +209,7 @@
 																if(level <= hlog.dbgLevel) {\
 																	switch (level) {\
 																		case DBG_DEBUG: {\
-																				vast_log_array(FONT_CYAN aHEAD, aTAIL RESET_COLOR, aARRAY, nLEN);\
+																				vast_log_array(aHEAD, aTAIL, aARRAY, nLEN);\
 																				break;\
 																		}\
 																		default: {\

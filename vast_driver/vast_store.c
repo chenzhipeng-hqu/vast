@@ -21,6 +21,7 @@
 #include <stdarg.h>
 #include "vast_core/utils.h"
 #include "vast_store.h"
+#include "vast_driver/vast_log.h"
 
 /***********************************************
                     define

@@ -188,6 +188,36 @@ __kfifo_int_must_check_helper(int val)
     return val;
 }
 
+#define kfifo_add_out(fifo, off) \
+(void)({ \
+    typeof((fifo) + 1) __tmp = (fifo); \
+     __tmp->kfifo.out += off; \
+})
+
+/*
+ * __kfifo_add_out internal helper function for updating the out offset
+ */
+static inline void __kfifo_add_out(struct __kfifo *fifo,
+				unsigned int off)
+{
+	fifo->out += off;
+}
+
+/*
+ * __kfifo_add_in internal helper function for updating the in offset
+ */
+static inline void __kfifo_add_in(struct __kfifo *fifo,
+				unsigned int off)
+{
+	fifo->in += off;
+}
+
+#define kfifo_add_in(fifo, off) \
+(void)({ \
+    typeof((fifo) + 1) __tmp = (fifo); \
+     __tmp->kfifo.in += off; \
+})
+
 /**
  * kfifo_initialized - Check if the fifo is initialized
  * @fifo: address of the fifo to check

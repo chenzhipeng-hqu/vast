@@ -11,8 +11,8 @@ typedef struct
 } chn_slot_t;
 
 #define BLOCK_NO_SHIFT      (7)
-#define BLOCK_SIZE          (0x01 << BLOCK_NO_SHIFT)
-#define BLOCK_MASK          (BLOCK_SIZE-1)
+#define BLOCK_TOTAL_SIZE    (0x01 << BLOCK_NO_SHIFT)
+#define BLOCK_MASK          (BLOCK_TOTAL_SIZE-1)
 
 #define INVALID_BLOCK_NO    (0xFF)
 #define INVALID_PTR         (INVALID_BLOCK_NO << BLOCK_NO_SHIFT)

@@ -1,4 +1,4 @@
-#include <config.h>
+#include <vast_bsp/vast_config.h>
 #include <types.h>
 #include <init.h>
 #include "lib_config.h"

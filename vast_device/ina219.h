@@ -2,7 +2,6 @@
 #ifndef __INA219_H__
 #define __INA219_H__
 
-#include "stm32f4xx_hal.h"
 #include "vast_driver/i2c.h"
 
 //#define INA219_I2C_PORT                   GPIOB

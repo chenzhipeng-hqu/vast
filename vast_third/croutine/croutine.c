@@ -1,7 +1,7 @@
-#include <config.h>
-#include <croutine.h>
-#include "port.h"
-#include "jiffies.h"
+#include <vast_config.h>
+#include <vast_third/croutine/croutine.h>
+#include <vast_third/croutine/port.h>
+#include "vast_core/softtimer.h"
 
 static LIST_HEAD(task_list);
 static tcb_t *current;
@@ -89,7 +89,13 @@ void task_schedule(void)
     {
         if (current->status == TS_READY)
         {
+			time_t start_jiffies = jiffies;
+
             current->tcb_cb(current, current->data);
+
+            if(jiffies - start_jiffies > 2)
+				printf("task %ldms at %#lx\r\n", (uint32_t)(jiffies-start_jiffies), (uint32_t)current->tcb_cb);
+
         }
     }
 }

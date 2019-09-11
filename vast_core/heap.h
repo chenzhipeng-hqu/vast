@@ -5,7 +5,7 @@
 #include <vast_config.h>
 
 #ifndef configTOTAL_HEAP_SIZE
-#define configTOTAL_HEAP_SIZE   (1024u*2)
+    #define configTOTAL_HEAP_SIZE   (1024u*2)
 #endif
 
 #define malloc os_malloc

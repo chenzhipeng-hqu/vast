@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <vast_core/utils.h>
 #include <vast_third/croutine/port.h>
+#include <vast_third/croutine/croutine.h>
 //#include <printk.h>
 //#include <vast_core/jiffies.h>
 //#include <board.h>
@@ -45,7 +46,7 @@ void soft_timer_mod(struct soft_timer *st, time_t expires)
     exit_critical();
 }
 
-void soft_timer_task(void)
+static void soft_timer_task(void)
 {
 	struct soft_timer *iter, *n;
 
@@ -66,25 +67,13 @@ void soft_timer_task(void)
 	}
 }
 
-#if 0
 static void soft_timer_task_callback(struct task_ctrl_blk *tcb, ubase_t data)
 {
     tSTART(tcb);
 
     for (;;)
     {
-        struct soft_timer *iter, *n;
-
-        list_for_each_entry_safe(iter, n, &timer_list, entry)
-        {
-            if (time_after_eq(jiffies, iter->expires))
-            {
-                soft_timer_del(iter);
-
-                if (iter->cb) iter->cb(iter);
-									
-            }
-        }
+        soft_timer_task();   
         task_delay(tcb, 1);
     }
 
@@ -100,4 +89,3 @@ int setup_soft_timer_service(void)
     return 0;
 }
 core_initcall(setup_soft_timer_service);
-#endif

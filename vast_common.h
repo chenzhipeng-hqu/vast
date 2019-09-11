@@ -33,7 +33,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <stdarg.h>
-#include "vast_log.h"
+//#include "vast_log.h"
 
 /***********************************************
                     define

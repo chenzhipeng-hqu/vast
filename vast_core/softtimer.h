@@ -51,7 +51,7 @@ void soft_timer_add(struct soft_timer *st);
 void soft_timer_del(struct soft_timer *st);
 void soft_timer_mod(struct soft_timer *st, time_t expires);
 
-int setup_soft_timer_service(void);
-void soft_timer_task(void);
+//int setup_soft_timer_service(void);
+//void soft_timer_task(void);
 
 #endif

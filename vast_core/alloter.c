@@ -14,8 +14,8 @@ static struct
 
 int setup_chn_pool(void)
 {
-    while ((sizeof(mem_pool_man.buffer) / BLOCK_SIZE) > 8 * sizeof(mem_pool_man.free_bitmap));
-    mem_pool_man.free_bitmap = (1 << (sizeof(mem_pool_man.buffer) / BLOCK_SIZE)) - 1;
+    while ((sizeof(mem_pool_man.buffer) / BLOCK_TOTAL_SIZE) > 8 * sizeof(mem_pool_man.free_bitmap));
+    mem_pool_man.free_bitmap = (1 << (sizeof(mem_pool_man.buffer) / BLOCK_TOTAL_SIZE)) - 1;
 
     return 0;
 }
@@ -44,7 +44,7 @@ static uint32_t alloc_a_slot(void)
     k = get_last_bit_seqno(bitmap);
     bitmap &= (bitmap - 1);
     mem_pool_man.free_bitmap = bitmap;
-    mem_pool_man.buffer[(k << BLOCK_NO_SHIFT) | (BLOCK_SIZE - 1)] = INVALID_BLOCK_NO;
+    mem_pool_man.buffer[(k << BLOCK_NO_SHIFT) | (BLOCK_TOTAL_SIZE - 1)] = INVALID_BLOCK_NO;
     return k;
 }
 
@@ -105,8 +105,7 @@ err_t chn_put(chn_slot_t *chn,  const void *data, size_t len)
 
         k = chn->rx & BLOCK_MASK;
         k = BLOCK_MASK - k;
-//        k = min(len, k);
-        k = __VAST_MIN_LIMIT(k, len);
+        k = min(len, k);
         memcpy(&mem_pool_man.buffer[chn->rx], (u8 *)data + i, k);
         len -= k;
         chn->rx += k;
@@ -173,10 +172,8 @@ err_t chn_get(chn_slot_t *chn,  void *data, size_t len)
         //some space free
         k = chn->tx & BLOCK_MASK;
         k = BLOCK_MASK - k;
-//        k = min(len, k);
-        k = __VAST_MIN_LIMIT(k, len);
-//        k = min(k, chn->data_cnt);
-        k = __VAST_MIN_LIMIT(chn->data_cnt, k);
+        k = min(len, k);
+        k = min(k, chn->data_cnt);
         memcpy((u8 *)data + i, &mem_pool_man.buffer[chn->tx], k);
         len -= k;
         chn->tx += k;

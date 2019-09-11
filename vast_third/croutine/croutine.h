@@ -1,11 +1,17 @@
 #ifndef CO_ROUTINE_H
 #define CO_ROUTINE_H
 
-#include <list.h>
+#include <vast_core/list.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+enum {
+    SIG_ALARM = 1 << 0,
+    SIG_DATA  = 1 << 1,
+    SIG_USR   = 1 << 2,
+};
 
 enum TASK_STATE
 {
