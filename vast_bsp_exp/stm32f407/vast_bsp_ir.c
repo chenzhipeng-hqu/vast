@@ -94,6 +94,54 @@ static int vast_ir_bsp_init(void)
 
 device_initcall(vast_ir_bsp_init);
 
+#ifdef configUSING_CLI
+//------------------------------------------------------------------------------
+//-   custom command functions. ir
+//------------------------------------------------------------------------------
+void cliCmdIrSetup(CLI_HandleTypeDef *pCli,int argc, char *argv[])
+{
+  uint8_t protocal;
+
+  if(argc > 0)
+  {
+    protocal = str2u32(argv[1]);
+    InfraRed_RX_ChangeProtocol(protocal);
+    pCli->Init.Write("set ir %d\n", protocal);
+  }
+}
+
+void cliCmdIrSend(CLI_HandleTypeDef *pCli,int argc, char *argv[])
+{
+  uint16_t head;
+  uint16_t code;
+  uint16_t check;
+
+  if(argc > 3)
+  {
+    head = hex2u32(argv[1]);
+    code = hex2u32(argv[2]);
+    check = hex2u32(argv[3]);
+   // io_irSend(head, code, check);
+    pCli->Init.Write("send ir 0x%04X, 0x%X, 0x%X\n", head, code, check);
+  }
+}
+
+/**
+  * @brief  CLICmd_IRCtrl
+  * @param
+  * @retval
+  */
+const CLICmdTypedef CLICmd_IRCtrl[] =
+{
+  {"s", "s protocal(1:NEC/2:RC5/3:RC6/4:RCA/7:SONY/11:MI/14:SAMSUNG/15:PANASONIC/16:TOSHIBA) Exp:s 1", cliCmdIrSetup, 0},
+//  {"t", "t head code check", cliCmdIrSend, 0},
+	// last command must be all 0s.
+  {0, 0, 0, 0}
+};
+
+CLI_CMD_EXPORT(ir, "ir dir", 0, CLICmd_IRCtrl);
+#endif
+
 /**
   * @}
   */

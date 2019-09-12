@@ -16,5 +16,18 @@
 
 #define configUSING_SERIAL
 
+#define configUSING_CLI
+
+#define configUSING_LOG
+
+#define configUSING_IR
+
+#define configUSING_STORE
+
+#define configUSING_EEPROM
+
+#define configUSING_LED
+
+#define configUSING_EASY_KEY
 
 #endif

@@ -58,6 +58,17 @@ typedef struct _CLICmdTypedef
   const struct _CLICmdTypedef *child;
 } CLICmdTypedef;
 
+typedef void(*cli_func_t)(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
+
+#define	CLI_CMD_EXPORT(cmd, help, func, child) 	\
+		const struct _CLICmdTypedef __cli_##cmd __attribute__((used)) 		\
+	    __attribute__((__section__("cliTable"))) = {	\
+	    	#cmd,								\
+			help,								\
+			(cli_func_t)func,					\
+			(struct _CLICmdTypedef *)child		\
+		}
+
 /*************************************
               variable
 *************************************/

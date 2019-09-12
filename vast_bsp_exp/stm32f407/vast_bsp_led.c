@@ -167,6 +167,51 @@ static int vast_led_bsp_init(void)
 }
 
 device_initcall(vast_led_bsp_init);
+
+#ifdef configUSING_CLI
+/**
+  * @brief  CLICmd_DebugCtrl
+  * @param
+  * @retval
+  */
+void CLICmd_LedCtrl(CLI_HandleTypeDef *pCli, int argc, char *argv[])
+{
+	device_t *dev_led = NULL;
+
+	strcat(argv[0], argv[1]);
+
+	dev_led = device_find(argv[0]);
+
+	ASSERT(dev_led,
+			printf("argv[0]: %s\r\n", argv[0]);
+			return
+			);
+
+	device_open(dev_led, 0);
+
+	if(!stricmp(argv[2], "on"))
+	{
+		device_ctrl(dev_led, CTRL_ON, NULL);
+	}
+	else if(!stricmp(argv[2], "off"))
+	{
+		device_ctrl(dev_led, CTRL_OFF, NULL);
+	}
+	else if(!stricmp(argv[2], "normal"))
+	{
+		device_ctrl(dev_led, CTRL_NORMAL, NULL);
+	}
+	else if(!stricmp(argv[2], "emcy"))
+	{
+		device_ctrl(dev_led, CTRL_EMCY, NULL);
+	}
+
+	device_close(dev_led);
+}
+
+CLI_CMD_EXPORT(led, "led {r/g} {on/off/normal/emcy}", CLICmd_LedCtrl, 0);
+
+#endif
 /**
   * @}
   */

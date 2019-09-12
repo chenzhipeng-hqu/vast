@@ -135,6 +135,18 @@ int16_t vast_log_array(const char *head_buff, const char *tail_buff, const char 
 }
 
 /**
+  * @brief  vast_log_array.
+  * @param
+  * @retval
+  */
+size_t vast_log_info(int level, const char *fmt, ...)
+{
+	size_t len = 0;
+
+	return len;
+}
+
+/**
   * @brief  vast_log_initialize.
   * @param
   * @retval

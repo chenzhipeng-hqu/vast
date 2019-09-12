@@ -49,8 +49,8 @@ enum device_class_type
 #define RTC_CTRL_GET_TIME            0x01
 #define RTC_CTRL_SET_TIME            0x02
 #define RTC_CTRL_SET_DATE            0x03
-#define RTC_CTRL_ADD_ALARM            0x04
-#define RTC_CTRL_DEL_ALARM            0x05
+#define RTC_CTRL_ADD_ALARM           0x04
+#define RTC_CTRL_DEL_ALARM           0x05
 
 enum KEY_CTRL
 {
@@ -90,14 +90,10 @@ typedef struct device_ops
 struct device
 {
     struct object  parent;
-
     u16  flag;
     u16  open_flag;
-
     u8   ref_count;
-
     const struct device_ops *ops;
-
     void  *owner;
     void  *user_data;
 };
@@ -120,63 +116,82 @@ void     device_set_owner(device_t *dev, const void *owner);
 #endif
 
 #ifdef configUSING_SERIAL
-#include "vast_driver/vast_serial.h"
+	#include "vast_driver/vast_serial.h"
 #endif
 
-#ifdef configUSING_KEY
-#include "drivers/key.h"
+#ifdef configUSING_EASY_KEY
+	#include "vast_device/vast_easy_key.h"
 #endif
 
 #ifdef configUSING_SPI
-#include "drivers/spi/spi.h"
-# ifdef configUSING_SPI_BITBANG
-#include "drivers/spi/spi_bitbang.h"
-# endif
+	#include "drivers/spi/spi.h"
+	#ifdef configUSING_SPI_BITBANG
+		#include "drivers/spi/spi_bitbang.h"
+	#endif
 #endif
 
 #ifdef configUSING_W25Qxx
-#include "drivers/flash/spi_flash.h"
-#include "drivers/flash/spi_flash_w25qxx.h"
+	#include "drivers/flash/spi_flash.h"
+	#include "drivers/flash/spi_flash_w25qxx.h"
 #endif
 
 #ifdef configUSING_W5500
-#include "drivers/net/w5500.h"
+	#include "drivers/net/w5500.h"
 #endif
 
 #ifdef configUSING_I2C
-#include "vast_driver/i2c.h"
-#include "vast_driver/i2c_dev.h"
-#include "vast_driver/i2c-bit-ops.h"
+	#include "vast_driver/i2c.h"
+	#include "vast_driver/i2c_dev.h"
+	#include "vast_driver/i2c-bit-ops.h"
 #endif
 
 #ifdef configUSING_INA219
-#include "vast_device/ina219.h"
+	#include "vast_device/ina219.h"
+#endif
+
+#ifdef configUSING_CLI
+	#include "vast_driver/vast_cli.h"
+#endif
+
+#ifdef configUSING_LOG
+	#include "vast_driver/vast_log.h"
+#endif
+
+#ifdef configUSING_STORE
+	#include "vast_driver/vast_store.h"
+#endif
+
+#ifdef configUSING_EEPROM
+	#include "vast_driver/vast_simulatite_eeprom.h"
+#endif
+
+#ifdef configUSING_IR
+	#include "vast_device/vast_ir.h"
+#endif
+
+#ifdef configUSING_LED
+	#include "vast_device/vast_led.h"
 #endif
 
 #ifdef configUSING_RX8025
-#include "drivers/rtc/rx8025.h"
+	#include "drivers/rtc/rx8025.h"
 #endif
 
 #ifdef configUSING_AT24C
-#include "drivers/eeprom/at24cxx.h"
+	#include "drivers/eeprom/at24cxx.h"
 #endif
 
 #ifdef configUSING_HDC1080
-#include "drivers/hdc1080.h"
+	#include "drivers/hdc1080.h"
 #endif
 
 #ifdef configUSING_SI7020
-#include "drivers/si7020.h"
+	#include "drivers/si7020.h"
 #endif
 
 #ifdef configUSING_LCD
-#include "drivers/lcd.h"
+	#include "drivers/lcd.h"
 #endif
-
-struct flash_erase_cmd
-{
-    u32 start, size;
-};
 
 #endif /* __DEVICE_H__ */
 

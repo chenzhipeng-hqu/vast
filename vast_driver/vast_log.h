@@ -292,6 +292,7 @@ int16_t vast_log_array(const char *head_buff, const char *tail_buff, const char 
 /***********************************************
                    variable
 ***********************************************/
+
 extern const char buildDate[];
 extern const char buildTime[];
 extern Log_HandleTypeDef 	hlog;

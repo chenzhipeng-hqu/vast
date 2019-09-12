@@ -43,8 +43,8 @@
 *************************************/
 static void CLICmd_ResetCtrl(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
 static void CLICmd_DebugCtrl(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
-static void CLICmd_MemCtrl(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
-static void CLICmd_LedCtrl(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
+//static void CLICmd_MemCtrl(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
+//static void CLICmd_LedCtrl(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
 
 /*************************************
               variable
@@ -52,26 +52,32 @@ static void CLICmd_LedCtrl(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
 extern const CLICmdTypedef CLICmd_GpioCtrl[];
 extern const CLICmdTypedef cliCmdTableE2prom[];
 extern const CLICmdTypedef cliCmdTableReg[];
-extern const CLICmdTypedef CLICmd_IRCtrl[];
-extern const CLICmdTypedef CLICmd_StoreCtrl[];
+//extern const CLICmdTypedef CLICmd_IRCtrl[];
+//extern const CLICmdTypedef CLICmd_StoreCtrl[];
 
-const CLICmdTypedef CLI_CmdTableMain[] =
-{
-  {"cd"		, "goto dir", CLICmd_GotoTree, 0},
-  {"reg"	, "reg dir", 0, cliCmdTableReg},
-  {"gpio"	, "gpio dir", 0, CLICmd_GpioCtrl},
-  {"reset"	, "reset {iwdg/soft}", CLICmd_ResetCtrl, 0},
-  {"debug"	, "debug (sys/board/test) 0~5", CLICmd_DebugCtrl, 0},
-  {"mem"	, "mem {print/malloc/free} [size]", CLICmd_MemCtrl, 0},
-  {"eep"	, "e2prom dir", 0, cliCmdTableE2prom},
-  {"ir"		, "ir dir", 0, CLICmd_IRCtrl},
-  {"store"	, "store dir", 0, CLICmd_StoreCtrl},
-  {"led"	, "led {r/g} {on/off/normal/emcy}", CLICmd_LedCtrl, 0},
+//const CLICmdTypedef CLI_CmdTableMain[] =
+//{
+//  {"cd"		, "goto dir", CLICmd_GotoTree, 0},
+//  {"reg"	, "reg dir", 0, cliCmdTableReg},
+//  {"gpio"	, "gpio dir", 0, CLICmd_GpioCtrl},
+//  {"reset"	, "reset {iwdg/soft}", CLICmd_ResetCtrl, 0},
+//  {"debug"	, "debug (sys/board/test) 0~5", CLICmd_DebugCtrl, 0},
+//  {"mem"	, "mem {print/malloc/free} [size]", CLICmd_MemCtrl, 0},
+//  {"eep"	, "e2prom dir", 0, cliCmdTableE2prom},
+//  {"ir"		, "ir dir", 0, CLICmd_IRCtrl},
+//  {"store"	, "store dir", 0, CLICmd_StoreCtrl},
+//  {"led"	, "led {r/g} {on/off/normal/emcy}", CLICmd_LedCtrl, 0},
+//
+//  // last command must be all 0s.
+//  {0, 0, 0, 0}
+//};
 
-  // last command must be all 0s.
-  {0, 0, 0, 0}
-};
-
+CLI_CMD_EXPORT(reg		, "reg dir", 0, cliCmdTableReg);
+CLI_CMD_EXPORT(gpio		, "gpio dir", 0, CLICmd_GpioCtrl);
+CLI_CMD_EXPORT(reset	, "reset {iwdg/soft}", CLICmd_ResetCtrl, 0);
+CLI_CMD_EXPORT(debug	, "debug (sys/board/test) 0~5", CLICmd_DebugCtrl, 0);
+//CLI_CMD_EXPORT(mem		, "mem {print/malloc/free} [size]", CLICmd_MemCtrl, 0);
+CLI_CMD_EXPORT(eep		, "e2prom dir", 0, cliCmdTableE2prom);
 
 /*************************************
               function
@@ -83,99 +89,70 @@ const CLICmdTypedef CLI_CmdTableMain[] =
   */
 void CLICmd_DebugCtrl(CLI_HandleTypeDef *pCli, int argc, char *argv[])
 {
-
-	if(!strcmp(argv[1], "test"))
-	{
+	if(!strcmp(argv[1], "test")) {
 		DebugLevelEvt * const pe = Q_NEW(DebugLevelEvt, DEBUG_LEVEL_SIG);
 		pe->u8Param1 = str2u32(argv[2]);
 		QACTIVE_POST(AO_Test, &pe->super, me);
+	} else if(!strcmp(argv[1], "led")) {
+//		extern CLICmdTypedef __cliTab_start, __cliTab_end; /*申明外部变量,在ld的脚本文件中定义*/
+//		CLICmdTypedef *pFunc = &__cliTab_start;
+//		//char cmd[] = "led";
+//		for(; pFunc < &__cliTab_end; pFunc++) {
+//			//if(!strcmp(pFunc->cmd, cmd)) {
+//			pCli->Init.Write("\r\ncmd=%s\r\n", pFunc->cmd);
+//			pCli->Init.Write("help=%s\r\n", pFunc->help);
+//			pCli->Init.Write("pFun=%p\r\n", pFunc->pFun);
+//			pCli->Init.Write("child=%p\r\n", pFunc->child);
+//			//}
+//		}
+//		pCli->Init.Write("", );
 	}
 }
 
-/**
-  * @brief  CLICmd_DebugCtrl
-  * @param
-  * @retval
-  */
-void CLICmd_LedCtrl(CLI_HandleTypeDef *pCli, int argc, char *argv[])
-{
-	device_t *dev_led = NULL;
-
-	strcat(argv[0], argv[1]);
-
-	dev_led = device_find(argv[0]);
-
-	ASSERT(dev_led,
-			printf("argv[0]: %s\r\n", argv[0]);
-			return
-			);
-
-	device_open(dev_led, 0);
-
-	if(!stricmp(argv[2], "on"))
-	{
-		device_ctrl(dev_led, CTRL_ON, NULL);
-	}
-	else if(!stricmp(argv[2], "off"))
-	{
-		device_ctrl(dev_led, CTRL_OFF, NULL);
-	}
-	else if(!stricmp(argv[2], "normal"))
-	{
-		device_ctrl(dev_led, CTRL_NORMAL, NULL);
-	}
-	else if(!stricmp(argv[2], "emcy"))
-	{
-		device_ctrl(dev_led, CTRL_EMCY, NULL);
-	}
-
-	device_close(dev_led);
-}
-
-uint8_t *p[10] = {NULL};
-/**
-  * @brief  CLICmd_DebugCtrl
-  * @param
-  * @retval
-  */
-void CLICmd_MemCtrl(CLI_HandleTypeDef *pCli, int argc, char *argv[])
-{
-	if(!stricmp(argv[1], "print"))
-	{
-		//vast_getmemtablestatus();
-	}
-	else if(!stricmp(argv[1], "malloc"))
-	{
-		uint8_t i = str2u32(argv[2]);
-		uint32_t size = str2u32(argv[3]);
-
-		if(p[i] == NULL)
-		{
-			//p[i] = vast_malloc(size);
-			p[i] = malloc(size);
-		}
-		else
-		{
-			printf("p[%d]:%p, p[%d]:%d\r\n", i, p[i], i, *p[i]);
-		}
-	}
-	else if(!stricmp(argv[1], "free"))
-	{
-		uint8_t i = str2u32(argv[2]);
-
-		if(p[i] == NULL)
-		{
-			printf("p[%d]:%p, p[%d]:%d\r\n", i, p[i], i, *p[i]);
-		}
-		else
-		{
-			//vast_free(p[i]);
-			free(p[i]);
-			p[i] = NULL;
-		}
-
-	}
-}
+//uint8_t *p[10] = {NULL};
+///**
+//  * @brief  CLICmd_DebugCtrl
+//  * @param
+//  * @retval
+//  */
+//void CLICmd_MemCtrl(CLI_HandleTypeDef *pCli, int argc, char *argv[])
+//{
+//	if(!stricmp(argv[1], "print"))
+//	{
+//		//vast_getmemtablestatus();
+//	}
+//	else if(!stricmp(argv[1], "malloc"))
+//	{
+//		uint8_t i = str2u32(argv[2]);
+//		uint32_t size = str2u32(argv[3]);
+//
+//		if(p[i] == NULL)
+//		{
+//			//p[i] = vast_malloc(size);
+//			p[i] = malloc(size);
+//		}
+//		else
+//		{
+//			printf("p[%d]:%p, p[%d]:%d\r\n", i, p[i], i, *p[i]);
+//		}
+//	}
+//	else if(!stricmp(argv[1], "free"))
+//	{
+//		uint8_t i = str2u32(argv[2]);
+//
+//		if(p[i] == NULL)
+//		{
+//			printf("p[%d]:%p, p[%d]:%d\r\n", i, p[i], i, *p[i]);
+//		}
+//		else
+//		{
+//			//vast_free(p[i]);
+//			free(p[i]);
+//			p[i] = NULL;
+//		}
+//
+//	}
+//}
 
 /**
   * @brief  CLICmd_IwdgCtrl
@@ -545,237 +522,8 @@ const CLICmdTypedef cliCmdTableE2prom[] =
 };
 
 //------------------------------------------------------------------------------
-//-   custom command functions. ir
-//------------------------------------------------------------------------------
-void cliCmdIrSetup(CLI_HandleTypeDef *pCli,int argc, char *argv[])
-{
-  uint8_t protocal;
-
-  if(argc > 0)
-  {
-    protocal = str2u32(argv[1]);
-    InfraRed_RX_ChangeProtocol(protocal);
-    pCli->Init.Write("set ir %d\n", protocal);
-  }
-}
-
-void cliCmdIrSend(CLI_HandleTypeDef *pCli,int argc, char *argv[])
-{
-  uint16_t head;
-  uint16_t code;
-  uint16_t check;
-
-  if(argc > 3)
-  {
-    head = hex2u32(argv[1]);
-    code = hex2u32(argv[2]);
-    check = hex2u32(argv[3]);
-   // io_irSend(head, code, check);
-    pCli->Init.Write("send ir 0x%04X, 0x%X, 0x%X\n", head, code, check);
-  }
-}
-
-/**
-  * @brief  CLICmd_IRCtrl
-  * @param
-  * @retval
-  */
-const CLICmdTypedef CLICmd_IRCtrl[] =
-{
-  {"s", "s protocal(1:NEC/2:RC5/3:RC6/4:RCA/7:SONY/11:MI/14:SAMSUNG/15:PANASONIC/16:TOSHIBA) Exp:s 1", cliCmdIrSetup, 0},
-//  {"t", "t head code check", cliCmdIrSend, 0},
-	// last command must be all 0s.
-  {0, 0, 0, 0}
-};
-
-
-//------------------------------------------------------------------------------
 //-   custom command functions. store
 //------------------------------------------------------------------------------
-/**
-  * @brief  cliCmdStoreWrite
-  * @param
-  * @retval
-  */
-void cliCmdStoreWrite(CLI_HandleTypeDef *pCli, int argc, char *argv[])
-{
-	uint8_t ret = VAST_OK, type = 0;
-	uint32_t len = 0;
-	uint8_t *p = NULL;
-
-	printf("t1:%ld\r\n", HAL_GetTick());
-
-	type = str2u32(argv[1]);
-
-	if(argc > 3)
-	{
-		len = str2u32(argv[3]);
-//		p = (uint8_t *)vast_malloc(len);
-		p = (uint8_t *)malloc(len);
-
-		if(p != NULL)
-		{
-			memset((void *)p, str2u32(argv[2]), len);
-
-			//ret = vast_ring_flash_store((uint8_t *)p, len);
-			ret = vast_store_write(type, (uint8_t *)p, len);
-
-			if(ret != VAST_OK)
-			{
-				pCli->Init.Write("vast_ring_flash_store ret=%d\r\n", ret);
-			}
-
-//			vast_free(p);
-			free(p);
-		}
-		else
-		{
-			printf("p == NULL\r\n");
-		}
-
-	}
-	else if(argc > 2)
-	{
-		//ret = vast_ring_flash_store((uint8_t *)argv[2], strlen(argv[2]));
-		ret = vast_store_write(type, (uint8_t *)argv[2], strlen(argv[2]));
-
-		if(ret != VAST_OK)
-		{
-			pCli->Init.Write("vast_ring_flash_store ret=%d\r\n", ret);
-		}
-	}
-	printf("t2:%ld\r\n", HAL_GetTick());
-}
-
-/**
-  * @brief  cliCmdStoreRead
-  * @param
-  * @retval
-  */
-
-void cliCmdStoreRead(CLI_HandleTypeDef *pCli, int argc, char *argv[])
-{
-	uint8_t ret = VAST_OK, type = 0, isDetail = 0, isPrintHex = 0;
-	static uint8_t buff_array2[10240] = {0};
-	uint16_t read_len;
-
-	type = str2u32(argv[1]);
-	isDetail = str2u32(argv[2]);
-	isPrintHex = str2u32(argv[3]);
-	//read_len = vast_ring_flash_read(buff_array2, sizeof(buff_array2));
-	read_len = vast_store_read(type, buff_array2, sizeof(buff_array2));
-	buff_array2[read_len] = 0;
-
-	DBG_LOG(DBG_INFO, "read from flash [%d][%d]", type, read_len, (char *)buff_array2);
-
-	if(isDetail == 1)
-	{
-		DBG_INFO(DBG_DEBUG, "[%s]", (char *)buff_array2);
-	}
-
-	if(isPrintHex == 1)
-	{
-		DBG_ARRAY(DBG_DEBUG, "->(", "\b)", (char *)buff_array2, read_len);
-	}
-
-	DBG_INFO(DBG_INFO, "\r\n");
-
-	if(ret != VAST_OK)
-	{
-		pCli->Init.Write("vast_ring_flash_store ret=%d\r\n", ret);
-	}
-}
-
-/**
-  * @brief  cliCmdStoreInfo
-  * @param
-  * @retval
-  */
-
-void cliCmdStoreInfo(CLI_HandleTypeDef *pCli, int argc, char *argv[])
-{
-	/*uint32_t lastAddr = vast_ring_flash_get_last_addr();
-	uint32_t nextAddr = vast_ring_flash_get_next_addr();*/
-	uint32_t lastAddr = vast_store_get_last_addr();
-	uint32_t nextAddr = vast_store_get_next_addr();
-	pCli->Init.Write("lastAddr=%#lx, nextAddr=%#lx, len=%d\r\n", lastAddr, nextAddr, nextAddr-lastAddr);
-
-	int16_t ret = VAST_OK;
-	uint8_t *p = NULL;
-	uint32_t len = 5000;
-
-//	p = (uint8_t *)vast_malloc(len);
-	p = (uint8_t *)malloc(len+2);
-
-	if(p != NULL)
-	{
-		for (uint8_t i=0; i<1; i++)
-		{
-			memset((void *)p, 0x30, len);
-			ret = vast_store_write(0, (uint8_t *)p, len);
-
-			memset((void *)p, 0x31, len);
-			ret = vast_store_write(1, (uint8_t *)p, len+1);
-
-			memset((void *)p, 0x32, len);
-			ret = vast_store_write(2, (uint8_t *)p, len+2);
-
-			if(ret != VAST_OK)
-			{
-				pCli->Init.Write("%s, ret=%d\r\n", __FUNCTION__, ret);
-			}
-		}
-//		vast_free(p);
-		free(p);
-	}
-	else
-	{
-		printf("p == NULL\r\n");
-	}
-}
-
-/**
-  * @brief  cliCmdStorePrint
-  * @param
-  * @retval
-  */
-
-void cliCmdStorePrint(CLI_HandleTypeDef *pCli, int argc, char *argv[])
-{
-	uint8_t type = 0, isDetail = 0, isPrintHex = 0;
-
-	type = str2u32(argv[1]);
-	isDetail = str2u32(argv[2]);
-	isPrintHex = str2u32(argv[3]);
-	vast_store_print(type, isDetail, isPrintHex);
-}
-
-/**
-  * @brief  cliCmdStorePrint
-  * @param
-  * @retval
-  */
-
-void cliCmdStoreReset(CLI_HandleTypeDef *pCli, int argc, char *argv[])
-{
-	vast_store_reset();
-}
-
-/**
-  * @brief  CLICmd_StoreCtrl
-  * @param
-  * @retval
-  */
-const CLICmdTypedef CLICmd_StoreCtrl[] =
-{
-	{"i", "i:info", cliCmdStoreInfo, 0},
-	{"p", "p:print type isDetail isPrintHex", cliCmdStorePrint, 0},
-	{"R", "R:reset", cliCmdStoreReset, 0},
-	{"w", "w:write type data [size]", cliCmdStoreWrite, 0},
-	{"r", "r:read type isDetail isPrintHex", cliCmdStoreRead, 0},
-	// last command must be all 0s.
-	{0, 0, 0, 0}
-};
 
 /************************ (C) COPYRIGHT chenzhipeng *****END OF FILE****/
 
