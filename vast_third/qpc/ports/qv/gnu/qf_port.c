@@ -162,12 +162,9 @@ void QV_onIdle(void) { /* CATION: called with interrupts DISABLED, NOTE01 */
 #else
     QF_INT_ENABLE(); /* just enable interrupts */
 
+#endif
     //soft_timer_task();
     task_schedule();
-
-    /*LL_USART_TransmitData8(USART1, 'A');*/
-    /*while(!LL_USART_IsActiveFlag_TXE(USART1));*/
-#endif
 }
 
 /*..........................................................................*/
