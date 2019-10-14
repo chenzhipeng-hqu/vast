@@ -78,132 +78,12 @@
 #endif
 
 
-#define DBG_PRINTF_TASK(level, fmt, ...)    do{ \
-												if( level <= me->dbgLevel) {\
-													switch (level) {\
-														case DBG_CRISIS: {\
-															hlog.WriteLog(FONT_MAGENTA "[%s][%s]: " fmt RESET_COLOR, #level, __FUNCTION__, ##__VA_ARGS__);\
-																break;\
-														}\
-														case DBG_ERROR: {\
-															hlog.WriteLog(FONT_RED "[%08d][%s][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, __FUNCTION__, ##__VA_ARGS__);\
-																break;\
-														}\
-														case DBG_WARNING: {\
-															hlog.WriteLog(FONT_YELLOW "[%08d][%s][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, __FUNCTION__, ##__VA_ARGS__);\
-																break;\
-														}\
-														case DBG_INFO: {\
-																hlog.WriteLog(FONT_GREEN "[%08d][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, ##__VA_ARGS__);\
-																break;\
-														}\
-														case DBG_DEBUG: {\
-															hlog.WriteLog("[%08d][%s]: " fmt, hlog.Tick(), #level, ##__VA_ARGS__);\
-																break;\
-														}\
-														case DBG_QPSIG: {\
-															if((e->sig == Q_EMPTY_SIG)\
-																| (e->sig == TIME_TICK_SIG)\
-																| (e->sig == TEST_TIMEOUT_SIG) ){\
-															}else {\
-																hlog.WriteLog(FONT_BLUE "[%08d][%s][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, __FUNCTION__, ##__VA_ARGS__);\
-															}\
-																break;\
-														}\
-														default: {\
-																break;    \
-														}\
-													}\
-												}\
-											}while(0)
-
-#define DBG_LOG(level, fmt, ...)     do{ \
-										if( level <= hlog.dbgLevel) {\
-											switch (level) {\
-												case DBG_CRISIS: {\
-													hlog.WriteLog(FONT_MAGENTA "[%s][%s]: " fmt RESET_COLOR, #level, __FUNCTION__, ##__VA_ARGS__);\
-														break;\
-												}\
-												case DBG_ERROR: {\
-													hlog.WriteLog(FONT_RED "[%08d][%s][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, __FUNCTION__, ##__VA_ARGS__);\
-														break;\
-												}\
-												case DBG_WARNING: {\
-													hlog.WriteLog(FONT_YELLOW "[%08d][%s][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, __FUNCTION__, ##__VA_ARGS__);\
-														break;\
-												}\
-												case DBG_INFO: {\
-													hlog.WriteLog(FONT_GREEN "[%08d][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, ##__VA_ARGS__);\
-														break;\
-												}\
-												case DBG_DEBUG: {\
-													hlog.WriteLog("[%08d][%s]: " fmt, hlog.Tick(), #level, ##__VA_ARGS__);\
-														break;\
-												}\
-												default: {\
-														break;    \
-												}\
-											}\
-										}\
-									}while(0)
-
-#define DBG_INFO(level, fmt, ...)     do{ \
-										if( level <= hlog.dbgLevel) {\
-											switch (level) {\
-												case DBG_CRISIS: {\
-													hlog.WriteLog(FONT_MAGENTA fmt RESET_COLOR, ##__VA_ARGS__);\
-														break;\
-												}\
-												case DBG_ERROR: {\
-													hlog.WriteLog(FONT_RED fmt RESET_COLOR, ##__VA_ARGS__);\
-														break;\
-												}\
-												case DBG_WARNING: {\
-													hlog.WriteLog(FONT_YELLOW fmt RESET_COLOR, ##__VA_ARGS__);\
-														break;\
-												}\
-												case DBG_INFO: {\
-													hlog.WriteLog(FONT_GREEN fmt RESET_COLOR, ##__VA_ARGS__);\
-														break;\
-												}\
-												case DBG_DEBUG: {\
-													hlog.WriteLog(fmt, ##__VA_ARGS__);\
-														break;\
-												}\
-												default: {\
-														break;    \
-												}\
-											}\
-										}\
-									}while(0)
-
-#define DBG_PRINT(level, fmt, ...)  do{ \
-										switch (level) {\
-											case DBG_CRISIS: {\
-												hlog.WriteLog(FONT_MAGENTA "[%s][%s]: " fmt RESET_COLOR, #level, __FUNCTION__, ##__VA_ARGS__);\
-													break;\
-											}\
-											case DBG_ERROR: {\
-												hlog.WriteLog(FONT_RED "[%08d][%s][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, __FUNCTION__, ##__VA_ARGS__);\
-													break;\
-											}\
-											case DBG_WARNING: {\
-												hlog.WriteLog(FONT_YELLOW "[%08d][%s][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, __FUNCTION__, ##__VA_ARGS__);\
-													break;\
-											}\
-											case DBG_INFO: {\
-												hlog.WriteLog(FONT_GREEN "[%08d][%s]: " fmt RESET_COLOR, hlog.Tick(), #level, ##__VA_ARGS__);\
-													break;\
-											}\
-											case DBG_DEBUG: {\
-												hlog.WriteLog("[%08d][%s]: " fmt, hlog.Tick(), #level, ##__VA_ARGS__);\
-													break;\
-											}\
-											default: {\
-													break;    \
-											}\
-										}\
-									}while(0)
+#ifdef NDEBUG
+	#define     ASSERT(test_, err_exe) 							((void)0)
+	#define     DBG_LOG(level, fmt, ...) 						((void)0)
+	#define     DBG_INFO(level, fmt, ...) 						((void)0)
+	#define     DBG_ARRAY(level, aHEAD, aTAIL, aARRAY, nLEN)	((void)0)
+#else
 
 #define DBG_ARRAY(level, aHEAD, aTAIL, aARRAY, nLEN)		do{ \
 																if(level <= hlog.dbgLevel) {\
@@ -219,15 +99,29 @@
 																}\
 															}while(0)
 
-#ifdef NDEBUG
-	#define     ASSERT(test_, err_exe) 		((void)0)
-#else
-	#define     ASSERT(test_, err_exe) 		do{ \
-												if((test_) == 0) {\
-													printf("\033[15;31m Assertion failed in %s:%d\033[0m \r\n", __FILE__, __LINE__);\
-													err_exe;\
+#define	DBG_TASK_LOG(level, fmt, ...)		do{ \
+												if((e->sig == Q_EMPTY_SIG)\
+													| (e->sig == TIME_TICK_SIG)\
+													| (e->sig == TEST_TIMEOUT_SIG) ){\
+												}else {\
+													vast_log_log(level, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__);\
 												}\
 											}while(0)
+
+#define	DBG_LOG(level, fmt, ...)		do{ \
+											vast_log_log(level, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__);\
+										}while(0)
+
+#define	DBG_INFO(level, fmt, ...)		do{ \
+											vast_log_info(level, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__);\
+										}while(0)
+
+#define ASSERT(test_, err_exe) 			do{ \
+											if((test_) == 0) {\
+												printf("\033[15;31m Assertion failed in %s:%d\033[0m \r\n", __FILE__, __LINE__);\
+												err_exe;\
+											}\
+										}while(0)
 #endif
 
 #define		BUFF_LEN_MAX 		128
@@ -235,7 +129,8 @@
 /***********************************************
                     typedef
 ***********************************************/
-enum DBG_LEVEL{
+typedef enum DBG_LEVEL{
+	DBG_NULL,
 	DBG_CRISIS,
 	DBG_ERROR,
 	DBG_WARNING,
@@ -243,7 +138,7 @@ enum DBG_LEVEL{
 	DBG_DEBUG,
 	DBG_QPSIG,
 	DBG_MAX
-};
+}DBG_LEVEL_t;
 
 typedef enum
 {
@@ -254,6 +149,7 @@ typedef enum
 }LOG_SEL_FUNCx;
 
 typedef int16_t (*WriteLogFunc)( const char *format, ... );
+typedef size_t 	(*VprintLogFunc)( const char *format, va_list arg);
 typedef uint32_t (*LogTickFunc)(void);
 
 typedef struct _Log_InitTypeDef
@@ -272,6 +168,7 @@ typedef struct _Log_HandleTypeDef
 	uint8_t 				dbgLevel;
 	int16_t 				(*Read)		(uint8_t *pData, uint8_t len);
 	WriteLogFunc 			WriteLog;
+	VprintLogFunc 			vprintLog;
 	LogTickFunc	 			Tick;
 	uint8_t					(*pLogProcess)		(struct _Log_HandleTypeDef *pLog, LOG_SEL_FUNCx selFunc);
 
@@ -280,10 +177,12 @@ typedef struct _Log_HandleTypeDef
 /***********************************************
                function prototypes
 ***********************************************/
-int16_t vast_log_initialize(WriteLogFunc writeLogFunc, LogTickFunc tickFunc);
+int16_t vast_log_initialize(WriteLogFunc writeLogFunc, VprintLogFunc vprintLogFunc, LogTickFunc tickFunc);
 int16_t vast_log_printDate(void);
 int16_t vast_log_setLevel(uint8_t dbg_level);
 int16_t vast_log_array(const char *head_buff, const char *tail_buff, const char *pArray, uint16_t size);
+size_t vast_log_log(uint8_t level, const char *func, uint16_t line, const char *format, ...);
+size_t vast_log_info(uint8_t level, const char *func, uint16_t line, const char *format, ...);
 
 /***********************************************
 	      		    inline

@@ -33,7 +33,7 @@
 
 #define 	VAST_STORE_DBG_LOG(level, fmt, ...) 	do{											\
 														if(level <= hstore.dbgLevel){			\
-															DBG_PRINT(level, fmt, __VA_ARGS__);	\
+															DBG_INFO(level, fmt, __VA_ARGS__);	\
 														}										\
 													}while(0)
 

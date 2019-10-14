@@ -135,27 +135,16 @@ int16_t vast_log_array(const char *head_buff, const char *tail_buff, const char 
 }
 
 /**
-  * @brief  vast_log_array.
-  * @param
-  * @retval
-  */
-size_t vast_log_info(int level, const char *fmt, ...)
-{
-	size_t len = 0;
-
-	return len;
-}
-
-/**
   * @brief  vast_log_initialize.
   * @param
   * @retval
   */
-int16_t vast_log_initialize(WriteLogFunc writeLogFunc, LogTickFunc tickFunc)
+int16_t vast_log_initialize(WriteLogFunc writeLogFunc, VprintLogFunc vprintLogFunc, LogTickFunc tickFunc)
 {
 	if(writeLogFunc != NULL)
 	{
 		hlog.WriteLog = writeLogFunc;
+		hlog.vprintLog = vprintLogFunc;
 		hlog.Tick = tickFunc;
 
 		if(hlog.Init.year == 0)
@@ -190,6 +179,78 @@ int16_t vast_log_initialize(WriteLogFunc writeLogFunc, LogTickFunc tickFunc)
 	{
 		return 1;
 	}
+}
+
+const char *level_color[][2] = {
+		{""				, "NULL"},
+		{FONT_MAGENTA	, "CRIS"},
+		{FONT_RED		, "ERRO"},
+		{FONT_YELLOW	, "WARN"},
+		{FONT_GREEN		, "INFO"},
+		{FONT_CYAN		, "DBUG"},
+		{FONT_BLUE		, "QSIG"}
+};
+
+size_t vast_log_log(uint8_t level, const char *func, uint16_t line, const char *format, ...)
+{
+	size_t len = 0;
+	va_list arg;
+
+	if(level <= hlog.dbgLevel) {
+		va_start(arg, format);
+
+	//	switch (level) {
+	//		case DBG_CRISIS: {
+	//				break;
+	//		}
+	//		case DBG_ERROR: {
+	//				break;
+	//		}
+	//		case DBG_WARNING: {
+	//			hlog.WriteLog("%s[%08d][INFO][%s]: ", level_color[level], hlog.Tick(), func);
+	//				break;
+	//		}
+	//		case DBG_INFO: {
+	//				break;
+	//		}
+	//		case DBG_DEBUG: {
+	//				break;
+	//		}
+	//		default: {
+	//				break;
+	//		}
+	//	}
+
+		hlog.WriteLog("%s[%08d][%s][%s]: ", level_color[level][0], hlog.Tick(), level_color[level][1], func);
+
+		len = hlog.vprintLog(format, arg);
+
+		va_end(arg);
+
+		hlog.WriteLog(RESET_COLOR);
+	}
+
+	return len;
+}
+
+size_t vast_log_info(uint8_t level, const char *func, uint16_t line, const char *format, ...)
+{
+	size_t len = 0;
+	va_list arg;
+
+	if(level <= hlog.dbgLevel) {
+		va_start(arg, format);
+
+		hlog.WriteLog("%s", level_color[level][0]);
+
+		len = hlog.vprintLog(format, arg);
+
+		va_end(arg);
+
+		hlog.WriteLog(RESET_COLOR);
+	}
+
+	return len;
 }
 
 #if 0  // exp:
