@@ -42,6 +42,7 @@
 /* The maximum number of system clock tick rates */
 #define QF_MAX_TICK_RATE        2
 
+
 /* QF interrupt disable/enable and log2()... */
 #if (__ARM_ARCH == 6) /* Cortex-M0/M0+/M1(v6-M, v6S-M)? */
 
@@ -106,6 +107,34 @@
 #include "qv_port.h"  /* QV cooperative kernel port */
 #include "qf.h"       /* QF platform-independent public interface */
 
+#ifdef Q_UTEST
+/* interface used only inside QF implementation, but not in applications */
+#ifdef QP_IMPL
+
+    /* QUTEST scheduler locking (not used) */
+    #define QF_SCHED_STAT_
+    #define QF_SCHED_LOCK_(dummy) ((void)0)
+    #define QF_SCHED_UNLOCK_()    ((void)0)
+
+    /* native event queue operations */
+    #define QACTIVE_EQUEUE_WAIT_(me_) \
+        Q_ASSERT_ID(0, (me_)->eQueue.frontEvt != (QEvt *)0)
+    #define QACTIVE_EQUEUE_SIGNAL_(me_) \
+        QPSet_insert(&QS_rxPriv_.readySet, (uint_fast8_t)(me_)->prio)
+
+    /* native QF event pool operations */
+    #define QF_EPOOL_TYPE_  QMPool
+    #define QF_EPOOL_INIT_(p_, poolSto_, poolSize_, evtSize_) \
+        QMPool_init(&(p_), (poolSto_), (poolSize_), (evtSize_))
+
+    #define QF_EPOOL_EVENT_SIZE_(p_)  ((p_).blockSize)
+    #define QF_EPOOL_GET_(p_, e_, m_) ((e_) = (QEvt *)QMPool_get(&(p_), (m_)))
+    #define QF_EPOOL_PUT_(p_, e_)     (QMPool_put(&(p_), e_))
+
+    #include "qf_pkg.h" /* internal QF interface */
+
+#endif /* QP_IMPL */
+#endif
 /*****************************************************************************
 * NOTE1:
 * The maximum number of active objects QF_MAX_ACTIVE can be increased

@@ -38,6 +38,7 @@
 * @endcond
 */
 #define QP_IMPL           /* this is QP implementation */
+#include "qf_port.h"     /* QEP port */
 #include "qep_port.h"     /* QEP port */
 #include "qassert.h"      /* QP embedded systems-friendly assertions */
 #ifdef Q_SPY              /* QS software tracing enabled? */
