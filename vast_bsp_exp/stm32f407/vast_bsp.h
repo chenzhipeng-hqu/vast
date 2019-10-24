@@ -16,8 +16,8 @@
   */
 
 /* Define to prevent recursive inclusion */
-#ifndef __VAST_RING_QUEUE_H__
-#define __VAST_RING_QUEUE_H__
+#ifndef __VAST_BSP_H__
+#define __VAST_BSP_H__
 
 #ifdef __cplusplus
  extern "C" {
@@ -26,7 +26,7 @@
 /***********************************************
                     include
 ***********************************************/
-#include "vast_common.h"
+#include "stm32f407xx.h"
 
 /***********************************************
                     define
@@ -35,16 +35,19 @@
 /***********************************************
                     typedef
 ***********************************************/
+ typedef struct _gpio_list_t
+ {
+	GPIO_TypeDef 	*GPIOx;
+	uint32_t 		PinMask;
+	uint8_t 		_default;
+ }gpio_list_t;
 
- typedef struct {
- 	int head;
- 	int tail;
- 	int length;
- 	Vast_LockTypedef lock;
- 	char queue_type;
- 	char queue_name[15];
- 	void *data;
- }RingQueueTypedef;
+ typedef struct _dma_list_t
+ {
+    DMA_TypeDef  	*DMAx;
+	uint8_t 		chx;
+	IRQn_Type		irq;
+ }dma_list_t;
 
 /***********************************************
                function prototypes
@@ -54,27 +57,21 @@
 	      		    inline
 ***********************************************/
 
+
 /***********************************************
                    variable
 ***********************************************/
-
-
-extern int 	vast_ring_queue_init		(RingQueueTypedef *rq, int length, unsigned char *pData);
-extern int 	vast_ring_queue_pop			(RingQueueTypedef *rq, char *pop_buf, int size);
-extern int  vast_ring_queue_push		(RingQueueTypedef *rq, char *push_buf, int size);
-extern void *vast_ring_queue_add_size	(RingQueueTypedef *rq, int size);
-extern int 	vast_ring_queue_refresh_tail(RingQueueTypedef *rq, int tail);
-extern int 	vast_ring_queue_find_block	(RingQueueTypedef *rq, char *pop_buf, int start_index, int end_index);
-extern int	vast_ring_queue_empty		(RingQueueTypedef *rq);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /*__VAST_RING_QUEUE_H__*/
+#endif /* __VAST_BSP_H__ */
 /**
   * @}
   */
 
 
 /*************** (C) COPYRIGHT chenzhipeng *******END OF FILE******/
+
+

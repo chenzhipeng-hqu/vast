@@ -27,6 +27,7 @@
                     include
 ***********************************************/
 #include "vast_common.h"
+#include "vast_core/device.h"
 
 /***********************************************
                     define
@@ -87,6 +88,17 @@ typedef struct _EasyKey_HandleTypeDef
 	uint8_t				(*pKeyProcess)	(struct _EasyKey_HandleTypeDef *pKey, EASYKEY_SEL_FUNCx selFunc);
 }EasyKey_HandleTypeDef;
 
+typedef struct key_ops
+{
+	bool (*is_pressed)(uint8_t keyno);
+}key_ops_t;
+
+typedef struct key_device
+{
+	device_t parent;
+
+}key_device_t;
+
 /***********************************************
                    variable
 ***********************************************/
@@ -96,6 +108,8 @@ typedef struct _EasyKey_HandleTypeDef
 ***********************************************/
 extern int16_t				EasyKey_Init	(EasyKey_HandleTypeDef *pKey);
 extern KEY_StateTypeDef		EasyKey_Scan	(EasyKey_HandleTypeDef *pKey);
+
+int key_device_register(key_device_t *dev_key, const char *name, uint32_t flag, void *argv);
 
 #ifdef __cplusplus
 }

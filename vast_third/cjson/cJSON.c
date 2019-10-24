@@ -2972,6 +2972,97 @@ CJSON_PUBLIC(void) cJSON_free(void *object)
     global_hooks.deallocate(object);
 }
 
+#include "stm32f4xx_hal.h"
+CJSON_PUBLIC(void) cJSON_test(void)
+{
+	printf("cJSON_Version: %s\r\n", cJSON_Version());
+
+	cJSON *  	A=cJSON_CreateObject();
+	cJSON *  	AA=cJSON_CreateObject();
+	cJSON *  	AAA=cJSON_CreateArray();
+	cJSON *  	STUDENT1=cJSON_CreateObject();
+	cJSON *  	STUDENT2=cJSON_CreateObject();
+	cJSON *  	STUDENT3=cJSON_CreateObject();
+	cJSON *  	STUDENT4=cJSON_CreateObject();
+	char*       out;
+
+	cJSON_AddItemToObject(STUDENT1, "name", cJSON_CreateString("小明"));
+	cJSON_AddItemToObject(STUDENT1, "age", cJSON_CreateNumber(15));
+	cJSON_AddItemToObject(STUDENT2, "name", cJSON_CreateString("小红"));
+	cJSON_AddItemToObject(STUDENT2, "age", cJSON_CreateNumber(14));
+	cJSON_AddItemToObject(STUDENT3, "name", cJSON_CreateString("小强"));
+	cJSON_AddItemToObject(STUDENT3, "age", cJSON_CreateNumber(16.5));
+	cJSON_AddItemToObject(STUDENT4, "name", cJSON_CreateString("小东"));
+	cJSON_AddItemToObject(STUDENT4, "age", cJSON_CreateNumber(18));
+	cJSON_AddItemToArray(AAA,STUDENT1);
+	cJSON_AddItemToArray(AAA,STUDENT2);
+	cJSON_AddItemToArray(AAA,STUDENT3);
+	cJSON_InsertItemInArray(AAA, 0, STUDENT4);
+	cJSON_AddItemToObject(AA, "class_number", cJSON_CreateNumber(1));
+	cJSON_AddItemToObject(AA, "students", AAA);
+	cJSON_AddItemToObject(A, "class", AA);
+
+	out=cJSON_Print(A);
+	printf("%s \r\n",out);
+	printf("-----------------------------------\r\n");
+
+	cJSON* AAAA; //定义一个cJSON结构体变量，该变量用于表达AAA的子系
+	cJSON* NAME;   //item名为name的cJSON
+	cJSON* AGE;     //item名为age的cJSON
+	char*  name;
+	uint8_t     age;
+	uint8_t     n;
+//	char *C="{\"class\":{\"class_number\":1,\"students\":[{\"name\": \"小明\",\"age\":15},{\"name\": \"小红\",\"age\":14}, {\"name\": \"小强\",\"age\":14}]}}";
+
+	A = cJSON_Parse(out);
+	if(A == NULL )
+	{
+		printf("Error Parse before: [%s]\n",cJSON_GetErrorPtr());
+	}
+	else
+	{
+		AA=(cJSON_GetObjectItem(A,"class"));
+		AAA=(cJSON_GetObjectItem(AA,"students"));
+		n=cJSON_GetArraySize(AAA);                  //获得数组成员个数
+		printf("arr_num=%u \r\n",n);
+
+		HAL_Delay(50);
+		for(uint16_t i=0; i<n; i++)                     //从成员0到成员2，依次打印
+		{
+			AAAA=cJSON_GetArrayItem(AAA,i);      //成员1的cJOSN_Object
+			NAME=(cJSON_GetObjectItem(AAAA,"name"));
+
+			if(NAME == NULL)
+			{
+				printf("ERROR NAME \r\n");
+			}
+			else
+			{
+				name=NAME->valuestring;
+				printf("student%u_name=%s \r\n",i,name);
+			}
+			HAL_Delay(50);
+			AGE=cJSON_GetObjectItem(AAAA,"age");
+			if(AGE==NULL)
+			{
+				printf("ERROR AGE \r\n");
+			}
+			else
+			{
+				age=AGE->valueint;
+				double age2=AGE->valuedouble;
+				printf("student%u_age=%u, %g\r\n",i,age,age2);
+			}
+			HAL_Delay(50);
+		}
+	}
+
+	cJSON_Delete(A);                     //删除cJSON结构体
+	cJSON_free(out);
+}
+
+
+
 #if 0
 printf("cJSON_Version: %s\r\n", cJSON_Version());
 

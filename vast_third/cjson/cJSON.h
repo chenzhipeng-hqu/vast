@@ -278,6 +278,8 @@ CJSON_PUBLIC(double) cJSON_SetNumberHelper(cJSON *object, double number);
 CJSON_PUBLIC(void *) cJSON_malloc(size_t size);
 CJSON_PUBLIC(void) cJSON_free(void *object);
 
+CJSON_PUBLIC(void) cJSON_test(void);
+
 #ifdef __cplusplus
 }
 #endif

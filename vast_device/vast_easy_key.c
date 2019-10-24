@@ -188,7 +188,7 @@ KEY_StateTypeDef EasyKey_Driver(EasyKey_HandleTypeDef *pKey)
 
 /**
   * @brief EasyKey_Scan.
-	* @param  
+  * @param
   * @retval 
   */
 KEY_StateTypeDef EasyKey_Scan(EasyKey_HandleTypeDef *pKey)
@@ -234,6 +234,27 @@ KEY_StateTypeDef EasyKey_Scan(EasyKey_HandleTypeDef *pKey)
 	}
 	
 	return key_ret;
+}
+
+
+static device_ops_t key_ops =
+{
+		//.ctrl = key_ctrl,
+};
+
+/**
+  * @brief EasyKey_Scan.
+  * @param
+  * @retval
+  */
+int key_device_register(key_device_t *dev_key, const char *name, uint32_t flag, void *argv)
+{
+	device_t *dev = &(dev_key->parent);
+
+	dev->ops = &key_ops;
+	device_register(dev, name, flag);
+
+	return 0;
 }
 
 #if 0  // exp:

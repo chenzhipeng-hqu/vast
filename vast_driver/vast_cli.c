@@ -117,6 +117,8 @@ int main(int argc, char *argv[])
 /*************************************
               include
 *************************************/
+#include <stdio.h>
+#include <string.h>
 #include "vast_cli.h"
 
 /*************************************
@@ -146,6 +148,15 @@ int main(int argc, char *argv[])
 
 #define		ASCII_LEFT_SUPPORT 		false
 
+#define	CLI_CMD_LAST(cmd, help, func, child) 	\
+		const struct _CLICmdTypedef __cli_last __attribute__((used)) 		\
+	    __attribute__((__section__("cliTableLast"))) = {	\
+	    	cmd,								\
+			help,								\
+			(cli_func_t)func,					\
+			(struct _CLICmdTypedef *)child		\
+		}
+
 /**************************************
               typedef
 **************************************/
@@ -154,7 +165,6 @@ typedef enum
   CLI_CMD_EXE,
   CLI_CMD_DIR,
 } CLI_CMD_Type;
-
 
 typedef enum
 {
@@ -172,7 +182,12 @@ int g_CLI_CurrentIdx = 0;
 int g_CLI_HistoryIdx = 0;
 static int g_CLI_PosIdx = 0;
 
-static const CLICmdTypedef *CLI_CmdPath[CLI_CMD_TREE_LEVEL] = {CLI_CmdTableMain, 0};
+
+CLI_CMD_LAST(0, 0, 0, 0);
+CLI_CMD_EXPORT(cd		, "goto dir", CLICmd_GotoTree, 0);
+
+extern CLICmdTypedef __cliTab_start, __cliTab_end; /*申明外部变量,在ld的脚本文件中定义*/
+static const CLICmdTypedef *CLI_CmdPath[CLI_CMD_TREE_LEVEL] = {&__cliTab_start, 0};
 static uint16_t cliCmdLevel = 0;
 
 #if	ASCII_LEFT_SUPPORT	== true
@@ -865,7 +880,7 @@ int32_t str2s32(const char *str)
 float str2float(const char *str)
 {
   const char *pCh = str;
-#if 1
+#if 0
   int32_t data = 0;
   int32_t fractional = 0;
   uint32_t flag = 0;

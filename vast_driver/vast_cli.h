@@ -29,12 +29,6 @@
 /**************************************
               typedef
 **************************************/
-typedef struct __MsgTypedef
-{
-	uint16_t len;
-	char data[1];   //
-}MsgTypedef;
-
 typedef enum
 {
 	CLI_FUNC_INIT,
@@ -46,7 +40,7 @@ typedef enum
 typedef struct _CLI_InitTypeDef
 {
 	int16_t 	(*Read)	(uint8_t *pData, uint8_t len);
-	int 		(*Write)	(const char *format, ... );
+	int16_t 	(*Write)	(const char *format, ... );
 }CLI_InitTypeDef;
 
 typedef struct _CLI_HandleTypeDef
@@ -63,6 +57,17 @@ typedef struct _CLICmdTypedef
   void (*pFun)(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
   const struct _CLICmdTypedef *child;
 } CLICmdTypedef;
+
+typedef void(*cli_func_t)(CLI_HandleTypeDef *pCli, int argc, char *argv[]);
+
+#define	CLI_CMD_EXPORT(cmd, help, func, child) 	\
+		const struct _CLICmdTypedef __cli_##cmd __attribute__((used)) 		\
+	    __attribute__((__section__("cliTable"))) = {	\
+	    	#cmd,								\
+			help,								\
+			(cli_func_t)func,					\
+			(struct _CLICmdTypedef *)child		\
+		}
 
 /*************************************
               variable
