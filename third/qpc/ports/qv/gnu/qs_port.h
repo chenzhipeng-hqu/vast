@@ -55,7 +55,7 @@
 * and QF_CRIT_EXIT are needed. In this port QS is configured to be used with
 * the other QP component, by simply including "qf_port.h" *before* "qs.h".
 */
-#include <third/qpc/ports/qv/gnu/qf_port.h> /* use QS with QF */
-#include <third/qpc/include/qs.h>      /* QS platform-independent public interface */
+#include <qf_port.h> /* use QS with QF */
+#include <qs.h>      /* QS platform-independent public interface */
 
 #endif /* qs_port_h */

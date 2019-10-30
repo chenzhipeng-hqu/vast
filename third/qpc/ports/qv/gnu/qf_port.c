@@ -33,11 +33,11 @@
 *****************************************************************************/
 #include <core/init.h>
 #include <core/softtimer.h>
-#include <third/croutine/croutine.h>
-#include <third/qpc/include/qpc.h>
+#include <core/croutine.h>
+#include <qpc.h>
 #include "stm32f4xx.h"  /* CMSIS-compliant header file for the MCU used */
 #include "stm32f4xx_ll_usart.h"
-#include "../../../../../../task/qpc_common.h"
+#include "qpc_common.h"
 
 /* add other drivers if necessary... */
 

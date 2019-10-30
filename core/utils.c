@@ -282,6 +282,28 @@ char *os_strstr(const char *s1, const char *s2)
  *
  * @return the result
  */
+int stricmp(const char *dst, const char *src)
+{
+    int ch1, ch2;
+
+    do {
+        if ( ((ch1 = (unsigned char)(*(dst++))) >= 'A') && (ch1 <= 'Z'))
+            ch1 += 0x20;
+        if ( ((ch2 = (unsigned char)(*(src++))) >= 'A') && (ch2 <= 'Z'))
+            ch2 += 0x20;
+    } while(ch1 && (ch1 == ch2));
+
+    return (ch1 - ch2);
+}
+
+/**
+ * This function will compare two strings while ignoring differences in case
+ *
+ * @param a the string to be compared
+ * @param b the string to be compared
+ *
+ * @return the result
+ */
 uint32_t os_strcasecmp(const char *a, const char *b)
 {
     int ca, cb;

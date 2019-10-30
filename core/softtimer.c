@@ -3,8 +3,8 @@
 #include <core/softtimer.h>
 #include <core/utils.h>
 #include <stdio.h>
-#include <third/croutine/croutine.h>
-#include <third/croutine/port.h>
+#include <core/croutine.h>
+//#include <third/croutine/port.h>
 //#include <printk.h>
 //#include <vast_core/jiffies.h>
 //#include <board.h>
@@ -62,7 +62,8 @@ static void soft_timer_task(void)
 				iter->cb(iter);
 
 			if(jiffies - start_jiffies > 1)
-				printf("soft time task spent %ldms at %#lx\r\n", (uint32_t)(jiffies-start_jiffies), (uint32_t)iter->cb);
+				printf("soft time task spent %ldms at %#lx\r\n",
+						(uint32_t)(jiffies-start_jiffies), (uint32_t)iter->cb);
 		}
 	}
 }

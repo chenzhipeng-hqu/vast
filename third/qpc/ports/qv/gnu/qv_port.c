@@ -36,7 +36,7 @@
 ******************************************************************************
 * @endcond
 */
-#include <third/qpc/ports/qv/gnu/qf_port.h>
+#include <qf_port.h>
 
 #if (__ARM_ARCH == 6) /* Cortex-M0/M0+/M1 (v6-M, v6S-M)? */
 

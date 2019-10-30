@@ -148,14 +148,14 @@ int main(int argc, char *argv[])
 
 #define		ASCII_LEFT_SUPPORT 		false
 
-#define	CLI_CMD_LAST(cmd, help, func, child) 	\
-		const struct _CLICmdTypedef __cli_last __attribute__((used)) 		\
-	    __attribute__((__section__("cliTableLast"))) = {	\
-	    	cmd,								\
-			help,								\
-			(cli_func_t)func,					\
-			(struct _CLICmdTypedef *)child		\
-		}
+#define		CLI_CMD_LAST(cmd, help, func, child) 	\
+			const struct _CLICmdTypedef __cli_last __attribute__((used)) 		\
+			__attribute__((__section__("cliTableLast"))) = {	\
+				cmd,								\
+				help,								\
+				(cli_func_t)func,					\
+				(struct _CLICmdTypedef *)child		\
+			}
 
 /**************************************
               typedef
@@ -932,19 +932,7 @@ float str2float(const char *str)
 
 //FUNCTIONS
 /*  ���Դ�Сд�ַ����Ա�  */
-int stricmp(const char *dst, const char *src)
-{
-    int ch1, ch2;
 
-    do 
-    {
-        if ( ((ch1 = (unsigned char)(*(dst++))) >= 'A') && (ch1 <= 'Z'))
-            ch1 += 0x20;
-        if ( ((ch2 = (unsigned char)(*(src++))) >= 'A') && (ch2 <= 'Z'))
-            ch2 += 0x20;
-    }while(ch1 && (ch1 == ch2));
-    return (ch1 - ch2);
-}
 
 /**
   * @}

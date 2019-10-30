@@ -33,11 +33,34 @@
 #include <stddef.h>
 #include <string.h>
 #include <stdarg.h>
+#include <cmsis_gcc.h>
 //#include "vast_log.h"
 
 /***********************************************
                     define
 ***********************************************/
+#ifdef USING_OS_MODULE
+	#include <cmsis_gcc.h>
+	#include <core/types.h>
+	#define enable_irq()      __enable_irq()
+	#define disable_irq()     __disable_irq()
+
+	#define portBYTE_ALIGNMENT      (4)
+	#define portBYTE_ALIGNMENT_MASK (0x03)
+
+	#define OS_CPU_SR   uint32_t
+	#define enter_critical()        \
+		do { cpu_sr = __get_PRIMASK(); disable_irq();} while (0)
+	#define exit_critical()         \
+		do { __set_PRIMASK(cpu_sr);} while (0)
+
+	#define portDISABLE_INTERRUPTS __disable_irq
+#else
+//	#include "os_dummy"
+	#define OS_CPU_SR   		uint32_t
+	#define enter_critical() 	(void)(cpu_sr)
+	#define exit_critical()		(void)(cpu_sr)
+#endif
 
 /***********************************************
                     typedef

@@ -84,44 +84,43 @@
 	#define     DBG_INFO(level, fmt, ...) 						((void)0)
 	#define     DBG_ARRAY(level, aHEAD, aTAIL, aARRAY, nLEN)	((void)0)
 #else
-
-#define DBG_ARRAY(level, aHEAD, aTAIL, aARRAY, nLEN)		do{ \
-																if(level <= hlog.dbgLevel) {\
-																	switch (level) {\
-																		case DBG_DEBUG: {\
-																				vast_log_array(aHEAD, aTAIL, aARRAY, nLEN);\
-																				break;\
+	#define 	DBG_ARRAY(level, aHEAD, aTAIL, aARRAY, nLEN)		do{ \
+																		if(level <= hlog.dbgLevel) {\
+																			switch (level) {\
+																				case DBG_DEBUG: {\
+																						vast_log_array(aHEAD, aTAIL, aARRAY, nLEN);\
+																						break;\
+																				}\
+																				default: {\
+																						break;    \
+																				}\
+																			}\
 																		}\
-																		default: {\
-																				break;    \
-																		}\
-																	}\
-																}\
-															}while(0)
+																	}while(0)
 
-#define	DBG_TASK_LOG(level, fmt, ...)		do{ \
-												if((e->sig == Q_EMPTY_SIG)\
-													| (e->sig == TIME_TICK_SIG)\
-													| (e->sig == TEST_TIMEOUT_SIG) ){\
-												}else {\
+	#define		DBG_TASK_LOG(level, fmt, ...)		do { \
+														if((e->sig == Q_EMPTY_SIG)\
+															| (e->sig == TIME_TICK_SIG)\
+															| (e->sig == TEST_TIMEOUT_SIG) ){\
+														}else {\
+															vast_log_log(level, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__);\
+														}\
+													} while(0)
+
+	#define		DBG_LOG(level, fmt, ...)		do{ \
 													vast_log_log(level, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__);\
-												}\
-											}while(0)
+												}while(0)
 
-#define	DBG_LOG(level, fmt, ...)		do{ \
-											vast_log_log(level, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__);\
-										}while(0)
+	#define		DBG_INFO(level, fmt, ...)		do{ \
+													vast_log_info(level, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__);\
+												}while(0)
 
-#define	DBG_INFO(level, fmt, ...)		do{ \
-											vast_log_info(level, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__);\
-										}while(0)
-
-#define ASSERT(test_, err_exe) 			do{ \
-											if((test_) == 0) {\
-												printf("\033[15;31m Assertion failed in %s:%d\033[0m \r\n", __FILE__, __LINE__);\
-												err_exe;\
-											}\
-										}while(0)
+	#define 	ASSERT(test_, err_exe) 			do{ \
+													if((test_) == 0) {\
+														printf("\033[15;31m Assertion failed in %s:%d\033[0m \r\n", __FILE__, __LINE__);\
+														err_exe;\
+													}\
+												}while(0)
 #endif
 
 #define		BUFF_LEN_MAX 		128

@@ -1,7 +1,16 @@
 //#include <config.h>
 #include <core/heap.h>
 #include <core/utils.h>
-#include <third/croutine/port.h>
+//#include <third/croutine/port.h>
+
+
+#ifndef	 portBYTE_ALIGNMENT
+	#define portBYTE_ALIGNMENT      (4)
+#endif
+
+#ifndef	 portBYTE_ALIGNMENT_MASK
+	#define portBYTE_ALIGNMENT_MASK (0x03)
+#endif
 
 #define heapMINIMUM_BLOCK_SIZE  ((size_t)(xHeapStructSize << 1))
 #define heapBITS_PER_BYTE       ((size_t)8)

@@ -3,7 +3,6 @@
 #include <core/init.h>
 #include <core/utils.h>
 #include <string.h>
-#include <third/croutine/port.h>
 #include "vast_common.h"
 
 static struct

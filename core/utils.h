@@ -195,7 +195,11 @@
 #define strcpy    os_strcpy
 #define memmove   os_memmove
 #define memcmp    os_memcmp
-//#define strcasecmp  os_strcasecmp
+ //#define strcasecmp  os_strcasecmp
+
+#ifndef stricmp
+	#define stricmp  os_strcasecmp
+#endif
 
 /***********************************************
 				 typedef

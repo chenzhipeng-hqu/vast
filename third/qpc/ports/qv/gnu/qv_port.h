@@ -63,6 +63,6 @@
 
 #endif
 
-#include <third/qpc/include/qv.h> /* QV platform-independent public interface */
+#include <qv.h> /* QV platform-independent public interface */
 
 #endif /* qv_port_h */

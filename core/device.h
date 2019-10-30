@@ -5,7 +5,7 @@
 #include <core/object.h>
 #include <core/softtimer.h>
 #include <core/types.h>
-#include "../../bsp/vast_config.h"
+#include "vast_config.h"
 
 /**
  * device (I/O) class type
@@ -39,7 +39,7 @@ enum device_class_type
 #define DEVICE_CTRL_SET_TX_INT       0x13       /* enable transmit irq */
 #define DEVICE_CTRL_CLR_TX_INT       0x14       /* disable transmit irq */
 #define DEVICE_CTRL_ADD_OUT          0x15       /* add fifo out */
-#define DEVICE_CTRL_INT_PRIO      	 0x16       /* modify Priority */
+#define DEVICE_CTRL_INT_PRIO      	  0x16       /* modify Priority */
 
 #define DEVICE_CTRL_BLK_GETGEOME     0x10       /**< get geometry information   */
 #define DEVICE_CTRL_BLK_SYNC         0x11       /**< flush data to block device */
@@ -150,19 +150,19 @@ void     device_set_owner(device_t *dev, const void *owner);
 #endif
 
 #ifdef configUSING_CLI
-	#include <driver/vast_cli.h>
+	#include <component/vast_cli.h>
 #endif
 
 #ifdef configUSING_LOG
-	#include <driver/vast_log.h>
+	#include <component/vast_log.h>
 #endif
 
 #ifdef configUSING_STORE
-	#include <driver/vast_store.h>
+	#include <component/vast_store.h>
 #endif
 
 #ifdef configUSING_EEPROM
-	#include <driver/vast_simulatite_eeprom.h>
+	#include <component/vast_simulatite_eeprom.h>
 #endif
 
 #ifdef configUSING_IR

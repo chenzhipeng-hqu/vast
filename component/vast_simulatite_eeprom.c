@@ -18,7 +18,7 @@
 /***********************************************
                     include
 ***********************************************/
-#include <driver/vast_simulatite_eeprom.h>
+#include <component/vast_simulatite_eeprom.h>
 
 /***********************************************
                     define

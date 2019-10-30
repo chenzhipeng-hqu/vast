@@ -58,7 +58,7 @@ typedef struct _IR_BufTypeDef
 typedef struct _IR_TypeDef
 {
 	__IO uint8_t state;   // bit7: capture complete，bit6：is_capture_high, bit5:falling flag after high level, bit4~0: hight_level timer overflow times
-	__IO IR_BufTypeDef rx_buf[100];
+	__IO IR_BufTypeDef rx_buf[128];
 	__IO uint8_t len;
 	IR_DataTypeDef value;
 	uint16_t carry_freq;

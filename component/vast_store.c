@@ -19,8 +19,8 @@
                     include
 ***********************************************/
 #include <core/utils.h>
-#include <driver/vast_log.h>
-#include <driver/vast_store.h>
+#include <component/vast_log.h>
+#include <component/vast_store.h>
 #include <stdarg.h>
 
 /***********************************************

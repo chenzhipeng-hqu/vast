@@ -110,7 +110,7 @@ static size_t serial_read(struct device *dev, off_t pos, void *buffer, size_t si
     if (dev->open_flag & DEVICE_FLAG_INT_RX)
     {
         return chn_get(&serial->rx, buffer, size);
-        return serial->ops->get_c(serial);
+        //        return serial->ops->get_c(serial);
     }
 
     if (dev->open_flag & DEVICE_FLAG_DMA_RX)
