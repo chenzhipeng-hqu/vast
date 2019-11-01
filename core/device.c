@@ -11,7 +11,7 @@ device_t *device_find(const char *name)
     return (device_t *)object_find(name);
 }
 
-err_t device_register(device_t *dev, const char *name, uint16_t flags)
+error_t device_register(device_t *dev, const char *name, uint16_t flags)
 {
     return object_attach((object_t *)dev, name);
 }
@@ -21,9 +21,9 @@ void device_unregister(device_t *dev)
     object_detach((object_t *)dev);
 }
 
-err_t device_open(device_t *dev, uint16_t oflag)
+error_t device_open(device_t *dev, uint16_t oflag)
 {
-    err_t ret = 0;
+    error_t ret = 0;
 
     const struct device_ops *ops = dev->ops;
 
@@ -54,9 +54,9 @@ err_t device_open(device_t *dev, uint16_t oflag)
     return ret;
 }
 
-err_t device_close(device_t *dev)
+error_t device_close(device_t *dev)
 {
-    err_t ret = 0;
+    error_t ret = 0;
 
     const struct device_ops *ops = dev->ops;
 
@@ -103,7 +103,7 @@ size_t device_write(device_t *dev, off_t pos, const void *buffer, size_t size)
     return 0;
 }
 
-err_t device_ctrl(device_t *dev, uint8_t cmd, void *arg)
+error_t device_ctrl(device_t *dev, uint8_t cmd, void *arg)
 {
     const struct device_ops *ops = dev->ops;
 

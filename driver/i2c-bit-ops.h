@@ -22,7 +22,7 @@ struct i2c_bit_ops
     uint32_t timeout;   /* in tick */
 };
 
-err_t i2c_bit_add_bus(struct i2c_bus_device *bus,
+error_t i2c_bit_add_bus(struct i2c_bus_device *bus,
                       const char            *bus_name);
 
 #ifdef __cplusplus

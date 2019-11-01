@@ -19,7 +19,7 @@ typedef struct
 
 int  setup_chn_pool(void);
 void chn_init(chn_slot_t *chn, u16 maxlen);
-err_t chn_put(chn_slot_t *chn,  const void *data, size_t len);
-err_t chn_get(chn_slot_t *chn,  void *data, size_t len);
-err_t chn_peek(chn_slot_t *chn, void *data, size_t len);
+error_t chn_put(chn_slot_t *chn,  const void *data, size_t len);
+error_t chn_get(chn_slot_t *chn,  void *data, size_t len);
+error_t chn_peek(chn_slot_t *chn, void *data, size_t len);
 #endif

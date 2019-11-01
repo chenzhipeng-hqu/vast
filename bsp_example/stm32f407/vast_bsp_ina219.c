@@ -51,7 +51,7 @@ static ina219_device_t ina219_dev;
   * @param
   * @retval
   */
-static err_t ina219_init_bsp(ina219_device_t *ina219, ina219_init_t *args)
+static error_t ina219_init_bsp(ina219_device_t *ina219, ina219_init_t *args)
 {
 	args->rnf 		= 10;	// 10 mΩ
 	args->i_lsb 	= 200;  // calculate method in INA219_Config()
@@ -144,7 +144,7 @@ static const ina219_ops_t ina219_ops =
   */
 static int vast_ina219_bsp_init(void)
 {
-	err_t ret = 0;
+	error_t ret = 0;
 
 	struct i2c_bus_device *i2c_bus = (struct i2c_bus_device *)device_find("i2c");
 

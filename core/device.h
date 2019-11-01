@@ -73,13 +73,13 @@ typedef struct device device_t;
 
 typedef struct device_ops
 {
-    err_t(*init)(device_t *dev);
-    err_t(*open)(device_t *dev, uint16_t oflag);
-    err_t(*close)(device_t *dev);
+    error_t(*init)(device_t *dev);
+    error_t(*open)(device_t *dev, uint16_t oflag);
+    error_t(*close)(device_t *dev);
     size_t (*read)(device_t *dev, off_t pos, void *buffer, size_t size);
     size_t (*peek)(device_t *dev, off_t pos, void *buffer, size_t size);
     size_t (*write)(device_t *dev, off_t pos, const void *buffer, size_t size);
-    err_t(*ctrl)(device_t *dev, uint8_t cmd, void *args);
+    error_t(*ctrl)(device_t *dev, uint8_t cmd, void *args);
 }device_ops_t;
 
 #define ARGS2U80(args) (__VAST_GET_BITS((u32)(args), 0,  7))
@@ -100,14 +100,14 @@ struct device
 
 
 device_t *device_find(const char *name);
-err_t    device_register(device_t *dev, const char *name, uint16_t flags);
+error_t    device_register(device_t *dev, const char *name, uint16_t flags);
 void     device_unregister(device_t *dev);
-err_t    device_open(device_t *dev, uint16_t oflag);
-err_t    device_close(device_t *dev);
+error_t    device_open(device_t *dev, uint16_t oflag);
+error_t    device_close(device_t *dev);
 size_t   device_peek(device_t *dev, off_t pos, void *buffer, size_t size);
 size_t   device_read(device_t *dev, off_t pos, void *buffer, size_t size);
 size_t   device_write(device_t *dev, off_t pos, const void *buffer, size_t size);
-err_t    device_ctrl(device_t *dev, uint8_t cmd, void *arg);
+error_t    device_ctrl(device_t *dev, uint8_t cmd, void *arg);
 void     device_set_owner(device_t *dev, const void *owner);
 
 #ifndef pdMS_TO_TICKS
@@ -120,7 +120,7 @@ void     device_set_owner(device_t *dev, const void *owner);
 #endif
 
 #ifdef configUSING_EASY_KEY
-	#include <device/vast_easy_key.h>
+	#include <vast_key.h>
 #endif
 
 #ifdef configUSING_SPI

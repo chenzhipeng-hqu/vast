@@ -17,7 +17,7 @@ struct i2c_priv_data
 };
 
 struct i2c_bus_device;
-err_t i2c_bus_device_device_init(struct i2c_bus_device *bus,
+error_t i2c_bus_device_device_init(struct i2c_bus_device *bus,
                                  const char            *name);
 
 #ifdef __cplusplus

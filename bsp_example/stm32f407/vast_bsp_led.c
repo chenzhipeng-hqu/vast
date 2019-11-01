@@ -64,7 +64,7 @@ static void led_gpio_init(void)
   * @param
   * @retval
   */
-static err_t led_on_bsp(led_device_t *dev)
+static error_t led_on_bsp(led_device_t *dev)
 {
 	gpio_list_t *gpio = (gpio_list_t *)(dev->parent.user_data);
 
@@ -85,7 +85,7 @@ static err_t led_on_bsp(led_device_t *dev)
   * @param
   * @retval
   */
-static err_t led_off_bsp(led_device_t *dev)
+static error_t led_off_bsp(led_device_t *dev)
 {
 	gpio_list_t *gpio = (gpio_list_t *)(dev->parent.user_data);
 
@@ -106,7 +106,7 @@ static err_t led_off_bsp(led_device_t *dev)
   * @param
   * @retval
   */
-static err_t led_toggle_bsp(led_device_t *dev)
+static error_t led_toggle_bsp(led_device_t *dev)
 {
 	gpio_list_t *gpio = (gpio_list_t *)(dev->parent.user_data);
 	LL_GPIO_TogglePin(gpio->GPIOx, gpio->PinMask);
@@ -133,7 +133,7 @@ static const led_ops_t led_ops =
   */
 static int vast_led_bsp_init(void)
 {
-	err_t ret = 0;
+	error_t ret = 0;
 
 	led_gpio_init();
 

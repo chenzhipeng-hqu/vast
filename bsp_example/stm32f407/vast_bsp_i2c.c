@@ -207,7 +207,7 @@ static const struct i2c_bit_ops i2c1_bit_ops =
   */
 static int vast_i2c_bsp_init(void)
 {
-	err_t ret = 0;
+	error_t ret = 0;
 
 	i2c_gpio_init();
 

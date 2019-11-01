@@ -34,12 +34,13 @@
 #include <string.h>
 #include <stdarg.h>
 #include <cmsis_gcc.h>
-//#include "vast_log.h"
+#include "vast_config.h"
+ //#include "vast_log.h"
 
 /***********************************************
                     define
 ***********************************************/
-#ifdef USING_OS_MODULE
+#ifdef configUSING_RTOS
 	#include <cmsis_gcc.h>
 	#include <core/types.h>
 	#define enable_irq()      __enable_irq()

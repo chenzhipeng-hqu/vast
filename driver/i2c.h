@@ -33,7 +33,7 @@ struct i2c_bus_device_ops
     size_t (*slave_xfer)(struct i2c_bus_device *bus,
                          struct i2c_msg msgs[],
                          uint32_t num);
-    err_t(*i2c_bus_control)(struct i2c_bus_device *bus,
+    error_t(*i2c_bus_control)(struct i2c_bus_device *bus,
                             uint32_t,
                             uint32_t);
 };
@@ -58,7 +58,7 @@ struct i2c_bus_device
 #define i2c_dbg(fmt, ...)
 #endif
 
-err_t  i2c_bus_device_register(struct i2c_bus_device *bus, const char *bus_name);
+error_t  i2c_bus_device_register(struct i2c_bus_device *bus, const char *bus_name);
 struct i2c_bus_device *i2c_bus_device_find(const char *bus_name);
 size_t i2c_transfer(struct i2c_bus_device *bus, struct i2c_msg msgs[], uint32_t num);
 size_t i2c_master_send(struct i2c_bus_device *bus,

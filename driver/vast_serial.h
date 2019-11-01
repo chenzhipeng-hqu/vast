@@ -103,8 +103,8 @@ typedef struct rt_serial_device rt_serial_t;
  */
 struct uart_ops
 {
-    err_t(*cfg)(struct serial_device *dev, struct serial_configure *cfg);
-    err_t(*control)(struct serial_device *dev, int cmd, void *arg);
+    error_t(*cfg)(struct serial_device *dev, struct serial_configure *cfg);
+    error_t(*control)(struct serial_device *dev, int cmd, void *arg);
 
     int (*put_c)(struct serial_device *dev, char c);
     int (*get_c)(struct serial_device *dev);
@@ -113,6 +113,6 @@ struct uart_ops
 
 void serial_device_isr(struct serial_device *serial, int event);
 
-err_t serial_device_register(struct serial_device *serial, const char *name, uint32_t flag, void *data);
+error_t serial_device_register(struct serial_device *serial, const char *name, uint32_t flag, void *data);
 
 #endif

@@ -105,7 +105,7 @@ static void uart_gpio_init(void)
   * @param
   * @retval
   */
-static err_t uart_configure(struct serial_device *serial, struct serial_configure *cfg)
+static error_t uart_configure(struct serial_device *serial, struct serial_configure *cfg)
 {
     //struct _uart_list_t *uart = (struct _uart_list_t *)serial->parent.user_data;
     struct _uart_list_t *uart = (struct _uart_list_t *)serial->parent.user_data;
@@ -145,7 +145,7 @@ static err_t uart_configure(struct serial_device *serial, struct serial_configur
   * @param
   * @retval
   */
-static err_t uart_control(struct serial_device *serial, int cmd, void *arg)
+static error_t uart_control(struct serial_device *serial, int cmd, void *arg)
 {
     //struct _uart *uart = (struct _uart *)serial->parent.user_data;
     struct _uart_list_t *uart = (struct _uart_list_t *)serial->parent.user_data;
@@ -461,7 +461,7 @@ void DMA1_Stream6_IRQHandler(void)
   */
 static int vast_uart_bsp_init(void)
 {
-	err_t ret = 0;
+	error_t ret = 0;
     struct _uart_list_t const *uart;
     struct serial_configure config = SERIAL_CONFIG_DEFAULT;
 

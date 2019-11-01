@@ -237,7 +237,7 @@ void INA219_Get_All_Value(INA219_HandleTypeDef *ina219x)
   * @param
   * @retval
   */
-static err_t ina219_init(device_t *dev)
+static error_t ina219_init(device_t *dev)
 {
 	ina219_device_t *ina219 = (ina219_device_t *)dev;
 	ina219_init_t args;
@@ -268,7 +268,7 @@ static err_t ina219_init(device_t *dev)
   * @param
   * @retval
   */
-static err_t ina219_ctrl(device_t *dev, uint8_t cmd, void *args)
+static error_t ina219_ctrl(device_t *dev, uint8_t cmd, void *args)
 {
 	ina219_device_t *ina219 = (ina219_device_t *)dev;
 	uint16_t *value = args;
@@ -338,7 +338,7 @@ static struct device_ops ina219_ops =
 	.ctrl = ina219_ctrl,
 };
 
-err_t ina219_device_register(ina219_device_t *ina219, const char *name, uint32_t flag, void *data)
+error_t ina219_device_register(ina219_device_t *ina219, const char *name, uint32_t flag, void *data)
 {
 	device_t *dev = &(ina219->parent);
 

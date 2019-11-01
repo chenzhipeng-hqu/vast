@@ -109,13 +109,13 @@ be done by word  */
 /***********************************************
                function prototypes
 ***********************************************/
-int16_t vast_store_initialize	(void);
-int32_t vast_store_write		(Store_TypeTypeDef type, uint8_t *dat, uint32_t len);
-int32_t vast_store_read			(Store_TypeTypeDef type, uint8_t *dat, uint32_t len);
-int16_t vast_store_print		(Store_TypeTypeDef type, uint8_t isDetail, uint8_t isPrintHex);
+int 	 vast_store_initialize	(void);
+int32_t  vast_store_write		(Store_TypeTypeDef type, uint8_t *dat, uint32_t len);
+int32_t  vast_store_read		(Store_TypeTypeDef type, uint8_t *dat, uint32_t len);
+int16_t  vast_store_print		(Store_TypeTypeDef type, uint8_t isDetail, uint8_t isPrintHex);
 uint32_t vast_store_get_next_addr(void);
 uint32_t vast_store_get_last_addr(void);
-int16_t vast_store_reset		(void);
+int16_t  vast_store_reset		(void);
 
 /***********************************************
 	      		    inline

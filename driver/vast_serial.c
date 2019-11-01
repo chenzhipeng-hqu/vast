@@ -16,9 +16,9 @@ static void serial_tmr_cb(struct soft_timer *st)
     }
 }
 #endif
-static err_t serial_init(struct device *dev)
+static error_t serial_init(struct device *dev)
 {
-    err_t result = 0;
+    error_t result = 0;
     struct serial_device *serial = (struct serial_device *)dev;
 
     /* apply configuration */
@@ -37,7 +37,7 @@ static err_t serial_init(struct device *dev)
     return result;
 }
 
-static err_t serial_open(struct device *dev, uint16_t oflag)
+static error_t serial_open(struct device *dev, uint16_t oflag)
 {
     struct serial_device *serial = (struct serial_device *)dev;
 
@@ -72,7 +72,7 @@ static err_t serial_open(struct device *dev, uint16_t oflag)
     return 0;
 }
 
-static err_t serial_close(struct device *dev)
+static error_t serial_close(struct device *dev)
 {
     struct serial_device *serial = (struct serial_device *)dev;
 
@@ -180,9 +180,9 @@ static size_t serial_write(struct device *dev, off_t pos, const void *buffer, si
     return ret;
 }
 
-static err_t serial_control(struct device *dev, uint8_t cmd, void *args)
+static error_t serial_control(struct device *dev, uint8_t cmd, void *args)
 {
-    err_t err = 0;
+    error_t err = 0;
     struct serial_device *serial = (struct serial_device *)dev;
 
     switch (cmd)
@@ -225,7 +225,7 @@ static const struct device_ops serial_ops =
     .ctrl  = serial_control,
 };
 
-err_t serial_device_register(struct serial_device *serial, const char *name, uint32_t flag, void *data)
+error_t serial_device_register(struct serial_device *serial, const char *name, uint32_t flag, void *data)
 {
     struct device *dev = &(serial->parent);
 

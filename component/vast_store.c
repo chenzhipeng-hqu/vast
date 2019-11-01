@@ -529,7 +529,7 @@ static int16_t vast_store_writeToBackupBlock(Store_TypeTypeDef type, uint8_t *da
   * @param
   * @retval
   */
-int16_t vast_store_initialize(void)
+int vast_store_initialize(void)
 {
 	int16_t ret = VAST_OK;
 	uint32_t validAddr = 0xFFFFF, backupAddr = 0xFFFFF;

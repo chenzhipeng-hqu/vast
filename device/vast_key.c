@@ -50,12 +50,13 @@
 /***********************************************
                     include
 ***********************************************/
-#include <device/vast_easy_key.h>
 #include <stdio.h>
+#include <device/vast_key.h>
 
 /***********************************************
                     define
 ***********************************************/
+#ifdef configUSING_KEY
 	
 /***********************************************
                     typedef
@@ -357,6 +358,8 @@ int main(int argc, char *argv[])
 	return 0;
 }
 #endif
+
+#endif /*configUSING_KEY*/
 /**
   * @}
   */

@@ -100,7 +100,7 @@ static void led_tmr_cb(struct soft_timer * st)
   * @param
   * @retval
   */
-static err_t led_init(device_t *dev)
+static error_t led_init(device_t *dev)
 {
 	led_device_t *led = (led_device_t *)dev;
 	struct soft_timer *st = &led->tmr;
@@ -117,7 +117,7 @@ static err_t led_init(device_t *dev)
   * @param
   * @retval
   */
-static err_t led_ctrl(device_t *dev, uint8_t cmd, void *args)
+static error_t led_ctrl(device_t *dev, uint8_t cmd, void *args)
 {
 	led_device_t *led = (led_device_t *)dev;
 
@@ -167,7 +167,7 @@ static struct device_ops led_ops =
 	.ctrl = led_ctrl,
 };
 
-err_t led_device_register(led_device_t *led, const char *name, uint32_t flag, void *data)
+error_t led_device_register(led_device_t *led, const char *name, uint32_t flag, void *data)
 {
 	device_t *dev = &(led->parent);
 

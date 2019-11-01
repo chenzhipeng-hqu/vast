@@ -9,10 +9,10 @@
 
 static LIST_HEAD(object_list);
 
-err_t object_attach(object_t *o, const char *name)
+error_t object_attach(object_t *o, const char *name)
 {
     OS_CPU_SR cpu_sr;
-    err_t ret = 1;
+    error_t ret = 1;
 
 	if(NULL == object_find(name))
 	{

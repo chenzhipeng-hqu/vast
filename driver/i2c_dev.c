@@ -43,11 +43,11 @@ static size_t i2c_bus_device_write(device_t *dev,
     return i2c_master_send(bus, addr, flags, buffer, count);
 }
 
-static err_t i2c_bus_device_control(device_t *dev,
+static error_t i2c_bus_device_control(device_t *dev,
                                     uint8_t  cmd,
                                     void    *args)
 {
-    err_t ret;
+    error_t ret;
     struct i2c_priv_data *priv_data;
     struct i2c_bus_device *bus = (struct i2c_bus_device *)dev->user_data;
 
@@ -87,7 +87,7 @@ static const struct device_ops i2c_bus_ops =
     .ctrl = i2c_bus_device_control,
 };
 
-err_t i2c_bus_device_device_init(struct i2c_bus_device *bus,
+error_t i2c_bus_device_device_init(struct i2c_bus_device *bus,
                                  const char               *name)
 {
     struct device *device;

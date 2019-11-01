@@ -3,9 +3,9 @@
 //#include <printk.h>
 
 #ifdef configUSING_I2C
-err_t i2c_bus_device_register(struct i2c_bus_device *bus, const char *bus_name)
+error_t i2c_bus_device_register(struct i2c_bus_device *bus, const char *bus_name)
 {
-    err_t res = 0;
+    error_t res = 0;
 
     if (bus->timeout == 0) bus->timeout = configHZ;
 
@@ -65,7 +65,7 @@ size_t i2c_master_send(struct i2c_bus_device *bus,
                        const uint8_t         *buf,
                        uint32_t               count)
 {
-    err_t ret;
+    error_t ret;
     struct i2c_msg msg;
 
     msg.addr  = addr;
@@ -84,7 +84,7 @@ size_t i2c_master_recv(struct i2c_bus_device *bus,
                        uint8_t               *buf,
                        uint32_t               count)
 {
-    err_t ret;
+    error_t ret;
     struct i2c_msg msg;
 //    assert(bus != NULL);
 

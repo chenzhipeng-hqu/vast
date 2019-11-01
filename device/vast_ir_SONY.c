@@ -1,5 +1,5 @@
 
-#include <vast_ir.h>
+#include <device/vast_ir.h>
 
 //
 static int InfraRed_RX_SONY_Calculate(IR_TypeDef *pIR_Obj);

@@ -19,11 +19,12 @@
 /*************************************
               include
 *************************************/
-#include <vast_ir.h>
+#include <device/vast_ir.h>
 
 /*************************************
               define
 *************************************/
+#ifdef configUSING_IR
 
 /**************************************
               typedef
@@ -229,7 +230,10 @@ int main(int argc, char *argv[])
 	}
 	return 0;
 }
-#endif
+
+#endif /*test*/
+
+#endif /*configUSING_IR*/
 /**
   * @}
   */

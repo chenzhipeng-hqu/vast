@@ -68,7 +68,7 @@ static inline void chn_reset(chn_slot_t *chn)
 #define block_no(ptr)       ((ptr) >> BLOCK_NO_SHIFT)
 #define block_valid(blk)    ((blk) != INVALID_BLOCK_NO)
 
-err_t chn_put(chn_slot_t *chn,  const void *data, size_t len)
+error_t chn_put(chn_slot_t *chn,  const void *data, size_t len)
 {
     int k, i = 0;
     OS_CPU_SR cpu_sr;
@@ -116,7 +116,7 @@ exit:
     return (i);
 }
 
-err_t chn_peek(chn_slot_t *chn, void *data, size_t len)
+error_t chn_peek(chn_slot_t *chn, void *data, size_t len)
 {
     int n = 0;
     u16 rx, tx;
@@ -141,7 +141,7 @@ err_t chn_peek(chn_slot_t *chn, void *data, size_t len)
     return n;
 }
 
-err_t chn_get(chn_slot_t *chn,  void *data, size_t len)
+error_t chn_get(chn_slot_t *chn,  void *data, size_t len)
 {
     int k, i = 0;
     OS_CPU_SR cpu_sr;

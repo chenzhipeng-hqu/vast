@@ -172,7 +172,7 @@ typedef struct _ina219_init_t
 
 typedef struct _ina219_ops_t
 {
-	err_t	(*init)		(struct _ina219_device_t *ina219, ina219_init_t *args);
+	error_t	(*init)		(struct _ina219_device_t *ina219, ina219_init_t *args);
 	size_t 	(*read)		(struct _ina219_device_t *ina219, uint8_t reg, uint16_t *dat);
 	size_t 	(*write)	(struct _ina219_device_t *ina219, uint8_t reg, uint16_t dat);
 }ina219_ops_t;
@@ -210,7 +210,7 @@ extern void INA219_Get_All_Value(INA219_HandleTypeDef *ina219x);
 extern void INA219_Config(INA219_HandleTypeDef *ina219 );
 
 
-err_t ina219_device_register(ina219_device_t *ina219, const char *name, uint32_t flag, void *data);
+error_t ina219_device_register(ina219_device_t *ina219, const char *name, uint32_t flag, void *data);
 
 #endif
 

@@ -82,7 +82,7 @@ int16_t vast_log_setDate(Log_HandleTypeDef *pLog, uint16_t year, uint8_t month, 
 	pLog->Init.hour 	= hour;
 	pLog->Init.min 		= min;
 	pLog->Init.sec 		= sec;
-	pLog->WriteLog("set: %d-%02d-%02d %02d:%02d:%02d\r\n", pLog->Init.year, pLog->Init.month, pLog->Init.day, pLog->Init.hour, pLog->Init.min, pLog->Init.sec);
+//	pLog->WriteLog("set: %d-%02d-%02d %02d:%02d:%02d\r\n", pLog->Init.year, pLog->Init.month, pLog->Init.day, pLog->Init.hour, pLog->Init.min, pLog->Init.sec);
 	return 0;
 }
 

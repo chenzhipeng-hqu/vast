@@ -32,7 +32,7 @@ static inline void i2c_delay2(struct i2c_bit_ops *ops)
 /**
  * release scl line, and wait scl line to high.
  */
-static err_t SCL_H(struct i2c_bit_ops *ops)
+static error_t SCL_H(struct i2c_bit_ops *ops)
 {
     time_t start,tick_now;
     SET_SCL(ops, 1);
@@ -223,7 +223,7 @@ static size_t i2c_send_bytes(struct i2c_bus_device *bus,
     return bytes;
 }
 
-static err_t i2c_send_ack_or_nack(struct i2c_bus_device *bus, int ack)
+static error_t i2c_send_ack_or_nack(struct i2c_bus_device *bus, int ack)
 {
     struct i2c_bit_ops *ops = bus->priv;
 
@@ -287,7 +287,7 @@ static int32_t i2c_send_address(struct i2c_bus_device *bus,
 {
     struct i2c_bit_ops *ops = bus->priv;
     int32_t i;
-    err_t ret = 0;
+    error_t ret = 0;
 
     for (i = 0; i <= retries; i++)
     {
@@ -304,7 +304,7 @@ static int32_t i2c_send_address(struct i2c_bus_device *bus,
     return ret;
 }
 
-static err_t i2c_bit_send_address(struct i2c_bus_device *bus,
+static error_t i2c_bit_send_address(struct i2c_bus_device *bus,
                                   struct i2c_msg        *msg)
 {
     uint16_t flags = msg->flags;
@@ -313,7 +313,7 @@ static err_t i2c_bit_send_address(struct i2c_bus_device *bus,
 
     uint8_t addr1, addr2;
     int32_t retries;
-    err_t ret;
+    error_t ret;
 
     retries = ignore_nack ? 0 : bus->retries;
 
@@ -437,7 +437,7 @@ static const struct i2c_bus_device_ops i2c_bit_bus_ops =
     NULL
 };
 
-err_t i2c_bit_add_bus(struct i2c_bus_device *bus,
+error_t i2c_bit_add_bus(struct i2c_bus_device *bus,
                       const char               *bus_name)
 {
     bus->ops = &i2c_bit_bus_ops;
