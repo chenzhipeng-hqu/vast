@@ -39,7 +39,10 @@ enum device_class_type
 #define DEVICE_CTRL_SET_TX_INT       0x13       /* enable transmit irq */
 #define DEVICE_CTRL_CLR_TX_INT       0x14       /* disable transmit irq */
 #define DEVICE_CTRL_ADD_OUT          0x15       /* add fifo out */
-#define DEVICE_CTRL_INT_PRIO      	  0x16       /* modify Priority */
+#define DEVICE_CTRL_INT_PRIO      	 0x16       /* modify Priority */
+#define DEVICE_CTRL_SET_TX_DMA       0x17       /* enable transmit dma */
+#define DEVICE_CTRL_CLR_TX_DMA       0x18       /* disnable transmit dma */
+#define DEVICE_CTRL_SET_TX_DMA_LEN   0x19       /* set tramsimt dma length */
 
 #define DEVICE_CTRL_BLK_GETGEOME     0x10       /**< get geometry information   */
 #define DEVICE_CTRL_BLK_SYNC         0x11       /**< flush data to block device */

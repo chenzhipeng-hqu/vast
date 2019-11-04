@@ -12,7 +12,7 @@ static void serial_tmr_cb(struct soft_timer *st)
 
     if (serial->parent.owner)
     {
-        //task_send_signal(serial->parent.owner, SIG_DATA);
+        task_send_signal(serial->parent.owner, SIG_DATA);
     }
 }
 #endif
@@ -44,6 +44,7 @@ static error_t serial_open(struct device *dev, uint16_t oflag)
     /* get open flags */
     dev->open_flag = oflag & 0xff;
 
+#ifdef configUSING_SERIAL_INT
     if (oflag & DEVICE_FLAG_INT_RX)
     {
         chn_init(&serial->rx, serial->config.bufsz);
@@ -56,7 +57,9 @@ static error_t serial_open(struct device *dev, uint16_t oflag)
         chn_init(&serial->tx, serial->config.bufsz);
         dev->open_flag |= DEVICE_FLAG_INT_TX;
     }
+#endif
 
+#ifdef configUSING_SERIAL_DMA
     if (oflag & DEVICE_FLAG_DMA_RX)
     {
         INIT_KFIFO(serial->rx_kfifo);
@@ -65,9 +68,11 @@ static error_t serial_open(struct device *dev, uint16_t oflag)
 
     if (oflag & DEVICE_FLAG_DMA_TX)
     {
-        INIT_LIST_HEAD(&serial->tx_list);
+        //INIT_LIST_HEAD(&serial->tx_list);
+        INIT_KFIFO(serial->tx_kfifo);
         dev->open_flag |= DEVICE_FLAG_DMA_TX;
     }
+#endif
 
     return 0;
 }
@@ -76,6 +81,7 @@ static error_t serial_close(struct device *dev)
 {
     struct serial_device *serial = (struct serial_device *)dev;
 
+#ifdef configUSING_SERIAL_INT
     if (dev->open_flag & DEVICE_FLAG_INT_RX)
     {
         dev->open_flag &= ~DEVICE_FLAG_INT_RX;
@@ -87,7 +93,9 @@ static error_t serial_close(struct device *dev)
         dev->open_flag &= ~DEVICE_FLAG_INT_TX;
         serial->ops->control(serial, DEVICE_CTRL_CLR_INT, (void *)0);
     }
+#endif
 
+#ifdef configUSING_SERIAL_DMA
     if (dev->open_flag & DEVICE_FLAG_DMA_RX)
     {
         dev->open_flag &= ~DEVICE_FLAG_DMA_RX;
@@ -99,6 +107,7 @@ static error_t serial_close(struct device *dev)
         dev->open_flag &= ~DEVICE_FLAG_DMA_TX;
         serial->ops->control(serial, DEVICE_CTRL_CLR_INT, (void *)0);
     }
+#endif
 
     return 0;
 }
@@ -107,12 +116,15 @@ static size_t serial_read(struct device *dev, off_t pos, void *buffer, size_t si
 {
     struct serial_device *serial = (struct serial_device *)dev;
 
+#ifdef configUSING_SERIAL_INT
     if (dev->open_flag & DEVICE_FLAG_INT_RX)
     {
         return chn_get(&serial->rx, buffer, size);
         //        return serial->ops->get_c(serial);
     }
+#endif
 
+#ifdef configUSING_SERIAL_DMA
     if (dev->open_flag & DEVICE_FLAG_DMA_RX)
     {
         //if(!kfifo_is_empty(&serial->rx_kfifo))
@@ -120,6 +132,7 @@ static size_t serial_read(struct device *dev, off_t pos, void *buffer, size_t si
             return kfifo_out(&serial->rx_kfifo, buffer, size);
         }
     }
+#endif
 
     return 0;
 }
@@ -128,15 +141,19 @@ static size_t serial_peek(struct device *dev, off_t pos, void *buffer, size_t si
 {
     struct serial_device *serial = (struct serial_device *)dev;
 
+#ifdef configUSING_SERIAL_INT
     if (dev->open_flag & DEVICE_FLAG_INT_RX)
     {
         return chn_peek(&serial->rx, buffer, size);
     }
+#endif
 
+#ifdef configUSING_SERIAL_DMA
     if (dev->open_flag & DEVICE_FLAG_DMA_RX)
     {
         return kfifo_out_peek(&serial->rx_kfifo, buffer, size);
     }
+#endif
 
     return 0;
 }
@@ -149,6 +166,7 @@ static size_t serial_write(struct device *dev, off_t pos, const void *buffer, si
     //log_d("send data to %s\r\n", dev->parent.name);
     //log_arr_d(buffer, size);
 
+#ifdef configUSING_SERIAL_INT
     if (dev->open_flag & DEVICE_FLAG_INT_TX)
     {
     	//while(1) {
@@ -167,15 +185,36 @@ static size_t serial_write(struct device *dev, off_t pos, const void *buffer, si
 			serial->ops->control(serial, DEVICE_CTRL_SET_TX_INT, NULL);
 		}
     }
+#endif
 
+#ifdef configUSING_SERIAL_DMA
     if (dev->open_flag & DEVICE_FLAG_DMA_TX)
     {
-    	serial->ops->write(serial, pos, buffer, size);
-        if (ret > 0)
-        {
-            serial->ops->control(serial, DEVICE_CTRL_SET_TX_INT, NULL);
+        int inv = 0, priority = 0;
+        //uint8_t *buff = (uint8_t *)buffer;
+
+    	do {
+            //ret += kfifo_in(&serial->tx_kfifo, &buff[ret], size-ret);
+            ret += kfifo_in(&serial->tx_kfifo, (uint8_t *)(buffer + ret), size-ret);
+            //ret += kfifo_in(&serial->tx_kfifo, buffer + ret, size-ret);
+            if (ret > 0) {
+                serial->ops->control(serial, DEVICE_CTRL_SET_TX_INT, NULL);
+            }
+
+            if ((ret != size) & (inv == 0)) {
+                inv = 1;
+                priority = 0;
+                serial->ops->control(serial, DEVICE_CTRL_INT_PRIO, &priority);
+            }
+
+    	}while(ret != size);
+
+        if (inv == 1) {
+            priority = 15;
+            serial->ops->control(serial, DEVICE_CTRL_INT_PRIO, &priority);
         }
     }
+#endif
 
     return ret;
 }
@@ -200,7 +239,7 @@ static error_t serial_control(struct device *dev, uint8_t cmd, void *args)
     break;
     case DEVICE_CTRL_ADD_OUT:
     {
-        size_t len = *(size_t *)(args);
+        unsigned int len = *(size_t *)(args);
         len = min(len, kfifo_len(&serial->rx_kfifo));
         kfifo_add_out(&serial->rx_kfifo, len);
     }
@@ -240,8 +279,11 @@ void serial_device_isr(struct serial_device *dev, int event)
 {
     u8 c;
 
+    (void)c;
+
     switch (event & 0xff)
     {
+#ifdef configUSING_SERIAL_INT
     case SERIAL_EVENT_TX_RDY:
         if (chn_get(&dev->tx, &c, 1))
         {
@@ -252,28 +294,47 @@ void serial_device_isr(struct serial_device *dev, int event)
             dev->ops->control(dev, DEVICE_CTRL_CLR_TX_INT, NULL);
         }
         break;
+#endif
+#ifdef configUSING_SERIAL_DMA
+    case SERIAL_EVENT_TX_DMADONE: {
+            unsigned int len = kfifo_out(&dev->tx_kfifo, (uint8_t *)&(dev->tx_dma_buff), sizeof(&dev->tx_dma_buff));
+            if (len > 0)
+            {
+                dev->ops->control(dev, DEVICE_CTRL_CLR_TX_DMA, NULL);
+                dev->ops->control(dev, DEVICE_CTRL_SET_TX_DMA_LEN, &len);
+                dev->ops->control(dev, DEVICE_CTRL_SET_TX_DMA, NULL);
+            }
+            else
+            {
+                dev->ops->control(dev, DEVICE_CTRL_CLR_TX_INT, NULL);
+            }
+        }
+        break;
+#endif
 
     case SERIAL_EVENT_RX_IND:
     {
-        int ch = -1;
+        #ifdef configUSING_SERIAL_INT
+            int ch = -1;
 
-        while (1)
-        {
-            ch = dev->ops->get_c(dev);
-            if (ch == -1) break;
+            while (1)
+            {
+                ch = dev->ops->get_c(dev);
+                if (ch == -1) break;
 
-            c = ch;
-            chn_put(&dev->rx, &c, 1);
-        }
+                c = ch;
+                chn_put(&dev->rx, &c, 1);
+            }
+        #endif
 
-#ifdef configUSING_FRAME_TIMEOUT_SOFT
+        #ifdef configUSING_FRAME_TIMEOUT_SOFT
         {
             struct soft_timer *st = &dev->rxto;
             soft_timer_del(st);
             st->expires = jiffies + configSERIAL_RX_TO;
             soft_timer_add(st);
         }
-#endif
+        #endif
         break;
     }
     }

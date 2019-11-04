@@ -56,7 +56,7 @@
 # define SERIAL_RB_BUFSZ             64
 #endif
 
-#define		KFIFO_BUFFER_SIZE		(128U)
+#define		KFIFO_BUFFER_SIZE		(256U)
 
 /* Default config for serial_configure structure */
 #define SERIAL_CONFIG_DEFAULT              \
@@ -90,11 +90,17 @@ struct serial_device
 #ifdef configUSING_FRAME_TIMEOUT_SOFT
     struct soft_timer rxto;
 #endif
+#ifdef configUSING_SERIAL_INT
     chn_slot_t          rx, tx;
+#endif
     //DECLARE_KFIFO_PTR(serial_rx, unsigned char);
     //DECLARE_KFIFO_PTR(serial_tx, unsigned char);
+#ifdef configUSING_SERIAL_DMA
     DECLARE_KFIFO(rx_kfifo, unsigned char, KFIFO_BUFFER_SIZE);
+    DECLARE_KFIFO(tx_kfifo, unsigned char, KFIFO_BUFFER_SIZE);
     list_t          tx_list;
+    unsigned char tx_dma_buff[64];
+#endif
 };
 typedef struct rt_serial_device rt_serial_t;
 
@@ -108,7 +114,6 @@ struct uart_ops
 
     int (*put_c)(struct serial_device *dev, char c);
     int (*get_c)(struct serial_device *dev);
-    int (*write)(struct serial_device *dev, off_t pos, const void *buffer, size_t size);
 };
 
 void serial_device_isr(struct serial_device *serial, int event);
