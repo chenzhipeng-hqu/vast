@@ -1,6 +1,7 @@
 #include <core/device.h>
 #include <core/types.h>
 #include <core/utils.h>
+#include "core/croutine.h"
 //#include <printk.h>
 
 #ifdef configUSING_SERIAL
@@ -63,12 +64,12 @@ static error_t serial_open(struct device *dev, uint16_t oflag)
     if (oflag & DEVICE_FLAG_DMA_RX)
     {
         INIT_KFIFO(serial->rx_kfifo);
+        serial->rx_dma_old_cnt = serial->rx_kfifo.kfifo.mask+1;
         dev->open_flag |= DEVICE_FLAG_DMA_RX;
     }
 
     if (oflag & DEVICE_FLAG_DMA_TX)
     {
-        //INIT_LIST_HEAD(&serial->tx_list);
         INIT_KFIFO(serial->tx_kfifo);
         dev->open_flag |= DEVICE_FLAG_DMA_TX;
     }
@@ -308,6 +309,41 @@ void serial_device_isr(struct serial_device *dev, int event)
             {
                 dev->ops->control(dev, DEVICE_CTRL_CLR_TX_INT, NULL);
             }
+        }
+        break;
+    case SERIAL_EVENT_RX_IDLE: {
+            //int dma_cnt = LL_DMA_GetDataLength(uart->rx_dma.DMAx, uart->rx_dma.chx);
+            int len = 0;
+
+            dev->ops->control(dev, DEVICE_CTRL_GET_RX_DMA_LEN, &len);
+
+            if(dev->rx_dma_old_cnt < len) {
+                dev->rx_dma_old_cnt += dev->rx_kfifo.kfifo.mask+1;
+            }
+
+            kfifo_add_in(&dev->rx_kfifo, (dev->rx_dma_old_cnt-len));
+            dev->rx_dma_old_cnt = len;
+
+//            len = sizeof(dev->rx_dma_buff) - len;
+//            dev->ops->control(dev, DEVICE_CTRL_CLR_RX_DMA, NULL);
+//            len = kfifo_in(&dev->rx_kfifo, (dev->rx_dma_buff), len);
+//            len = sizeof(dev->rx_dma_buff);
+//            dev->ops->control(dev, DEVICE_CTRL_SET_RX_DMA_LEN, &len);
+//            dev->ops->control(dev, DEVICE_CTRL_SET_RX_DMA, NULL);
+
+            if ((dev->parent.owner) && (len > 0)) {
+                task_send_signal(dev->parent.owner, SIG_DATA);
+            }
+        }
+    	break;
+    case SERIAL_EVENT_RX_DMADONE: {
+//            int len2 = 0;
+//
+//            len2 = kfifo_in(&dev->rx_kfifo, (dev->rx_dma_buff), sizeof(dev->rx_dma_buff));
+//
+//            if ((dev->parent.owner) && (len2 > 0)) {
+//                task_send_signal(dev->parent.owner, SIG_DATA);
+//            }
         }
         break;
 #endif

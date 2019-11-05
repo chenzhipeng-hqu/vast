@@ -42,7 +42,11 @@ enum device_class_type
 #define DEVICE_CTRL_INT_PRIO      	 0x16       /* modify Priority */
 #define DEVICE_CTRL_SET_TX_DMA       0x17       /* enable transmit dma */
 #define DEVICE_CTRL_CLR_TX_DMA       0x18       /* disnable transmit dma */
-#define DEVICE_CTRL_SET_TX_DMA_LEN   0x19       /* set tramsimt dma length */
+#define DEVICE_CTRL_SET_RX_DMA       0x19       /* enable transmit dma */
+#define DEVICE_CTRL_CLR_RX_DMA       0x1a       /* disnable transmit dma */
+#define DEVICE_CTRL_SET_TX_DMA_LEN   0x1b       /* set tramsimt dma length */
+#define DEVICE_CTRL_SET_RX_DMA_LEN   0x1c       /* set receive dma length */
+#define DEVICE_CTRL_GET_RX_DMA_LEN   0x1d       /* get receive dma length */
 
 #define DEVICE_CTRL_BLK_GETGEOME     0x10       /**< get geometry information   */
 #define DEVICE_CTRL_BLK_SYNC         0x11       /**< flush data to block device */

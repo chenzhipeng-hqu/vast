@@ -41,6 +41,7 @@
 #define SERIAL_EVENT_RX_DMADONE      0x03
 #define SERIAL_EVENT_TX_DMADONE      0x04
 #define SERIAL_EVENT_RX_TIMEOUT      0x05    /* Rx timeout    */
+#define SERIAL_EVENT_RX_IDLE      	  0x06
 
 #define SERIAL_RX_INT                0x01
 #define SERIAL_TX_INT                0x02
@@ -53,10 +54,12 @@
 #define SERIAL_TX_DATAQUEUE_LWM      30
 
 #ifndef SERIAL_RB_BUFSZ
-# define SERIAL_RB_BUFSZ             64
+    # define SERIAL_RB_BUFSZ             64
 #endif
 
-#define		KFIFO_BUFFER_SIZE		(256U)
+#ifndef KFIFO_BUFFER_SIZE
+    #define		KFIFO_BUFFER_SIZE		(256U)
+#endif
 
 /* Default config for serial_configure structure */
 #define SERIAL_CONFIG_DEFAULT              \
@@ -98,8 +101,9 @@ struct serial_device
 #ifdef configUSING_SERIAL_DMA
     DECLARE_KFIFO(rx_kfifo, unsigned char, KFIFO_BUFFER_SIZE);
     DECLARE_KFIFO(tx_kfifo, unsigned char, KFIFO_BUFFER_SIZE);
-    list_t          tx_list;
     unsigned char tx_dma_buff[64];
+//    unsigned char rx_dma_buff[32];
+    size_t rx_dma_old_cnt;
 #endif
 };
 typedef struct rt_serial_device rt_serial_t;

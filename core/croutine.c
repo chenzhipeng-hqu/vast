@@ -15,7 +15,8 @@ static void check_delayed_list(void)
 
     list_for_each_entry(iter, &task_list, entry)
     {
-        if (iter->status == TS_DELAY && time_after_eq(jiffies, iter->expire))
+
+    	if (iter->status == TS_DELAY && time_after_eq(jiffies, iter->expire))
         {
             enter_critical();
             iter->status = TS_READY;
