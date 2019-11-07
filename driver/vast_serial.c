@@ -308,6 +308,9 @@ void serial_device_isr(struct serial_device *dev, int event)
             else
             {
                 dev->ops->control(dev, DEVICE_CTRL_CLR_TX_INT, NULL);
+                if (dev->parent.owner) {
+					task_send_signal(dev->parent.owner, SIG_ALARM);
+				}
             }
         }
         break;
