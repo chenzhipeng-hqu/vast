@@ -6,7 +6,6 @@
 static LIST_HEAD(task_list);
 static tcb_t *current;
 
-#define corINITIAL_STATE    (0)
 
 static void check_delayed_list(void)
 {
@@ -15,7 +14,6 @@ static void check_delayed_list(void)
 
     list_for_each_entry(iter, &task_list, entry)
     {
-
     	if (iter->status == TS_DELAY && time_after_eq(jiffies, iter->expire))
         {
             enter_critical();
@@ -30,8 +28,18 @@ void task_create(tcb_t *tcb, void (*tcb_cb)(struct task_ctrl_blk *, ubase_t), ub
     tcb->state  = corINITIAL_STATE;
     tcb->data   = data;
     tcb->tcb_cb = tcb_cb;
+    tcb->status = TS_READY;
 
     list_add_tail(&tcb->entry, &task_list);
+}
+
+void task_destroy(tcb_t *tcb, void (*tcb_cb)(struct task_ctrl_blk *, ubase_t), ubase_t data)
+{
+	OS_CPU_SR cpu_sr;
+
+	enter_critical();
+    list_del(&tcb->entry);
+    exit_critical();
 }
 
 void task_add_to_delayed_list(tcb_t *tcb, time_t ticks_to_delay)

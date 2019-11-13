@@ -35,7 +35,9 @@ void task_create(tcb_t *tcb, void (*tcb_cb)(struct task_ctrl_blk *, ubase_t), ub
 tcb_t *task_get_current_task_handle(void);
 void task_schedule(void);
 
-#define tSTART(tcb) switch((tcb)->state) {case 0:
+#define corINITIAL_STATE    (0)
+
+#define tSTART(tcb) switch((tcb)->state) {case corINITIAL_STATE:
 #define tEND() }
 
 /*
@@ -43,7 +45,7 @@ void task_schedule(void);
  * only.  The macros should not be used directly by application writers.
  */
 #define tSET_STATE0(tcb) (tcb)->state = (__LINE__*2); return; case (__LINE__*2):
-#define tSET_STATE1(tcb) (tcb)->state = (__LINE__*2+1); return; case (__LINE__*2+1):
+#define tSET_STATE1(tcb) (tcb)->state = ((__LINE__*2)+1); return; case ((__LINE__*2)+1):
 
 #define task_delay(tcb, ticks)                              \
     if((ticks) > 0)                                         \
