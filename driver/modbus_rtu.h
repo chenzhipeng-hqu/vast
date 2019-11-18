@@ -32,7 +32,7 @@
 /***********************************************
                     define
 ***********************************************/
-#ifdef configUSING_MODBUS_RTU
+#ifdef configUSING_MODBUS_RTU2
 
 #ifdef MODBUS_DEBUG
 #define modbus_dbg(fmt, ...)   printk(fmt, ##__VA_ARGS__)

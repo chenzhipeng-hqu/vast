@@ -200,5 +200,14 @@ void     device_set_owner(device_t *dev, const void *owner);
 	#include "drivers/lcd.h"
 #endif
 
+#ifdef configUSING_MODBUS_RTU
+    #include "component/modbus_rtu.h"
+#endif
+
+#ifdef configUSING_MODBUS_RTU2
+    #include "driver/modbus_rtu.h"
+#endif
+
+
 #endif /* __DEVICE_H__ */
 

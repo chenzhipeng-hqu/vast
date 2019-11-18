@@ -18,12 +18,13 @@
 /***********************************************
                     include
 ***********************************************/
-#include "math.h"
-#include "modbus_rtu.h"
+//#include "math.h"
+#include "component/modbus_rtu.h"
 
 /***********************************************
                     define
 ***********************************************/
+#ifdef configUSING_MODBUS_RTU
 
 /***********************************************
                     typedef
@@ -109,6 +110,20 @@ int ModBus_Init(ModbusRtu_HandleTypeDef *pModbusRtu)
 	return 0;
 }
 
+double pow(double num1,double num2)   //函数定义
+{
+    double result=1;
+    int i;
+    for(i=0;i<num2;i++)
+        result*=num1;   //累乘
+    return result;
+}
+
+double fmod(double x, double y)
+{
+        return x - (int)(x / y) * y;
+}
+
 //������תΪ����
 uint16_t float2int(float value)
 {
@@ -150,7 +165,7 @@ float int2float(uint16_t value)
   * @param  
   * @retval 
   */
-static uint16_t crc16(uint8_t *buffer, uint16_t buffer_length)
+static uint16_t modbus_crc16(uint8_t *buffer, uint16_t buffer_length)
 {
     uint8_t crc_hi = 0xFF; /* high CRC byte initialized */
     uint8_t crc_lo = 0xFF; /* low CRC byte initialized */
@@ -186,7 +201,7 @@ static void writeModBus(ModbusRtu_HandleTypeDef *pModbusRtu, uint8_t cmd, uint8_
 		TxCommand[i + 2] = *p;
 		p++;
 	}
-	crc = crc16((uint8_t *)TxCommand, dataLen + 2);
+	crc = modbus_crc16((uint8_t *)TxCommand, dataLen + 2);
 	crc_H = crc >> 8;
 	crc_L = crc & 0x00ff;
 	TxCommand[2 + dataLen] = crc_H;
@@ -216,7 +231,7 @@ bool checkModBusData(ModbusRtu_HandleTypeDef *pModbusRtu, uint8_t *data, uint16_
 		return false;
 	}
 
-	crc = crc16((uint8_t *)data, len);
+	crc = modbus_crc16((uint8_t *)data, len);
 
 	return (crc == 0);
 }
@@ -514,6 +529,7 @@ bool readSingleInputReg(ModbusRtu_HandleTypeDef *pModbusRtu, uint16_t reg_addr)
 }
 
 	
+#endif
 /**
   * @}
   */

@@ -38,10 +38,13 @@
 ***********************************************/
 #include <stdint.h>
 #include <stdbool.h>
+#include <core/device.h>
 
 /***********************************************
                     define
 ***********************************************/
+#ifdef configUSING_MODBUS_RTU
+
 #define	MODBUS_RTU_BUFF_LEN				0x7F
 #define MAX_SLAVE_ADDR						0xFF
 #define	MAX_HOLDRES								64
@@ -97,6 +100,7 @@ float int2float(uint16_t value);
                    variable
 ***********************************************/
 
+#endif
 /**
   * @}
   */

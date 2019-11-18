@@ -24,6 +24,7 @@
 #include <stdarg.h>
 #include <math.h>
 
+#include "core/device.h"
 #include "component/vast_cli.h"
 //#include "cmsis_os.h"
 #include "qpc_common.h"
@@ -32,6 +33,7 @@
 #include "device/im1227.h"
 #include "driver/modbus_rtu.h"
 //#include "czp_debug.h"
+#include <component/vast_log.h>
 #include "component/protocol.h"
 
 /***********************************************
@@ -722,7 +724,7 @@ int protocolMsgDispatch(void * sender, ProtMsg_TypeDef *pProtMsg)
 			GpioEvt * pe = Q_NEW(GpioEvt, GPIO_OUTPUT_SIG);
 			pe->sender = sender_;
 			pe->cmd_id = cmd_id;
-			pe->pinId = str2u32(argv[0]);		
+			pe->pinId = str2u32(argv[0])-1;
 			pe->pinState = strcmp(argv[1], "on") ? 0 : 1;
 			
 			QACTIVE_POST(AO_Board[board_id], &pe->super, me);						
@@ -3196,7 +3198,7 @@ const CLICmdTypedef CLICmd_ProtocolCtrl[] =
   {" "			, "power off      : 0x2409 int(ms)"	, 0, 0},
   {" "			, "12V load sw    : 0x240a on/off"	, 0, 0},
   {" "			, "aging status   : 0x240b NULL"		, 0, 0},
-  {" "			, "gpio out       : 0x240c NULL"		, 0, 0},
+  {" "			, "gpio out       : 0x240c 1-6 on/off"	, 0, 0},
   {" "			, "gpio in        : 0x240d NULL"		, 0, 0},
   {" "			, "aging status   : 0x240b NULL"		, 0, 0},
   {"V220"		, "220V switch    : 0x2403 on/off/half", 0, 0},
@@ -3206,7 +3208,7 @@ const CLICmdTypedef CLICmd_ProtocolCtrl[] =
   {" "			, "ps_on          : 0x2407 on/off"	, 0, 0},
   {" "			, "adj_on         : 0x2408 on/off"	, 0, 0},
   {"power"	, "power factor   : 0x2601 NULL"		, 0, 0},
-  {"e load"	, "channel switch : 0x2710 hex(bit0~3)", 0, 0},
+  {"e load"	, "channel switch : 0x2710 chn hex(bit0~3)", 0, 0},
   {"  ch(n)", "load mode      : 0x27(n)1 hex(CC:0x01, CV:0x02, CR:0x03, CP:0x04, LED:0x05)", 0, 0},
   {" "			, "Vo value       : 0x27(n)2 int(mA/mV/mW/mR)", 0, 0},
   {" "			, "Io value       : 0x27(n)3 int(mA)"	, 0, 0},
