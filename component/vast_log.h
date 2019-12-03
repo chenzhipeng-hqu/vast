@@ -99,10 +99,11 @@
 																	}while(0)
 
 	#define		DBG_TASK_LOG(level, fmt, ...)		do { \
-														if((e->sig == Q_EMPTY_SIG)\
+														if((level == DBG_QPSIG)\
+														    & ((e->sig == Q_EMPTY_SIG)\
 															| (e->sig == TIME_TICK_SIG)\
 															| (e->sig == SET_LINK_TIMEOUT_SIG)\
-															| (e->sig == TEST_TIMEOUT_SIG) ){\
+															| (e->sig == TEST_TIMEOUT_SIG))){\
 														}else {\
 															vast_log_log(level, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__);\
 														}\
