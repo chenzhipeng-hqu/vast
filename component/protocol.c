@@ -3079,7 +3079,7 @@ int protocolMsgDispatch(void * sender, ProtMsg_TypeDef *pProtMsg)
   * @param  
   * @retval 
   */
-int protocolMsgUpload2(void ** sender, unsigned char boardId, unsigned short int cmdId, const char *format, ...)
+int protocolMsgUpload3(void ** sender, unsigned char boardId, unsigned short int cmdId, const char *format, ...)
 {
 	int ret = ERR_OK;
 	unsigned char check_xor=0, i;
@@ -3126,6 +3126,46 @@ int protocolMsgUpload2(void ** sender, unsigned char boardId, unsigned short int
 		DBG_INFO(DBG_DEBUG, "%02x %02x \r\n", check_xor, PROT_TAIL);
 		
 		pe->len = i;
+		
+		pe->socket_n = boardId;
+		
+		QACTIVE_POST(sender_, &pe->super, me);
+	}
+	else
+	{
+		DBG_LOG(DBG_WARNING, "pe == NULL\r\n");
+	}
+	
+	*sender = (QActive *)NULL;
+	
+	return ret;
+}
+
+
+/**
+  * @brief  protocolMsgDispatch.
+  * @param  
+  * @retval 
+  */
+int protocolMsgUpload2(void ** sender, unsigned char boardId, unsigned short int cmdId, const char *format, ...)
+{
+	int ret = ERR_OK;
+	QActive * sender_ = (QActive *)(*(sender));
+		
+	if(sender_ == NULL)
+	{
+		DBG_LOG(DBG_DEBUG, "sender_ is NULL! \r\n");
+		return ERR_SENDER;
+	}
+	
+	ProtocolSendEvt * pe = Q_NEW(ProtocolSendEvt, RESULT_SIG);
+		
+	if (pe != NULL)
+	{
+		va_list arg;
+		va_start(arg, format);
+		pe->len = vsnprintf(&pe->write_buff[0], BUFF_LEN_MAX, format, arg);
+		va_end(arg);
 		
 		pe->socket_n = boardId;
 		

@@ -262,6 +262,7 @@ typedef enum {
 extern int protocolMsgDispatch	(void * sender, ProtMsg_TypeDef *pProtMsg);
 extern int protocolMsgUpload		(void * sender, ProtMsg_TypeDef *pProtMsg);
 extern int protocolMsgUpload2		(void ** sender, unsigned char boardId, unsigned short int cmdId, const char *format, ...);
+extern int protocolMsgUpload3(void ** sender, unsigned char boardId, unsigned short int cmdId, const char *format, ...);
 
 /***********************************************
 									  inline
