@@ -68,7 +68,7 @@
 
 #define __VAST_POSITION_VAL(VAL)     	(__CLZ(__RBIT(VAL)))
 
-#define __VAST_ABS(x)   				((x)>0 ? (x) : (0-x))
+#define __VAST_ABS(x)   				((x)>0 ? (x) : -(x))
 
 #define __VAST_GET_SIGN(x) 				((x)>=0?(1):0)  //get sign
 

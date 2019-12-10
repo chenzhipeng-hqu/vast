@@ -431,7 +431,7 @@ int protocolMsgDispatch(void * sender, ProtMsg_TypeDef *pProtMsg)
 			
 			pe->sender = sender_;
 			pe->cmd_id = cmd_id;
-			//QACTIVE_POST(AO_Ethernet, &pe->super, me);
+            QACTIVE_POST(AO_Ethernet, &pe->super, me);
 			break;
 		}	
 		case CMDID_SET_MAC :
@@ -475,7 +475,7 @@ int protocolMsgDispatch(void * sender, ProtMsg_TypeDef *pProtMsg)
 			
 			pe->sender = sender_;
 			pe->cmd_id = cmd_id;
-			//QACTIVE_POST(AO_Ethernet, &pe->super, me);
+            QACTIVE_POST(AO_Ethernet, &pe->super, me);
 			break;
 		}	
 		case CMDID_GET_VER:
