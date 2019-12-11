@@ -146,6 +146,7 @@ static void * CJSON_CDECL internal_realloc(void *pointer, size_t size)
     return realloc(pointer, size);
 }
 #else
+#include <core/device.h>
 #define internal_malloc malloc
 #define internal_free free
 #define internal_realloc realloc

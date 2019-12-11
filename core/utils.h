@@ -190,7 +190,7 @@
 
 #define strchr    os_strchr
 #define strstr    os_strstr
-#define sscanf    os_sscanf
+//#define sscanf    os_sscanf
 #define strncpy   os_strncpy
 #define strcpy    os_strcpy
 #define memmove   os_memmove

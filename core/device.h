@@ -126,6 +126,11 @@ void     device_set_owner(device_t *dev, const void *owner);
 	#include <driver/vast_serial.h>
 #endif
 
+#ifdef OS_USING_HEAP
+	#include <core/heap.h>
+#endif
+
+
 #ifdef configUSING_EASY_KEY
 	#include <vast_key.h>
 #endif
