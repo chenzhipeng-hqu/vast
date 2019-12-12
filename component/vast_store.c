@@ -703,7 +703,7 @@ int32_t vast_store_write(Store_TypeTypeDef type, uint8_t *dat, uint32_t len)
 	uint32_t validAddr = 0xFFFFF, backupAddr = 0xFFFFF;
 
 	ASSERT(len < (BLOCK_SIZE/STORE_TYPE_MAX),
-			VAST_STORE_DBG_LOG(DBG_INFO, "len=%ld, max=%ld\r\n", len, BLOCK_SIZE/STORE_TYPE_MAX);
+			VAST_STORE_DBG_LOG(DBG_ERROR, "len=%ld, max=%ld\r\n", len, BLOCK_SIZE/STORE_TYPE_MAX);
 			return VAST_ERROR);
 
 	vast_store_findValidBlock(&validAddr, &backupAddr);
