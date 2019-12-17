@@ -20,7 +20,8 @@ void soft_timer_add(struct soft_timer *st)
     OS_CPU_SR cpu_sr;
 
     enter_critical();
-	if (!(st->entry.next && st->entry.prev))
+
+	if ((st->cb) && (!(st->entry.next && st->entry.prev)))
 		list_add_tail(&st->entry, &timer_list);
     exit_critical();
 }
@@ -58,8 +59,8 @@ static void soft_timer_task(void)
 
 			time_t start_jiffies = jiffies;
 
-			if (iter->cb)
-				iter->cb(iter);
+			//if (iter->cb)
+			iter->cb(iter);
 
 			if(jiffies - start_jiffies > 1)
 				printf("soft time task spent %ldms at %#lx\r\n",

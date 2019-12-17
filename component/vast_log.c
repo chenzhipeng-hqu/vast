@@ -182,13 +182,13 @@ int16_t vast_log_initialize(WriteLogFunc writeLogFunc, VprintLogFunc vprintLogFu
 }
 
 const char *level_color[][2] = {
-		{""				, "NULL"},
-		{FONT_MAGENTA	, "CRIS"},
-		{FONT_RED		, "ERRO"},
-		{FONT_YELLOW	, "WARN"},
-		{FONT_GREEN		, "INFO"},
-		{FONT_CYAN		, "DBUG"},
-		{FONT_BLUE		, "QSIG"}
+		{""				, "N"},	//NULL
+		{FONT_MAGENTA	, "C"},	//CRIS
+		{FONT_RED		, "E"},	//ERRO
+		{FONT_YELLOW	, "W"},	//WARN
+		{FONT_GREEN		, "I"},	//INFO
+		{FONT_CYAN		, "D"},	//DBUG
+		{FONT_BLUE		, "Q"}	//QSIG
 };
 
 size_t vast_log_log(uint8_t level, const char *func, uint16_t line, const char *format, ...)

@@ -102,7 +102,7 @@ void task_schedule(void)
 
             current->tcb_cb(current, current->data);
 
-            if(jiffies - start_jiffies > 2)
+            if(jiffies - start_jiffies > 10)
 				printf("task %ldms at %#lx\r\n", (uint32_t)(jiffies-start_jiffies), (uint32_t)current->tcb_cb);
 
         }
