@@ -58,7 +58,7 @@ static void led_tmr_cb(struct soft_timer * st)
 	{
 		case CTRL_EMCY:
 		{
-			st->expires += pdMS_TO_TICKS(100);
+			st->expires = jiffies + pdMS_TO_TICKS(100);
 			soft_timer_add(st);
 
 			led->ops->toggle(led);
@@ -70,19 +70,19 @@ static void led_tmr_cb(struct soft_timer * st)
 			{
 				led->flash_cnt = LED_NORMAL_FLASH_TIMES;
 
-				st->expires += pdMS_TO_TICKS(configHZ - ((led->flash_cnt) * (LED_FLASH_ON_MS+LED_FLASH_OFF_MS)));
+				st->expires = jiffies + pdMS_TO_TICKS(configHZ - ((led->flash_cnt) * (LED_FLASH_ON_MS+LED_FLASH_OFF_MS)));
 				soft_timer_add(st);
 			}
 			else if(led->status == 0)
 			{
-				st->expires += pdMS_TO_TICKS(LED_FLASH_ON_MS);	//10ms
+				st->expires = jiffies + pdMS_TO_TICKS(LED_FLASH_ON_MS);	//10ms
 				soft_timer_add(st);
 				led->status = 1;
 				led->ops->on(led);
 			}
 			else if(led->status == 1)
 			{
-				st->expires += pdMS_TO_TICKS(LED_FLASH_OFF_MS);
+				st->expires = jiffies + pdMS_TO_TICKS(LED_FLASH_OFF_MS);
 				soft_timer_add(st);
 				led->flash_cnt--;
 				led->status = 0;
@@ -143,7 +143,7 @@ static error_t led_ctrl(device_t *dev, uint8_t cmd, void *args)
 		case CTRL_NORMAL:
 		{
 			led->flash_cnt = LED_NORMAL_FLASH_TIMES;
-			st->expires = INITIAL_JIFFIES + pdMS_TO_TICKS(0);
+			st->expires = jiffies + pdMS_TO_TICKS(0);
 			soft_timer_add(st);
 			break;
 		}
