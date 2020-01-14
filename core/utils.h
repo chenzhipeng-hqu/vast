@@ -226,6 +226,7 @@ char *i2str(uint8_t val, char *destStr);
 
 void reverse(void *buff, size_t len);
 
+unsigned int mtd_crc32(unsigned int crc, const char *buf, int len);
 uint16_t crc16(uint16_t crc, const void *buf, int size);
 int count_bit_in_long(unsigned long x);
 
