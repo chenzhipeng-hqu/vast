@@ -492,6 +492,7 @@ int CLI_Enter(CLI_HandleTypeDef *pCli)
 	}				
 	
 	g_CLI_PosIdx = 0;
+    memset(CLI_Buffer[g_CLI_CurrentIdx], ASCII_NULL, CLI_BUFFER_SIZE);
 
 #if	ASCII_LEFT_SUPPORT	== true
 	g_CLI_LeftPosIdx = 0;
@@ -511,6 +512,7 @@ int CLI_Cancel(CLI_HandleTypeDef *pCli)
 {
 	pCli->Init.Write("%c%c%c%c%c", g_CLI_PosIdx ? ASCII_HAT : ASCII_NULL, ASCII_CR, ASCII_LF, ASCII_CMD, ASCII_SPACE);
 	g_CLI_PosIdx = 0;
+    memset(CLI_Buffer[g_CLI_CurrentIdx], ASCII_NULL, CLI_BUFFER_SIZE);
 	
 #if	ASCII_LEFT_SUPPORT	== true
 	g_CLI_LeftPosIdx = 0;
@@ -564,6 +566,73 @@ uint8_t CLI_Backspace(CLI_HandleTypeDef *pCli)
   return backspaceFail;
 }
 
+#define CLI_AUTO_COMPLETE
+
+static int str_common(const char *str1, const char *str2)
+{
+    const char *str = str1;
+
+    while ((*str != 0) && (*str2 != 0) && (*str == *str2))
+    {
+        str ++;
+        str2 ++;
+    }
+
+    return (str - str1);
+}
+
+static void do_auto_complete(CLI_HandleTypeDef *pCli, char *prefix)
+{
+    int length, min_length;
+    const char *name_ptr, *cmd_name;
+    CLICmdTypedef *index;
+
+    min_length = 0;
+    name_ptr = NULL;
+
+    if (*prefix == '\0')
+    //if (g_CLI_PosIdx == 0)
+    {
+        //msh_help(0, NULL);
+    //	CLI_PutString("%c%c", ASCII_CR, ASCII_LF);
+        pCli->Init.Write("%c%c", ASCII_CR, ASCII_LF);
+      //CLI_Execute(pCli, "ls");
+      CLICmd_List(pCli);
+        CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx] = ASCII_NULL;
+    //	CLI_PutString("%c%c%s", ASCII_CMD, ASCII_SPACE, CLI_Buffer[g_CLI_CurrentIdx]);
+        pCli->Init.Write("%c%c%s", ASCII_CMD, ASCII_SPACE, CLI_Buffer[g_CLI_CurrentIdx]);
+        return;
+    }
+
+    for (index = &__cliTab_start; index < &__cliTab_end; index++)
+    {
+        cmd_name = (const char *)index->cmd;
+        if (!strncmp(prefix, cmd_name, strlen(prefix)))
+        {
+            if (min_length == 0)
+            {
+                name_ptr = cmd_name;
+                min_length = strlen(name_ptr);
+            }
+
+            length = str_common(name_ptr, cmd_name);
+            if (length < min_length)
+                min_length = length;
+
+            pCli->Init.Write("%s\r\n", cmd_name);
+        }
+    }
+
+    if (name_ptr) 
+    {
+        //pCli->Init.Write("g_CLI_PosIdx=%d, min_length:%d, %s\r\n", g_CLI_PosIdx, min_length, prefix);
+		g_CLI_PosIdx = min_length;
+        strncpy(prefix, name_ptr, min_length);
+        //strcpy(prefix, name_ptr);
+        //pCli->Init.Write("g_CLI_PosIdx=%d, min_length:%d, %s\r\n", g_CLI_PosIdx, min_length, prefix);
+    }
+}
+
 /**
   * @brief  Process tab ch, list current command dir.
   * @param  None.
@@ -571,6 +640,11 @@ uint8_t CLI_Backspace(CLI_HandleTypeDef *pCli)
   */
 uint8_t CLI_Tab(CLI_HandleTypeDef *pCli)
 {
+#ifdef CLI_AUTO_COMPLETE
+	pCli->Init.Write("\r\n");
+    do_auto_complete(pCli, (char *)CLI_Buffer[g_CLI_CurrentIdx]);
+	pCli->Init.Write("%c%c%s", ASCII_CMD, ASCII_SPACE, CLI_Buffer[g_CLI_CurrentIdx]);
+#else
 //	CLI_PutString("%c%c", ASCII_CR, ASCII_LF);
 	pCli->Init.Write("%c%c", ASCII_CR, ASCII_LF);
   //CLI_Execute(pCli, "ls");
@@ -578,6 +652,7 @@ uint8_t CLI_Tab(CLI_HandleTypeDef *pCli)
 	CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx] = ASCII_NULL;
 //	CLI_PutString("%c%c%s", ASCII_CMD, ASCII_SPACE, CLI_Buffer[g_CLI_CurrentIdx]);
 	pCli->Init.Write("%c%c%s", ASCII_CMD, ASCII_SPACE, CLI_Buffer[g_CLI_CurrentIdx]);
+#endif
  
   return false;
 }
