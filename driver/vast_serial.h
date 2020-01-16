@@ -58,7 +58,7 @@
 #endif
 
 #ifndef KFIFO_BUFFER_SIZE
-    #define		KFIFO_BUFFER_SIZE		(256U)
+    #define		KFIFO_BUFFER_SIZE		(512U)
 #endif
 
 /* Default config for serial_configure structure */
@@ -101,7 +101,7 @@ struct serial_device
 #ifdef configUSING_SERIAL_DMA
     DECLARE_KFIFO(rx_kfifo, unsigned char, KFIFO_BUFFER_SIZE);
     DECLARE_KFIFO(tx_kfifo, unsigned char, KFIFO_BUFFER_SIZE);
-    unsigned char tx_dma_buff[64];
+    unsigned char tx_dma_buff[32];
 //    unsigned char rx_dma_buff[32];
     size_t rx_dma_old_cnt;
 #endif

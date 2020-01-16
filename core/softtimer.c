@@ -62,7 +62,7 @@ static void soft_timer_task(void)
 			//if (iter->cb)
 			iter->cb(iter);
 
-			if(jiffies - start_jiffies > 1)
+			if(jiffies - start_jiffies > 2)
 				printf("soft time task spent %ldms at %#lx\r\n",
 						(uint32_t)(jiffies-start_jiffies), (uint32_t)iter->cb);
 		}

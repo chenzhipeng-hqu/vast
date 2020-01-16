@@ -555,6 +555,7 @@ uint8_t CLI_Backspace(CLI_HandleTypeDef *pCli)
 		}
 	#endif	
     g_CLI_PosIdx --;
+	CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx] = ASCII_NULL;
     backspaceFail = false;
   }
   else
@@ -608,6 +609,7 @@ static void do_auto_complete(CLI_HandleTypeDef *pCli, char *prefix)
     {
         cmd_name = (const char *)index->cmd;
         if (!strncmp(prefix, cmd_name, strlen(prefix)))
+        //if (strstr(cmd_name, prefix))
         {
             if (min_length == 0)
             {
@@ -616,10 +618,26 @@ static void do_auto_complete(CLI_HandleTypeDef *pCli, char *prefix)
             }
 
             length = str_common(name_ptr, cmd_name);
+            //pCli->Init.Write("%s min_length=%d, length=%d \r\n", name_ptr, min_length, length);
             if (length < min_length)
-                min_length = length;
+             {
+                 //pCli->Init.Write(" min_length=%d, length=%d \r\n", min_length, length);
+                 min_length = length;
+             }
 
-            pCli->Init.Write("%s\r\n", cmd_name);
+            pCli->Init.Write("%s\t-> %s\r\n", cmd_name, index->help);
+
+            if(index->child)
+            {
+                uint8_t idx = 0;
+
+                while(index->child[idx].cmd)
+                {
+                    cmd_name = (const char *)index->child[idx].cmd;
+                    pCli->Init.Write("\t%s\t-> %s\r\n", index->child[idx].cmd, index->child[idx].help);
+                    idx++;
+                }
+            }
         }
     }
 
