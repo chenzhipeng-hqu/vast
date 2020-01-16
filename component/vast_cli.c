@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
 #define 	ASCII_NULL  			0x00
 #define 	ASCII_CANCEL 			0x03
 #define 	ASCII_BELL  			0x07
-#define 	ASCII_BS  				0x08	//backspace
+#define 	ASCII_BS  				0x08	//backspace '\b'
 #define 	ASCII_BS1 				0x7f
 #define 	ASCII_TAB 				0x09	// '\t'
 #define 	ASCII_LF  				0x0a  // '\n'
@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
 #define 	ASCII_HAT 				0x5e  // '^'
 #define 	ASCII_CMD 				'$'
 
-#define		ASCII_LEFT_SUPPORT 		false
+#define		ASCII_LEFT_SUPPORT 		true
 
 #define		CLI_CMD_LAST(cmd, help, func, child) 	\
 			const struct _CLICmdTypedef __cli_last __attribute__((used)) 		\
@@ -534,33 +534,34 @@ uint8_t CLI_Backspace(CLI_HandleTypeDef *pCli)
 
   if(g_CLI_PosIdx > 0)
   {
-//    CLI_PutString("%c%c%c", ASCII_BS, ASCII_SPACE, ASCII_BS);
-		pCli->Init.Write("%c%c%c", ASCII_BS, ASCII_SPACE, ASCII_BS);
+        g_CLI_PosIdx --;
 
 	#if	ASCII_LEFT_SUPPORT	== true
 		if(g_CLI_LeftPosIdx)
 		{
-			CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx-g_CLI_LeftPosIdx] = ASCII_SPACE;
-			
-			for(uint8_t pos=g_CLI_LeftPosIdx; pos > 0; pos--)
-			{
-				CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx-pos+g_CLI_LeftPosIdx-1] = CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx-pos+g_CLI_LeftPosIdx];
-				CLI_PutString("%c", CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx-pos-1]);
-			}
-			
+            //pCli->Init.Write("%s pos:%d left:%d\r\n", CLI_Buffer[g_CLI_CurrentIdx], g_CLI_PosIdx, g_CLI_LeftPosIdx);
+            memmove(&CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx - g_CLI_LeftPosIdx],
+                       &CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx - g_CLI_LeftPosIdx + 1],
+                       g_CLI_LeftPosIdx);
+			CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx] = ASCII_NULL;		
+            //pCli->Init.Write("%s pos:%d left:%d\r\n", CLI_Buffer[g_CLI_CurrentIdx], g_CLI_PosIdx, g_CLI_LeftPosIdx);
+			pCli->Init.Write("\b%s  \b\b", &CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx-g_CLI_LeftPosIdx]);
+            /* move the cursor to new position */
 			for(uint8_t i=0; i<g_CLI_LeftPosIdx; i++)
 			{
-				CLI_PutString("\x1b\x5b\x44");
-			}			
+				pCli->Init.Write("\b");
+			}
 		}
+        else
 	#endif	
-    g_CLI_PosIdx --;
-	CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx] = ASCII_NULL;
+        {
+            pCli->Init.Write("%c%c%c", ASCII_BS, ASCII_SPACE, ASCII_BS);
+            CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx] = ASCII_NULL;
+        }
     backspaceFail = false;
   }
   else
   {
-//    CLI_PutString("%c", ASCII_BELL);
 		pCli->Init.Write("%c", ASCII_BELL);
     backspaceFail = true;
   }
@@ -595,12 +596,10 @@ static void do_auto_complete(CLI_HandleTypeDef *pCli, char *prefix)
     //if (g_CLI_PosIdx == 0)
     {
         //msh_help(0, NULL);
-    //	CLI_PutString("%c%c", ASCII_CR, ASCII_LF);
         pCli->Init.Write("%c%c", ASCII_CR, ASCII_LF);
       //CLI_Execute(pCli, "ls");
       CLICmd_List(pCli);
         CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx] = ASCII_NULL;
-    //	CLI_PutString("%c%c%s", ASCII_CMD, ASCII_SPACE, CLI_Buffer[g_CLI_CurrentIdx]);
         pCli->Init.Write("%c%c%s", ASCII_CMD, ASCII_SPACE, CLI_Buffer[g_CLI_CurrentIdx]);
         return;
     }
@@ -663,12 +662,10 @@ uint8_t CLI_Tab(CLI_HandleTypeDef *pCli)
     do_auto_complete(pCli, (char *)CLI_Buffer[g_CLI_CurrentIdx]);
 	pCli->Init.Write("%c%c%s", ASCII_CMD, ASCII_SPACE, CLI_Buffer[g_CLI_CurrentIdx]);
 #else
-//	CLI_PutString("%c%c", ASCII_CR, ASCII_LF);
 	pCli->Init.Write("%c%c", ASCII_CR, ASCII_LF);
   //CLI_Execute(pCli, "ls");
   CLICmd_List(pCli);
 	CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx] = ASCII_NULL;
-//	CLI_PutString("%c%c%s", ASCII_CMD, ASCII_SPACE, CLI_Buffer[g_CLI_CurrentIdx]);
 	pCli->Init.Write("%c%c%s", ASCII_CMD, ASCII_SPACE, CLI_Buffer[g_CLI_CurrentIdx]);
 #endif
  
@@ -686,23 +683,21 @@ uint8_t CLI_PushChar(CLI_HandleTypeDef *pCli, uint8_t ch)
 
   if(g_CLI_PosIdx < CLI_BUFFER_SIZE - 1)
   {
-//    CLI_PutString("%c", ch);
 		pCli->Init.Write("%c", ch);
 	#if	ASCII_LEFT_SUPPORT	== true
 		if(g_CLI_LeftPosIdx)
 		{
-			for(uint8_t pos=g_CLI_LeftPosIdx; pos > 0; pos--)
-			{
-				CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx-pos+g_CLI_LeftPosIdx+1] = CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx-pos+g_CLI_LeftPosIdx];
-				CLI_PutString("%c", CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx-pos+1]);
-			}
-			
+            memmove(&CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx - g_CLI_LeftPosIdx + 1],
+                       &CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx - g_CLI_LeftPosIdx],
+                       g_CLI_LeftPosIdx);
+			CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx-g_CLI_LeftPosIdx] = ch;		
+			pCli->Init.Write("%s", &CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx-g_CLI_LeftPosIdx+1]);
+
+            /* move the cursor to new position */
 			for(uint8_t i=0; i<g_CLI_LeftPosIdx; i++)
 			{
-				CLI_PutString("\x1b\x5b\x44");
+				pCli->Init.Write("\b");
 			}
-			
-			CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx-g_CLI_LeftPosIdx] = ch;		
 		}
 		else
 	#endif
@@ -714,7 +709,6 @@ uint8_t CLI_PushChar(CLI_HandleTypeDef *pCli, uint8_t ch)
   }
   else
   {
-//    CLI_PutString("%c", ASCII_BELL);
 		pCli->Init.Write("%c", ASCII_BELL);
     pushFail = true;
   }
@@ -738,18 +732,15 @@ uint8_t CLI_LoadHistory(CLI_HandleTypeDef *pCli, uint8_t historyUp)
     {// not null, switch to this history.
       for(tmp = 0; tmp < g_CLI_PosIdx; tmp++)
       {
-//				CLI_PutString("%c%c%c", ASCII_BS, ASCII_SPACE, ASCII_BS);
 				pCli->Init.Write("%c%c%c", ASCII_BS, ASCII_SPACE, ASCII_BS);
       }
       g_CLI_HistoryIdx = next;
-//      CLI_PutString("%s", CLI_Buffer[g_CLI_HistoryIdx]);
 			pCli->Init.Write("%s", CLI_Buffer[g_CLI_HistoryIdx]);
 			g_CLI_PosIdx = strlen((const char *)CLI_Buffer[g_CLI_HistoryIdx]);
 			memcpy(CLI_Buffer[g_CLI_CurrentIdx], CLI_Buffer[g_CLI_HistoryIdx], g_CLI_PosIdx);	
     }
     else
     {
-//			CLI_PutString("%c", ASCII_BELL);
 			pCli->Init.Write("%c", ASCII_BELL);
       historyOk = false;
     }
@@ -758,7 +749,6 @@ uint8_t CLI_LoadHistory(CLI_HandleTypeDef *pCli, uint8_t historyUp)
   { // clean current line.
 		for(tmp = 0; tmp < g_CLI_PosIdx; tmp++)
 		{
-//			CLI_PutString("%c%c%c", ASCII_BS, ASCII_SPACE, ASCII_BS);
 			pCli->Init.Write("%c%c%c", ASCII_BS, ASCII_SPACE, ASCII_BS);
 		}
     g_CLI_PosIdx = 0;
@@ -766,7 +756,6 @@ uint8_t CLI_LoadHistory(CLI_HandleTypeDef *pCli, uint8_t historyUp)
     if((next != g_CLI_CurrentIdx) && (g_CLI_HistoryIdx != g_CLI_CurrentIdx))
     {	// not null, switch to this history.
       g_CLI_HistoryIdx = next;	
-//			CLI_PutString("%s", CLI_Buffer[g_CLI_HistoryIdx]);
 			pCli->Init.Write("%s", CLI_Buffer[g_CLI_HistoryIdx]);
 			g_CLI_PosIdx = strlen((const char *)CLI_Buffer[g_CLI_HistoryIdx]);
 			memcpy(CLI_Buffer[g_CLI_CurrentIdx], CLI_Buffer[g_CLI_HistoryIdx], g_CLI_PosIdx);	
@@ -774,7 +763,6 @@ uint8_t CLI_LoadHistory(CLI_HandleTypeDef *pCli, uint8_t historyUp)
     else
     {		
       g_CLI_HistoryIdx = g_CLI_CurrentIdx;
-//			CLI_PutString("%c", ASCII_BELL);
 			pCli->Init.Write("%c", ASCII_BELL);
       historyOk = false;
     }
@@ -799,7 +787,6 @@ int16_t CLI_Handle(CLI_HandleTypeDef *pCli)
 	pop_ch = pCli->pCLIProcess(pCli, CLI_FUNC_RX_POP);	
 	
 	if(pop_ch != ASCII_NULL) {
-//		CLI_PutString("0x%02x", pop_ch);
 		switch(inputState) {
 			case CLI_ESC: {	
 				switch(pop_ch) {
@@ -823,13 +810,24 @@ int16_t CLI_Handle(CLI_HandleTypeDef *pCli)
 						CLI_LoadHistory(pCli, pop_ch == ASCII_UP);
 						break;
 					case ASCII_RIGHT:
+					#if	ASCII_LEFT_SUPPORT	== true	
+                        if(g_CLI_LeftPosIdx > 0)
+                        {
+                            pCli->Init.Write("%c", CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx-g_CLI_LeftPosIdx]);
+                            g_CLI_LeftPosIdx--;
+                        }
+					#endif
 						break;
 					case ASCII_LEFT:
 					#if	ASCII_LEFT_SUPPORT	== true	
-						CLI_PutString("\x1b\x5b\x44");
-						g_CLI_LeftPosIdx++;
+						//pCli->Init.Write("\x1b\x5b\x44");
+						pCli->Init.Write("\b");
+                        if(g_CLI_LeftPosIdx < g_CLI_PosIdx)
+                        {
+                            g_CLI_LeftPosIdx++;
+                        }
 					#else
-						CLI_Backspace(pCli);
+                        CLI_Backspace(pCli);
 					#endif
 						break;
 					default:// ch
