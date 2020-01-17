@@ -592,18 +592,6 @@ static void do_auto_complete(CLI_HandleTypeDef *pCli, char *prefix)
     min_length = 0;
     name_ptr = NULL;
 
-    if (*prefix == '\0')
-    //if (g_CLI_PosIdx == 0)
-    {
-        //msh_help(0, NULL);
-        pCli->Init.Write("%c%c", ASCII_CR, ASCII_LF);
-      //CLI_Execute(pCli, "ls");
-      CLICmd_List(pCli);
-        CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx] = ASCII_NULL;
-        pCli->Init.Write("%c%c%s", ASCII_CMD, ASCII_SPACE, CLI_Buffer[g_CLI_CurrentIdx]);
-        return;
-    }
-
     for (index = &__cliTab_start; index < &__cliTab_end; index++)
     {
         cmd_name = (const char *)index->cmd;
@@ -657,17 +645,22 @@ static void do_auto_complete(CLI_HandleTypeDef *pCli, char *prefix)
   */
 uint8_t CLI_Tab(CLI_HandleTypeDef *pCli)
 {
+    pCli->Init.Write("%c%c", ASCII_CR, ASCII_LF);
+
 #ifdef CLI_AUTO_COMPLETE
-	pCli->Init.Write("\r\n");
-    do_auto_complete(pCli, (char *)CLI_Buffer[g_CLI_CurrentIdx]);
-	pCli->Init.Write("%c%c%s", ASCII_CMD, ASCII_SPACE, CLI_Buffer[g_CLI_CurrentIdx]);
-#else
-	pCli->Init.Write("%c%c", ASCII_CR, ASCII_LF);
-  //CLI_Execute(pCli, "ls");
-  CLICmd_List(pCli);
-	CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx] = ASCII_NULL;
-	pCli->Init.Write("%c%c%s", ASCII_CMD, ASCII_SPACE, CLI_Buffer[g_CLI_CurrentIdx]);
+    //if (CLI_Buffer[g_CLI_CurrentIdx][0] != '\0')
+    if (g_CLI_PosIdx != 0)
+    {
+        do_auto_complete(pCli, (char *)CLI_Buffer[g_CLI_CurrentIdx]);
+    }
+    else
 #endif
+    {
+        CLICmd_List(pCli);
+        CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx] = ASCII_NULL;
+    }
+
+    pCli->Init.Write("%c%c%s", ASCII_CMD, ASCII_SPACE, CLI_Buffer[g_CLI_CurrentIdx]);
  
   return false;
 }
