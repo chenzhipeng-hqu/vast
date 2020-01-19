@@ -26,6 +26,8 @@
 /***********************************************
                     define
 ***********************************************/
+#ifdef configUSING_STORE
+
 #define 	VALID_BLOCK     	(0x8U)
 #define 	RECEIVE_BLOCK    	(0xCU)
 #define 	BACKUP_BLOCK    	(0xEU)
@@ -917,6 +919,7 @@ int main(int argc, char *argv[])
 	return 0;
 }
 */
+#endif //configUSING_STORE
 /**
   * @}
   */
