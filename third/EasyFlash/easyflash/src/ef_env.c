@@ -871,7 +871,7 @@ char *ef_get_env(const char *key)
             value[get_size] = '\0';
             return value;
         } else {
-            EF_INFO("Warning: The ENV value isn't string. Could not be returned\n");
+            EF_INFO("Warning: The ENV value isn't string. Could not be returned\r\n");
             return NULL;
         }
     }
@@ -1581,6 +1581,8 @@ static bool print_env_cb(env_node_obj_t env, void *arg1, void *arg2)
         *using_size += env->len;
         /* check ENV */
         if (env->status == ENV_WRITE) {
+        	print_value = (bool)*((int *)arg2);
+
             ef_print("%.*s=", env->name_len, env->name);
 
             if (env->value_len < EF_STR_ENV_VALUE_MAX_SIZE ) {
@@ -1622,7 +1624,7 @@ __reload:
 /**
  * Print ENV.
  */
-void ef_print_env(void)
+void ef_print_env(int verbose)
 {
     struct env_node_obj env;
     size_t using_size = 0;
@@ -1635,7 +1637,7 @@ void ef_print_env(void)
     /* lock the ENV cache */
     ef_port_env_lock();
 
-    env_iterator(&env, &using_size, NULL, print_env_cb);
+    env_iterator(&env, &using_size, &verbose, print_env_cb);
 
     ef_print("\r\nmode: next generation\r\n");
     ef_print("size: %lu/%lu bytes.\r\n", using_size + (SECTOR_NUM - EF_GC_EMPTY_SEC_THRESHOLD) * SECTOR_HDR_DATA_SIZE,
