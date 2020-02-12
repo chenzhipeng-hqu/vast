@@ -121,6 +121,10 @@ int main(int argc, char *argv[])
 #include <string.h>
 #include "vast_cli.h"
 
+#ifdef configUSING_EASYFLASH
+    #include <easyflash.h>
+#endif
+
 /*************************************
               define
 *************************************/
@@ -211,6 +215,21 @@ int16_t CLI_Initialize(CLI_HandleTypeDef *pCli)
 	if(pCli != NULL)
 	{
 		pCli->pCLIProcess(pCli, CLI_FUNC_INIT);
+    #ifdef configUSING_EASYFLASH
+        char cmd_tag[5] = {0};
+        for(int i=0; i<CLI_HISTORY_SIZE; i++)
+        {
+            size_t get_size;
+            sprintf(cmd_tag, "cmd%d", i);
+
+            if ((get_size = ef_get_env_blob(cmd_tag, CLI_Buffer[i], CLI_BUFFER_SIZE-1, NULL)) > 0) {
+                CLI_Buffer[i][get_size] = 0;
+                g_CLI_HistoryIdx = g_CLI_CurrentIdx = (g_CLI_CurrentIdx+1)%CLI_HISTORY_SIZE;
+            } else {
+            }
+        }
+        
+    #endif
 		return 0;
 	}
 	else
@@ -486,8 +505,11 @@ int CLI_Enter(CLI_HandleTypeDef *pCli)
 	
 	CLI_Buffer[g_CLI_CurrentIdx][g_CLI_PosIdx] = ASCII_NULL;
 	
+    char cmd_tag[5] = {0};
 	if(0 == CLI_Execute(pCli, (const char *)CLI_Buffer[g_CLI_CurrentIdx]))
 	{
+        sprintf(cmd_tag, "cmd%d", g_CLI_CurrentIdx);
+        ef_set_env(cmd_tag, (const char *)CLI_Buffer[g_CLI_CurrentIdx]);
 		g_CLI_HistoryIdx = g_CLI_CurrentIdx = (g_CLI_CurrentIdx+1)%CLI_HISTORY_SIZE;
 	}				
 	
