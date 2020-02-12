@@ -508,8 +508,10 @@ int CLI_Enter(CLI_HandleTypeDef *pCli)
     char cmd_tag[5] = {0};
 	if(0 == CLI_Execute(pCli, (const char *)CLI_Buffer[g_CLI_CurrentIdx]))
 	{
+    #ifdef configUSING_EASYFLASH
         sprintf(cmd_tag, "cmd%d", g_CLI_CurrentIdx);
         ef_set_env(cmd_tag, (const char *)CLI_Buffer[g_CLI_CurrentIdx]);
+    #endif
 		g_CLI_HistoryIdx = g_CLI_CurrentIdx = (g_CLI_CurrentIdx+1)%CLI_HISTORY_SIZE;
 	}				
 	
