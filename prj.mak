@@ -28,9 +28,9 @@ INCS += -I./vast/third/qpc/src
 INCS += -I./vast/third/qpc/ports/qv/gnu
 
 SRCS += vast/component/vast_cli.c
-SRCS += vast/component/vast_log.c
+#SRCS += vast/component/vast_log.c
 #SRCS += vast/component/vast_store.c
-SRCS += vast/component/vast_simulatite_eeprom.c
+#SRCS += vast/component/vast_simulatite_eeprom.c
 SRCS += vast/component/protocol.c
 SRCS += vast/component/modbus_rtu.c
 
@@ -41,7 +41,7 @@ SRCS += vast/core/kfifo.c
 SRCS += vast/core/object.c
 SRCS += vast/core/softtimer.c
 SRCS += vast/core/utils.c
-SRCS += vast/core/alloter.c
+#SRCS += vast/core/alloter.c
 
 SRCS += vast/device/ina219.c
 SRCS += vast/device/vast_key.c
@@ -62,10 +62,10 @@ SRCS += vast/device/cp8113.c
 SRCS += vast/device/im1227.c
 #SRCS += vast/device/ssr_v220.c
 
+SRCS += vast/driver/i2c/i2c_core.c
+SRCS += vast/driver/i2c/i2c_dev.c
+SRCS += vast/driver/i2c/i2c-bit-ops.c
 SRCS += vast/driver/modbus_rtu.c
-SRCS += vast/driver/i2c_core.c
-SRCS += vast/driver/i2c_dev.c
-SRCS += vast/driver/i2c-bit-ops.c
 SRCS += vast/driver/vast_serial.c
 
 SRCS += vast/third/cjson/cJSON.c
@@ -101,10 +101,12 @@ SRCS_DIRS += vast/third/EasyFlash/easyflash/src
 SRCS += vast/third/qpc/ports/qv/gnu/qv_port.c
 
 ifeq (spy, $(CONF))
-SRCS += src/qs/qs.c
-SRCS += src/qs/qs_rx.c
-SRCS += src/qs/qs_fp.c
-SRCS += src/qs/qs_64bit.c
+	SRCS += src/qs/qs.c
+	SRCS += src/qs/qs_rx.c
+	SRCS += src/qs/qs_fp.c
+	SRCS += src/qs/qs_64bit.c
 endif
+
+SRCS_DIRS += vast/third/configure
 
 

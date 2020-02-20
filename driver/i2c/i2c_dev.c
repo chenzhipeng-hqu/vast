@@ -1,5 +1,5 @@
 #include <core/device.h>
-#include <driver/i2c_dev.h>
+#include <driver/i2c/i2c_dev.h>
 #include <errno.h>
 
 #ifdef configUSING_I2C
