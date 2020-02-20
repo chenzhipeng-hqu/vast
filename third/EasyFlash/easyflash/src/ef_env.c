@@ -862,10 +862,11 @@ size_t ef_get_env_blob(const char *key, void *value_buf, size_t buf_len, size_t 
  */
 char *ef_get_env(const char *key)
 {
-    static char value[EF_STR_ENV_VALUE_MAX_SIZE + 1];
+    //static char value[EF_STR_ENV_VALUE_MAX_SIZE + 1];
+    static char value[128];
     size_t get_size;
 
-    if ((get_size = ef_get_env_blob(key, value, EF_STR_ENV_VALUE_MAX_SIZE, NULL)) > 0) {
+    if ((get_size = ef_get_env_blob(key, value, 128-1, NULL)) > 0) {
         /* the return value must be string */
         if (ef_is_str((uint8_t *)value, get_size)) {
             value[get_size] = '\0';
