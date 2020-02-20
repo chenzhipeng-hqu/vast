@@ -152,9 +152,9 @@ void     device_set_owner(device_t *dev, const void *owner);
 #endif
 
 #ifdef configUSING_I2C
-	#include <driver/i2c.h>
-	#include <driver/i2c_dev.h>
-	#include <driver/i2c-bit-ops.h>
+	#include <driver/i2c/i2c.h>
+	#include <driver/i2c/i2c_dev.h>
+	#include <driver/i2c/i2c-bit-ops.h>
 #endif
 
 #ifdef configUSING_INA219

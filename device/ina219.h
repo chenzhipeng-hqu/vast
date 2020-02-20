@@ -2,7 +2,7 @@
 #ifndef __INA219_H__
 #define __INA219_H__
 
-#include <driver/i2c.h>
+#include <driver/i2c/i2c.h>
 
 //#define INA219_I2C_PORT                   GPIOB
 //#define INA219_I2C_GPIO_CLOCK            RCC_APB2Periph_GPIOB

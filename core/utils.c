@@ -1,5 +1,5 @@
 #include <core/utils.h>
-#include "../../bsp/vast_config.h"
+#include "vast_common.h"
 
 #define OS_TINY_SIZE
 
