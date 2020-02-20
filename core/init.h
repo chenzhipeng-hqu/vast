@@ -1,13 +1,27 @@
 #ifndef _INIT_H
 #define _INIT_H
 
+#include <stdio.h>
 #include <core/compiler.h>
 
 typedef int (*initcall_t)(void);
 
-#define __define_initcall(fn, id) \
-    static const initcall_t __initcall_##fn##id __attribute__((used)) \
-    __attribute__((__section__("initcall" #id "init"))) = fn;
+#define DEBUG_INIT
+
+#ifdef DEBUG_INIT
+	struct init_desc
+	{
+		const char* fn_name;
+		const initcall_t fn;
+	};
+	#define __define_initcall(fn, id) \
+		static const struct init_desc __initcall_##fn##id __attribute__((used)) \
+		__attribute__((__section__("initcall" #id "init"))) = {#fn, fn};
+#else
+	#define __define_initcall(fn, id) \
+		static const initcall_t __initcall_##fn##id __attribute__((used)) \
+		__attribute__((__section__("initcall" #id "init"))) = fn;
+#endif
 
 
 #define pure_initcall(fn)       __define_initcall(fn, 0)
@@ -37,12 +51,24 @@ static inline void do_init_call(void)
         (*fn)();
     }
 #elif defined (__GNUC__)
-    extern initcall_t __initcall_start, __initcall_end; /*申明外部变量,在ld的脚本文件中定义*/
-    initcall_t *fn = &__initcall_start;
 
-    do{
-    	(*fn++)();
-    }while(fn < &__initcall_end);
+	#ifdef DEBUG_INIT
+    	extern struct init_desc __initcall_start, __initcall_end; /*申明外部变量,在ld的脚本文件中定义*/
+    	const struct init_desc *desc = &__initcall_start;
+
+		do{
+	        printf("init %s", desc->fn_name);
+	        printf(":%d done\r\n", desc->fn());
+		}while(desc++ < &__initcall_end);
+	#else
+		extern initcall_t __initcall_start, __initcall_end; /*申明外部变量,在ld的脚本文件中定义*/
+
+		initcall_t *fn = &__initcall_start;
+
+		do{
+			(*fn++)();
+		}while(fn < &__initcall_end);
+	#endif
 
 #endif
 }
