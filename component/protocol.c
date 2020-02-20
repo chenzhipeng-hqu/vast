@@ -36,6 +36,9 @@
 #include <component/vast_log.h>
 #include "component/protocol.h"
 
+#define LOG_TAG    "protocol"
+#include <elog.h>
+
 /***********************************************
                     define
 ***********************************************/
@@ -153,10 +156,10 @@ static int inline checkTail(unsigned char *pSrcBuf, unsigned char len)
 		
 		for(i=0; i<len+5; i++)
 		{
-			DBG_INFO(DBG_ERROR, "%02x ", pSrcBuf[i]);
+			log_e("%02x ", pSrcBuf[i]);
 		}
 		
-		DBG_INFO(DBG_ERROR, "\r\n");
+		log_e("\r\n");
 		
 		ret = ERR_TAIL;
 	}
@@ -340,20 +343,20 @@ int protocolMsgDispatch(void * sender, ProtMsg_TypeDef *pProtMsg)
 	char *argv[5] = {0};
 	
 	ASSERT(board_id < BOARD_MAX, 
-					DBG_LOG(DBG_ERROR, "board_id=%d, out the range of BOARD_x\r\n", board_id); 
+					log_e("board_id=%d, out the range of BOARD_x\r\n", board_id);
 					return 0
 				);
 	
 	argc = findArgument((char *)pProtMsg->data, argv, ' ');
 	
-	DBG_INFO(DBG_DEBUG, "argv: ");
+	log_d("argv: ");
 	
 	for(uint8_t argcCnt=0; argcCnt<argc; argcCnt++)
 	{
-		DBG_INFO(DBG_DEBUG, "%s ", argv[argcCnt]);
+		log_d("%s ", argv[argcCnt]);
 	}
 	
-	DBG_INFO(DBG_DEBUG, "\r\n");
+	log_d("\r\n");
 					
 	switch(cmd_id)
 	{	
@@ -3087,7 +3090,7 @@ int protocolMsgUpload3(void ** sender, unsigned char boardId, unsigned short int
 		
 	if(sender_ == NULL)
 	{
-		DBG_LOG(DBG_DEBUG, "sender_ is NULL! \r\n");
+		log_d("sender_ is NULL! \r\n");
 		return ERR_SENDER;
 	}
 	
@@ -3154,7 +3157,7 @@ int protocolMsgUpload2(void ** sender, unsigned char boardId, unsigned short int
 		
 	if(sender_ == NULL)
 	{
-		DBG_LOG(DBG_DEBUG, "sender_ is NULL! \r\n");
+		log_d("sender_ is NULL! \r\n");
 		return ERR_SENDER;
 	}
 	
@@ -3173,7 +3176,7 @@ int protocolMsgUpload2(void ** sender, unsigned char boardId, unsigned short int
 	}
 	else
 	{
-		DBG_LOG(DBG_WARNING, "pe == NULL\r\n");
+		log_w("pe == NULL\r\n");
 	}
 	
 	*sender = (QActive *)NULL;
@@ -3273,7 +3276,7 @@ const CLICmdTypedef CLICmd_ProtocolCtrl[] =
   {0, 0, 0, 0}
 };
 
-CLI_CMD_EXPORT(atsx, "atsx dir", 0, CLICmd_ProtocolCtrl);
+//CLI_CMD_EXPORT(atsx, "atsx dir", 0, CLICmd_ProtocolCtrl);
 
 #endif
 /**
