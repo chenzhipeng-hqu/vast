@@ -103,6 +103,10 @@ struct device
     const struct device_ops *ops;
     void  *owner;
     void  *user_data;
+
+    /* device call back */
+    error_t (*rx_indicate)(device_t *dev, size_t size);
+    error_t (*tx_complete)(device_t *dev, void *buffer);
 };
 
 

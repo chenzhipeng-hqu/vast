@@ -111,3 +111,21 @@ error_t device_ctrl(device_t *dev, uint8_t cmd, void *arg)
 
     return 0;
 }
+
+error_t device_set_rx_indicate(device_t *dev,
+								error_t (*rx_ind)(device_t *dev, size_t size))
+{
+
+    dev->rx_indicate = rx_ind;
+
+    return 0;
+}
+
+error_t device_set_tx_complete(device_t *dev,
+								error_t (*tx_done)(device_t *dev, void *buffer))
+{
+
+    dev->tx_complete = tx_done;
+
+    return 0;
+}

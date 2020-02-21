@@ -57,8 +57,12 @@
     # define SERIAL_RB_BUFSZ             64
 #endif
 
-#ifndef KFIFO_BUFFER_SIZE
-    #define		KFIFO_BUFFER_SIZE		(512U)
+#ifndef KFIFO_RX_BUFFER_SIZE
+    #define		KFIFO_RX_BUFFER_SIZE		(128U)
+#endif
+
+#ifndef KFIFO_TX_BUFFER_SIZE
+    #define		KFIFO_TX_BUFFER_SIZE		(1024U)
 #endif
 
 /* Default config for serial_configure structure */
@@ -99,9 +103,9 @@ struct serial_device
     //DECLARE_KFIFO_PTR(serial_rx, unsigned char);
     //DECLARE_KFIFO_PTR(serial_tx, unsigned char);
 #ifdef configUSING_SERIAL_DMA
-    DECLARE_KFIFO(rx_kfifo, unsigned char, KFIFO_BUFFER_SIZE);
-    DECLARE_KFIFO(tx_kfifo, unsigned char, KFIFO_BUFFER_SIZE);
-    unsigned char tx_dma_buff[64];
+    DECLARE_KFIFO(rx_kfifo, unsigned char, KFIFO_RX_BUFFER_SIZE);
+    DECLARE_KFIFO(tx_kfifo, unsigned char, KFIFO_TX_BUFFER_SIZE);
+    unsigned char tx_dma_buff[KFIFO_TX_BUFFER_SIZE/4];
 //    unsigned char rx_dma_buff[32];
     size_t rx_dma_old_cnt;
 #endif

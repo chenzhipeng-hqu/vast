@@ -1,7 +1,7 @@
 #include <core/device.h>
 #include <core/types.h>
 #include <core/utils.h>
-#include "core/croutine.h"
+//#include "core/croutine.h"
 //#include <printk.h>
 
 #ifdef configUSING_SERIAL
@@ -308,9 +308,14 @@ void serial_device_isr(struct serial_device *dev, int event)
             else
             {
                 dev->ops->control(dev, DEVICE_CTRL_CLR_TX_INT, NULL);
-                if (dev->parent.owner) {
-					task_send_signal(dev->parent.owner, SIG_ALARM);
-				}
+//                if (dev->parent.owner) {
+//					task_send_signal(dev->parent.owner, SIG_ALARM);
+//				}
+
+                /* invoke callback */
+                if (dev->parent.tx_complete != NULL) {
+                	dev->parent.tx_complete(&dev->parent, (void*)dev->tx_dma_buff);
+                }
             }
         }
         break;
@@ -325,7 +330,6 @@ void serial_device_isr(struct serial_device *dev, int event)
             }
 
             kfifo_add_in(&dev->rx_kfifo, (dev->rx_dma_old_cnt-len));
-            dev->rx_dma_old_cnt = len;
 
 //            len = sizeof(dev->rx_dma_buff) - len;
 //            dev->ops->control(dev, DEVICE_CTRL_CLR_RX_DMA, NULL);
@@ -334,9 +338,16 @@ void serial_device_isr(struct serial_device *dev, int event)
 //            dev->ops->control(dev, DEVICE_CTRL_SET_RX_DMA_LEN, &len);
 //            dev->ops->control(dev, DEVICE_CTRL_SET_RX_DMA, NULL);
 
-            if ((dev->parent.owner) && (len > 0)) {
-                task_send_signal(dev->parent.owner, SIG_DATA);
+//            if ((dev->parent.owner) && (len > 0)) {
+//                task_send_signal(dev->parent.owner, SIG_DATA);
+//            }
+
+            /* invoke callback */
+            if ((dev->parent.rx_indicate) && (len > 0)) {
+            	dev->parent.rx_indicate(&(dev->parent), (dev->rx_dma_old_cnt-len));
             }
+
+            dev->rx_dma_old_cnt = len;
         }
     	break;
     case SERIAL_EVENT_RX_DMADONE: {
