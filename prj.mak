@@ -107,6 +107,27 @@ ifeq (spy, $(CONF))
 	SRCS += src/qs/qs_64bit.c
 endif
 
-SRCS_DIRS += vast/third/configure
+
+################ third/modbus ################
+#INCS += -I./vast/third/FreeModbus/modbus/include
+#INCS += -I./vast/third/FreeModbus/modbus/rtu
+#INCS += -I./vast/third/FreeModbus/modbus/ascii
+#INCS += -I./vast/third/FreeModbus/port
+
+#SRCS += vast/third/FreeModbus/modbus/functions/mbfuncdiag.c
+#SRCS += vast/third/FreeModbus/modbus/functions/mbutils.c
+#SRCS += vast/third/FreeModbus/modbus/functions/mbfuncother.c
+#SRCS += vast/third/FreeModbus/modbus/rtu/mbcrc.c
+#SRCS += vast/third/FreeModbus/modbus/functions/mbfunccoils_m.c
+#SRCS += vast/third/FreeModbus/modbus/functions/mbfuncdisc_m.c
+#SRCS += vast/third/FreeModbus/modbus/functions/mbfuncholding_m.c
+#SRCS += vast/third/FreeModbus/modbus/functions/mbfuncinput_m.c
+#SRCS += vast/third/FreeModbus/modbus/rtu/mbrtu_m.c
+#SRCS += vast/third/FreeModbus/modbus/mb_m.c
+#SRCS += vast/third/FreeModbus/port/port.c
+#SRCS += vast/third/FreeModbus/port/portevent_m.c
+#SRCS += vast/third/FreeModbus/port/portserial_m.c
+#SRCS += vast/third/FreeModbus/port/porttimer_m.c
+#SRCS += vast/third/FreeModbus/port/user_mb_app_m.c
 
 
