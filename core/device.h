@@ -120,6 +120,8 @@ size_t   device_read(device_t *dev, off_t pos, void *buffer, size_t size);
 size_t   device_write(device_t *dev, off_t pos, const void *buffer, size_t size);
 error_t    device_ctrl(device_t *dev, uint8_t cmd, void *arg);
 void     device_set_owner(device_t *dev, const void *owner);
+error_t device_set_rx_indicate(device_t *dev, error_t (*rx_ind)(device_t *dev, size_t size));
+error_t device_set_tx_complete(device_t *dev, error_t (*tx_done)(device_t *dev, void *buffer));
 
 #ifndef pdMS_TO_TICKS
 # define pdMS_TO_TICKS(xTimeInMs) \

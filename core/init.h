@@ -35,6 +35,24 @@ typedef int (*initcall_t)(void);
 #define qf_initcall(fn)       	__define_initcall(fn, 8)
 #define qfrun_initcall(fn)      __define_initcall(fn, 9)
 
+#define INIT_EXPORT(fn, id)    __define_initcall(fn, id)
+
+/* board init routines will be called in board_init() function */
+#define INIT_BOARD_EXPORT(fn)           INIT_EXPORT(fn, 1)
+/* pre/device/component/env/app init routines will be called in init_thread */
+/* components pre-initialization (pure software initilization) */
+#define INIT_PREV_EXPORT(fn)            INIT_EXPORT(fn, 2)
+/* device initialization */
+#define INIT_DEVICE_EXPORT(fn)          INIT_EXPORT(fn, 3)
+/* components initialization (dfs, lwip, ...) */
+#define INIT_COMPONENT_EXPORT(fn)       INIT_EXPORT(fn, 5)
+/* environment initialization (mount disk, ...) */
+#define INIT_ENV_EXPORT(fn)             INIT_EXPORT(fn, 6)
+/* appliation initialization (rtgui application etc ...) */
+#define INIT_APP_EXPORT(fn)             INIT_EXPORT(fn, 7)
+
+#define INIT_QF_EXPORT(fn)              INIT_EXPORT(fn, 8)
+
 
 static inline void do_init_call(void)
 {

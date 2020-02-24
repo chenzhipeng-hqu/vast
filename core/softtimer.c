@@ -90,4 +90,4 @@ int setup_soft_timer_service(void)
 
     return 0;
 }
-core_initcall(setup_soft_timer_service);
+late_initcall(setup_soft_timer_service);
