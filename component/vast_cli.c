@@ -188,7 +188,7 @@ static int g_CLI_PosIdx = 0;
 
 
 CLI_CMD_LAST(0, 0, 0, 0);
-CLI_CMD_EXPORT(cd		, "goto dir", CLICmd_GotoTree, 0);
+//CLI_CMD_EXPORT(cd		, "goto dir", CLICmd_GotoTree, 0);
 
 extern CLICmdTypedef __cliTab_start, __cliTab_end; /*申明外部变量,在ld的脚本文件中定义*/
 static const CLICmdTypedef *CLI_CmdPath[CLI_CMD_TREE_LEVEL] = {&__cliTab_start, 0};
