@@ -838,9 +838,9 @@ int16_t CLI_Handle(CLI_HandleTypeDef *pCli)
 					case ASCII_LEFT:
 					#if	ASCII_LEFT_SUPPORT	== true	
 						//pCli->Init.Write("\x1b\x5b\x44");
-						pCli->Init.Write("\b");
                         if(g_CLI_LeftPosIdx < g_CLI_PosIdx)
                         {
+    						pCli->Init.Write("\b");
                             g_CLI_LeftPosIdx++;
                         }
 					#else
