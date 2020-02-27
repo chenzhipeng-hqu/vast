@@ -33,10 +33,10 @@
 #include "device/im1227.h"
 #include "driver/modbus_rtu.h"
 //#include "czp_debug.h"
-#include <component/vast_log.h>
+//#include <component/vast_log.h>
 #include "component/protocol.h"
 
-#define LOG_TAG    "protocol"
+#define LOG_TAG    "protcl"
 #include <elog.h>
 
 /***********************************************
@@ -3157,7 +3157,7 @@ int protocolMsgUpload2(void ** sender, unsigned char boardId, unsigned short int
 		
 	if(sender_ == NULL)
 	{
-		log_d("sender_ is NULL! \r\n");
+		log_d("sender_ is NULL!");
 		return ERR_SENDER;
 	}
 	
@@ -3176,7 +3176,7 @@ int protocolMsgUpload2(void ** sender, unsigned char boardId, unsigned short int
 	}
 	else
 	{
-		log_w("pe == NULL\r\n");
+		log_w("pe == NULL");
 	}
 	
 	*sender = (QActive *)NULL;
