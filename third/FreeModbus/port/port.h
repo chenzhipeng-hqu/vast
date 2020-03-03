@@ -25,6 +25,7 @@
 #include "mbconfig.h"
 
 #include "stm32f4xx_hal.h"
+#include "core/device.h"
 #include "usart.h"
 #include "tim.h"
 #include <assert.h>

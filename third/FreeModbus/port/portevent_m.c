@@ -199,18 +199,19 @@ void vMBMasterCBRequestScuuess( void ) {
 eMBMasterReqErrCode eMBMasterWaitRequestFinish( void ) 
 {
 	eMBMasterReqErrCode eErrStatus = MB_MRE_NO_ERR;
-	eMBMasterEventType recvedEvent;
-	uint32_t count = 0;
+	eMBMasterEventType recvedEvent = EV_MASTER_PROCESS_SUCESS;
+	//uint32_t count = 0;
 	
-	while(!finish_flag) {
-		HAL_Delay(1);
-		count++;
-		if(count > req_timeout) {
-			break;
-		}
-	}
-	recvedEvent = (eMBMasterEventType)finish_flag;
-	finish_flag = 0;
+    //TODO:
+//	while(!finish_flag) {
+//		HAL_Delay(1);
+//		count++;
+//		if(count > req_timeout) {
+//			break;
+//		}
+//	}
+//	recvedEvent = (eMBMasterEventType)finish_flag;
+//	finish_flag = 0;
 	
 	//printf("===count = %d, reqtimeout = %d, recvedEvent = %d\r\n", count, req_timeout, recvedEvent);
 	

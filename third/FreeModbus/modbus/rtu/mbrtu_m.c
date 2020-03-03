@@ -29,6 +29,7 @@
  */
 
 /* ----------------------- System includes ----------------------------------*/
+#include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
 
@@ -162,7 +163,7 @@ eMBMasterRTUReceive( UCHAR * pucRcvAddress, UCHAR ** pucFrame, USHORT * pusLengt
     ENTER_CRITICAL_SECTION(  );
     assert_param( usMasterRcvBufferPos < MB_SER_PDU_SIZE_MAX );
     /* Length and CRC check */
-#if 1
+#if 0
 		uint8_t i;
 		printf("modbus recv:");
 		for(i = 0; i < usMasterRcvBufferPos; i++) {
@@ -234,6 +235,10 @@ eMBMasterRTUSend( UCHAR ucSlaveAddress, const UCHAR * pucFrame, USHORT usLength 
         /* Activate the transmitter. */
         eSndState = STATE_M_TX_XMIT;
         vMBMasterPortSerialEnable( FALSE, TRUE );
+        //add czp@2020/03/03
+		xMBMasterPortSerialPutByte( ( CHAR )*pucMasterSndBufferCur );
+		pucMasterSndBufferCur++;  /* next byte in sendbuffer. */
+		usMasterSndBufferCount--;
     }
     else
     {
@@ -415,7 +420,7 @@ xMBMasterRTUTimerExpired(void)
 		if ( xFrameIsBroadcast == FALSE ) {
 			vMBMasterSetErrorType(EV_ERROR_RESPOND_TIMEOUT);
 			xNeedPoll = xMBMasterPortEventPost(EV_MASTER_ERROR_PROCESS);
-			uint32_t tickstart = HAL_GetTick();
+//			uint32_t tickstart = HAL_GetTick();
 			//printf("===tickstart2 = %d, arr = %d, cnt = %d\r\n", tickstart, htim6.Instance->ARR, htim6.Instance->CNT);
 		}
 		break;
