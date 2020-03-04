@@ -25,6 +25,8 @@
 #include "mbport.h"
 #include "port.h"
 
+#ifdef configUSING_FREEMODBUS
+
 #if MB_MASTER_RTU_ENABLED > 0 || MB_MASTER_ASCII_ENABLED > 0
 /* ----------------------- Defines ------------------------------------------*/
 /* ----------------------- Variables ----------------------------------------*/
@@ -40,6 +42,8 @@ xMBMasterPortEventInit( void )
     return TRUE;
 }
 
+#include "core/croutine.h"
+
 BOOL
 xMBMasterPortEventPost( eMBMasterEventType eEvent )
 {
@@ -51,6 +55,7 @@ xMBMasterPortEventPost( eMBMasterEventType eEvent )
 			//printf("===eEvent = 0x%02x\r\n", eEvent);
 			finish_flag = eEvent;			
 		}
+    task_send_signal(&modbus_tcb, SIG_ALARM);
     return TRUE;
 }
 
@@ -203,6 +208,7 @@ eMBMasterReqErrCode eMBMasterWaitRequestFinish( void )
 	//uint32_t count = 0;
 	
     //TODO:
+    task_send_signal(&modbus_tcb, SIG_ALARM);
 //	while(!finish_flag) {
 //		HAL_Delay(1);
 //		count++;
@@ -234,5 +240,6 @@ eMBMasterReqErrCode eMBMasterWaitRequestFinish( void )
 	
 	return eErrStatus;		
 }
+#endif
 
 #endif
