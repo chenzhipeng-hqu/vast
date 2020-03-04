@@ -116,14 +116,14 @@ redo:
     if (sm->init)
     {
         sm->init = 0;
-        ret = sm->op->op0(sm->buffer, sizeof(sm->buffer));
+        ret = sm->op->op0(sm, sm->buffer, sizeof(sm->buffer));
         if (sm->op->wait == 0) goto redo; // now: sm->init == 0
 
         soft_timer_mod(&sm->timer, jiffies + sm->op->wait);
     }
     else
     {
-        ret = sm->op->op1(sm->data);
+        ret = sm->op->op1(sm, sm->data);
     }
 
     if (ret == STATE_CTR_NEXT)
@@ -244,12 +244,12 @@ smart_frame_t * get_smart_frame(const uint8_t * in, uint32_t len)
 /*
  * do idle
  */
-static base_t do_get_data0(uint8_t *out, size_t maxlen)
+static base_t do_get_data0(state_machine_t *sm, uint8_t *out, size_t maxlen)
 {
     log_d("%s", __FUNCTION__);
     return 0;
 }
-static base_t do_get_data1(const void *arg)
+static base_t do_get_data1(state_machine_t *sm, const void *arg)
 {
     log_d("%s", __FUNCTION__);
     if (!arg)    /* time out */
@@ -266,12 +266,12 @@ static base_t do_get_data1(const void *arg)
 /*
  * do idle
  */
-static base_t do_dispatch0(uint8_t *out, size_t maxlen)
+static base_t do_dispatch0(state_machine_t *sm, uint8_t *out, size_t maxlen)
 {
     log_d("%s", __FUNCTION__);
     return 0;
 }
-static base_t do_dispatch1(const void *arg)
+static base_t do_dispatch1(state_machine_t *sm, const void *arg)
 {
     log_d("%s", __FUNCTION__);
     if (!arg)    /* time out */
@@ -283,12 +283,12 @@ static base_t do_dispatch1(const void *arg)
 /*
  * do idle
  */
-static base_t do_execute0(uint8_t *out, size_t maxlen)
+static base_t do_execute0(state_machine_t *sm, uint8_t *out, size_t maxlen)
 {
     log_d("%s", __FUNCTION__);
     return 0;
 }
-static base_t do_execute1(const void *arg)
+static base_t do_execute1(state_machine_t *sm, const void *arg)
 {
     log_d("%s", __FUNCTION__);
     if (!arg)    /* time out */
@@ -300,12 +300,12 @@ static base_t do_execute1(const void *arg)
 /*
  * do idle
  */
-static base_t do_wait_done0(uint8_t *out, size_t maxlen)
+static base_t do_wait_done0(state_machine_t *sm, uint8_t *out, size_t maxlen)
 {
     log_d("%s", __FUNCTION__);
     return 0;
 }
-static base_t do_wait_done1(const void *arg)
+static base_t do_wait_done1(state_machine_t *sm, const void *arg)
 {
     log_d("%s", __FUNCTION__);
     if (!arg)    /* time out */
@@ -317,12 +317,12 @@ static base_t do_wait_done1(const void *arg)
 /*
  * do idle
  */
-static base_t do_get_result0(uint8_t *out, size_t maxlen)
+static base_t do_get_result0(state_machine_t *sm, uint8_t *out, size_t maxlen)
 {
     log_d("%s", __FUNCTION__);
     return 0;
 }
-static base_t do_get_result1(const void *arg)
+static base_t do_get_result1(state_machine_t *sm, const void *arg)
 {
     log_d("%s", __FUNCTION__);
     if (!arg)    /* time out */
@@ -331,19 +331,19 @@ static base_t do_get_result1(const void *arg)
     return STATE_CTR_NEXT;
 }
 
-static base_t do_idle0(uint8_t *out, size_t maxlen)
+static base_t do_idle0(state_machine_t *sm, uint8_t *out, size_t maxlen)
 {
     log_d("%s", __FUNCTION__);
     return 0;
 }
 
-static base_t do_idle1(const void *arg)
+static base_t do_idle1(state_machine_t *sm, const void *arg)
 {
     struct SmartFrame *pframe = (struct SmartFrame *)arg;
     log_d("%s", __FUNCTION__);
 
     if (pframe->data[0] == 'c')
-        state_machine_change(&state_machine, STATE_GET_DATA);
+        state_machine_change(sm, STATE_GET_DATA);
 
     //if (ret > 0)
     {
@@ -352,19 +352,19 @@ static base_t do_idle1(const void *arg)
     return STATE_CTR_WAIT;
 }
 
-static base_t do_idle20(uint8_t *out, size_t maxlen)
+static base_t do_idle20(state_machine_t *sm, uint8_t *out, size_t maxlen)
 {
     log_d("%s", __FUNCTION__);
     return 0;
 }
 
-static base_t do_idle21(const void *arg)
+static base_t do_idle21(state_machine_t *sm, const void *arg)
 {
     struct SmartFrame *pframe = (struct SmartFrame *)arg;
     log_d("%s", __FUNCTION__);
 
     if (pframe->data[0] == 'c')
-        state_machine_change(&state_machine2, STATE_GET_DATA);
+        state_machine_change(sm, STATE_GET_DATA);
 
     //if (ret > 0)
     {
@@ -372,9 +372,6 @@ static base_t do_idle21(const void *arg)
     }
     return STATE_CTR_WAIT;
 }
-
-#define state_machine_state(state, next_state, wait, handler) \
-{state, next_state, #state, wait, handler##0, handler##1}
 
 static const state_machine_state_op_t state_machine_states[] =
 {

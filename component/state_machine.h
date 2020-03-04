@@ -33,7 +33,8 @@
 /***********************************************
                     define
 ***********************************************/
-#ifdef configUSING_SM
+#define state_machine_state(state, next_state, wait, handler) \
+                            {state, next_state, #state, wait, handler##0, handler##1}
 
 /***********************************************
                     typedef
@@ -49,13 +50,14 @@ enum
 };
 
 //---------------------------------------------------------------------------------------
-typedef struct 
+struct _state_machine;
+typedef struct sm_sta_op
 {
     ubase_t state, next_state;
     const char *name;
     time_t wait;
-    base_t (*op0)(uint8_t *out, size_t maxlen); //进入状态后执行的动作
-    base_t (*op1)(const void *arg);             //该状态收到消息后的动作
+    base_t (*op0)(struct _state_machine *, uint8_t *out, size_t maxlen); //进入状态后执行的动作
+    base_t (*op1)(struct _state_machine *, const void *arg);             //该状态收到消息后的动作
 } state_machine_state_op_t;
 
 typedef struct _state_machine
@@ -85,8 +87,6 @@ extern void state_machine_change(state_machine_t *sm, ubase_t state);
 /***********************************************
                    variable
 ***********************************************/
-
-#endif /*configUSING_SM*/
 
 #ifdef __cplusplus
 }
