@@ -171,10 +171,6 @@ error_t device_set_tx_complete(device_t *dev, error_t (*tx_done)(device_t *dev, 
 	#include <component/vast_cli.h>
 #endif
 
-#ifdef configUSING_LOG
-	#include <component/vast_log.h>
-#endif
-
 #ifdef configUSING_EEPROM
 	#include <component/vast_simulatite_eeprom.h>
 #endif

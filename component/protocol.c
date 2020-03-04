@@ -342,10 +342,7 @@ int protocolMsgDispatch(void * sender, ProtMsg_TypeDef *pProtMsg)
 	int argc = 0;
 	char *argv[5] = {0};
 	
-	ASSERT(board_id < BOARD_MAX, 
-					log_e("board_id=%d, out the range of BOARD_x\r\n", board_id);
-					return 0
-				);
+	assert(board_id < BOARD_MAX);
 	
 	argc = findArgument((char *)pProtMsg->data, argv, ' ');
 	
@@ -3109,24 +3106,20 @@ int protocolMsgUpload3(void ** sender, unsigned char boardId, unsigned short int
 		pe->write_buff[4] = cmdId & 0xff;
 		pe->write_buff[5] = boardId + 1;
 		
-		DBG_LOG(DBG_INFO, "ProtocolTx: cmd: %x, board: %x, dat=%s", cmdId, pe->write_buff[5], &pe->write_buff[6]);
-		DBG_ARRAY(DBG_DEBUG, "->(", "\b)", (const char *)&pe->write_buff[6], pe->write_buff[2]-3);
-		DBG_INFO(DBG_INFO, "\r\n");
-					
-		DBG_INFO(DBG_DEBUG, "protocol tx: ");
+		log_i("ProtocolTx: cmd: %x, board: %x, dat=%s", cmdId, pe->write_buff[5], &pe->write_buff[6]);
+		//DBG_ARRAY(DBG_DEBUG, "->(", "\b)", (const char *)&pe->write_buff[6], pe->write_buff[2]-3);
+		//log_i("\r\n");
 		
 		for(i=0; i<pe->write_buff[2] + 3; i++)  //head0, head1, len
 		{
 			check_xor ^= pe->write_buff[i];
-			
-			DBG_INFO(DBG_DEBUG, "%02x ", pe->write_buff[i]);
 		}
 		
 		pe->write_buff[i++] = check_xor;  
 		pe->write_buff[i++] = PROT_TAIL;  
 		pe->write_buff[i] = 0;  
 		
-		DBG_INFO(DBG_DEBUG, "%02x %02x \r\n", check_xor, PROT_TAIL);
+        elog_hexdump("protcl.tx", 10, (uint8_t *)pe->write_buff, pe->write_buff[2]);
 		
 		pe->len = i;
 		
@@ -3136,7 +3129,7 @@ int protocolMsgUpload3(void ** sender, unsigned char boardId, unsigned short int
 	}
 	else
 	{
-		DBG_LOG(DBG_WARNING, "pe == NULL\r\n");
+		log_e("pe == NULL");
 	}
 	
 	*sender = (QActive *)NULL;
