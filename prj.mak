@@ -33,6 +33,7 @@ SRCS += vast/component/vast_cli.c
 #SRCS += vast/component/vast_simulatite_eeprom.c
 SRCS += vast/component/protocol.c
 SRCS += vast/component/modbus_rtu.c
+SRCS += vast/component/modbus.c
 SRCS += vast/component/state_machine.c
 
 SRCS += vast/core/croutine.c
