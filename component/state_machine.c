@@ -116,7 +116,12 @@ redo:
     if (sm->init)
     {
         sm->init = 0;
-        ret = sm->op->op0(sm, sm->buffer, sizeof(sm->buffer));
+        ret = sm->op->op0(sm, sm->buffer, sm->size_max);
+        if (ret > 0) {
+            if (sm->process0) {
+            	ret = sm->process0(sm, sm->buffer, ret);
+            }
+        }
         if (sm->op->wait == 0) goto redo; // now: sm->init == 0
 
         soft_timer_mod(&sm->timer, jiffies + sm->op->wait);
@@ -165,7 +170,9 @@ static void sm_task_cb(struct task_ctrl_blk *tcb, ubase_t data)
 		/* check recvd data event */
         if (sigget(sig, SIG_DATA))
         {
-            sm->process(sm);
+            if (sm->process1) {
+                sm->process1(sm);
+            }
             state_machine_schedule(sm);
         }
 
@@ -184,15 +191,14 @@ int state_machine_init(state_machine_t *sm)
 
     sm->timer.cb = state_machine_timer_handle;
     sm->timer.data = (ubase_t)sm;
+    sm->data = (void *)sm;
 
 	task_create(&sm->tcb, sm_task_cb, (ubase_t)sm);
 
 	return ret;
 }
 
-#define SM_TEST
-
-#ifdef SM_TEST
+#ifdef configUSING_SM_TEST
 
 #define SIGSTACHG               SIG_USR    /* state change */
 
@@ -223,22 +229,6 @@ static state_machine_t state_machine2;
 static int smart_frame_len(const smart_frame_t *frame)
 {
     return SMART_FRAME_HEAD + frame->len + 1;
-}
-
-/**************************************************************************
-  * @brief	   : 解析一帧报文
-  * @param[in] : 
-  * @param[out]: 
-  * @return    : 
-  * @others    : 
-***************************************************************************/
-smart_frame_t * get_smart_frame(const uint8_t * in, uint32_t len)
-{
-	int i = 0;
-	smart_frame_t * pframe = (struct SmartFrame *) &in[i];
-
-	pframe = (struct SmartFrame *) &in[i];
-	return pframe;
 }
 
 /*
@@ -483,8 +473,8 @@ void CLICmd_SMachine(CLI_HandleTypeDef *pCli, int argc, char *argv[])
     }
 }
 CLI_CMD_EXPORT(sm, "state machine test", CLICmd_SMachine, 0);
-#endif
 
+#endif /*configUSING_SM_TEST*/
 
 /**
   * @}

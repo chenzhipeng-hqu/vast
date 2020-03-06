@@ -66,12 +66,14 @@ typedef struct _state_machine
     uint32_t init;
     struct soft_timer timer;
     tcb_t tcb;
-    uint8_t buffer[1024];
+    uint8_t *buffer;
+    size_t size_max;
     void *data;
     const state_machine_state_op_t *op;
     const state_machine_state_op_t *states;
     uint8_t states_size;
-    base_t (*process)(const void *arg);
+    base_t (*process0)(const void *arg, uint8_t *out, size_t len);
+    base_t (*process1)(const void *arg);
 } state_machine_t;
 
 /***********************************************
@@ -83,6 +85,10 @@ extern void state_machine_change(state_machine_t *sm, ubase_t state);
 /***********************************************
 	      		    inline
 ***********************************************/
+static inline int is_sm_state(state_machine_t *sm, int state)
+{
+    return sm->cur_state == state;
+}
 
 /***********************************************
                    variable
