@@ -94,6 +94,10 @@ typedef struct device_ops
 #define ARGS2U82(args) (__VAST_GET_BITS((u32)(args), 16, 23))
 #define ARGS2U83(args) (__VAST_GET_BITS((u32)(args), 24, 31))
 
+/* device call back */
+typedef error_t (*rx_indicate)(device_t *dev, size_t size) ;
+typedef error_t (*tx_complete)(device_t *dev, void *buffer) ;
+
 struct device
 {
     struct object  parent;
