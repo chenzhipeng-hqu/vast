@@ -20,7 +20,7 @@
 ***********************************************/
 #include "component/state_machine.h"
 
-#define LOG_TAG    "sm"
+#define LOG_TAG    "fsm"
 #include <elog.h>
 
 /***********************************************
@@ -141,7 +141,7 @@ redo:
     {
         sm->trycnt++;
         state_machine_change(sm, sm->op->state);
-        log_d("STATE_CTR_RETRY");
+        log_w("STATE_CTR_RETRY:%d", sm->trycnt);
     }
 }
 
@@ -192,6 +192,8 @@ int state_machine_init(state_machine_t *sm)
     sm->timer.cb = state_machine_timer_handle;
     sm->timer.data = (ubase_t)sm;
     sm->data = (void *)sm;
+
+    elog_set_filter_tag_lvl(LOG_TAG, ELOG_LVL_INFO);
 
 	task_create(&sm->tcb, sm_task_cb, (ubase_t)sm);
 

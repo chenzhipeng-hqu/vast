@@ -101,6 +101,7 @@ typedef struct SmartFrame
 	uint8_t stc;
 	rx_indicate rx_ind;
 	tx_complete tx_done;
+    void *to;
     list_t 	entry;
 	uint8_t len;
 	uint8_t data[1];
@@ -109,26 +110,43 @@ typedef struct SmartFrame
 
 #pragma pack()
 
-typedef struct modbus_device
+typedef struct modbus_device modbus_t;
+
+typedef struct _modbus_ops_t
+{
+    error_t (*init)             (struct modbus_device *modbus);
+	error_t	(*tx_prepare)		(struct modbus_device *modbus, void *buffer);
+	error_t	(*tx_done)		    (struct modbus_device *modbus, void *buffer);
+	error_t	(*rx_indicate)		(struct modbus_device *modbus, size_t size);
+}modbus_ops_t;
+
+struct modbus_device
 {
 	device_t parent;
-	uint16_t slave_addr;
+	//uint16_t slave_addr;
 	uint8_t rx_data[MODBUS_RX_MAX];
 //	uint8_t tx_data[MODBUS_TX_MAX];
 //    DECLARE_KFIFO(rx_kfifo, unsigned char, MODBUS_RX_MAX);
 //    DECLARE_KFIFO(tx_kfifo, unsigned char, MODBUS_TX_MAX);
     list_t 	tx_list;
     state_machine_t sm;
-}modbus_t;
+ 	const modbus_ops_t 	*ops;
+};
 
 /***********************************************
                function prototypes
 ***********************************************/
-int readInputReg2(modbus_t *modbus, uint16_t slave_addr, uint16_t start_addr, uint16_t reg_cnt);
-int writeMultiHoldReg2(modbus_t *modbus, uint16_t slave_addr, uint16_t reg_addr, uint16_t reg_cnt, uint16_t *data);
-int writeSingleHoldReg2(modbus_t *modbus, uint16_t slave_addr, uint16_t reg_addr, uint16_t reg_val);
+error_t modbus_device_register(modbus_t *modbus, const char *name, uint32_t flag, void *data);
+int readInputReg2(modbus_t *modbus, uint16_t slave_addr, uint16_t start_addr, uint16_t reg_cnt, rx_indicate rx_ind);
+int writeMultiHoldReg2(modbus_t *modbus, uint16_t slave_addr, uint16_t reg_addr, uint16_t reg_cnt, uint16_t *data, rx_indicate rx_ind);
+int writeSingleHoldReg2(modbus_t *modbus, uint16_t slave_addr, uint16_t reg_addr, uint16_t reg_val, rx_indicate rx_ind);
 //int readHoldReg2(modbus_t *modbus, uint16_t slave_addr, uint16_t reg_addr, uint16_t reg_cnt);
 int readHoldReg2(modbus_t *modbus, uint16_t slave_addr, uint16_t start_addr, uint16_t reg_cnt, rx_indicate rx_ind);
+
+extern error_t read_input_reg_rx_ind(device_t *dev, size_t size);
+extern error_t read_hold_reg_rx_ind(device_t *dev, size_t size);
+extern error_t write_hold_reg_rx_ind(device_t *dev, size_t size);
+extern error_t write_holds_reg_rx_ind(device_t *dev, size_t size);
 
 /***********************************************
 					inline

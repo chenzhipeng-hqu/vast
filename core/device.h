@@ -211,6 +211,14 @@ error_t device_set_tx_complete(device_t *dev, error_t (*tx_done)(device_t *dev, 
     #include "component/modbus_rtu.h"
 #endif
 
+//#ifdef configUSING_SM
+    //#include "component/state_machine.h"
+//#endif
+
+//#ifdef configUSING_MODBUS
+    //#include "component/modbus.h"
+//#endif
+
 #ifdef configUSING_MODBUS_RTU2
     #include "driver/modbus_rtu.h"
 #endif
