@@ -104,6 +104,9 @@
 
 #define __VAST_DIM(array_) (sizeof(array_) / sizeof((array_)[0]))  //dimension
 
+#define vast_malloc             malloc
+#define vast_free               free
+
 #define set_bit(x, bit) 		((x) |= 1 << (bit))
 #define clr_bit(x, bit) 		((x) &= ~(1 << (bit)))
 #define tst_bit(x, bit) 		((x) & (1 << (bit)))

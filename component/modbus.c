@@ -109,7 +109,7 @@ int readInputReg2(modbus_t *modbus, uint16_t slave_addr,
 {
     int ret = 0;
 
-	smart_frame_t *smartframe = (smart_frame_t *)malloc(sizeof(smart_frame_t) + sizeof(modbus_frame_t));
+	smart_frame_t *smartframe = (smart_frame_t *)vast_malloc(sizeof(smart_frame_t) + sizeof(modbus_frame_t));
     //log_d("%d %d", sizeof(smart_frame_t), sizeof(modbus_frame_t));
 
     if (smartframe == NULL) {
@@ -140,7 +140,7 @@ int writeMultiHoldReg2(modbus_t *modbus, uint16_t slave_addr, uint16_t start_add
 {
     int ret = 0;
 
-	smart_frame_t *smartframe = (smart_frame_t *)malloc(sizeof(smart_frame_t) + sizeof(modbus_frame_t) + (reg_cnt * sizeof(reg_cnt)) + sizeof(reg_cnt)/2);
+	smart_frame_t *smartframe = (smart_frame_t *)vast_malloc(sizeof(smart_frame_t) + sizeof(modbus_frame_t) + (reg_cnt * sizeof(reg_cnt)) + sizeof(reg_cnt)/2);
 
     //log_d("%d", sizeof(smart_frame_t)+(reg_cnt * sizeof(reg_cnt)) + sizeof(reg_cnt)/2);
 
@@ -183,7 +183,7 @@ int writeSingleHoldReg2(modbus_t *modbus, uint16_t slave_addr,
 {
     int ret = 0;
 
-	smart_frame_t *smartframe = (smart_frame_t *)malloc(sizeof(smart_frame_t) + sizeof(modbus_frame_t));
+	smart_frame_t *smartframe = (smart_frame_t *)vast_malloc(sizeof(smart_frame_t) + sizeof(modbus_frame_t));
 
     if (smartframe == NULL) {
         ret = 1;
@@ -214,7 +214,7 @@ int readHoldReg2(modbus_t *modbus, uint16_t slave_addr,
 {
     int ret = 0;
 
-	smart_frame_t *smartframe = (smart_frame_t *)malloc(sizeof(smart_frame_t) + sizeof(modbus_frame_t));
+	smart_frame_t *smartframe = (smart_frame_t *)vast_malloc(sizeof(smart_frame_t) + sizeof(modbus_frame_t));
 
     if (smartframe == NULL) {
         ret = 1;
@@ -288,7 +288,7 @@ static base_t do_execute1(state_machine_t *sm, const void *arg)
 error:
 	smartframe = list_last_entry(&modbus->tx_list, smart_frame_t, entry);
 	list_del(&smartframe->entry);
-	free(smartframe);
+	vast_free(smartframe);
 
     return STATE_CTR_NEXT;
 }
