@@ -37,6 +37,9 @@
                     include
 ***********************************************/
 //#include "ring_queue.h"
+#include <stdint.h>
+#include <stdbool.h>
+#include <core/device.h>
 
 /***********************************************
                     define
@@ -255,6 +258,30 @@ typedef enum {
 	CMDID_LED_READ_I,
 	
 }E_CMD_ID;
+
+#pragma pack(1)
+typedef struct SmartFrame
+{
+	uint8_t stc;
+    uint32_t from;
+    uint32_t to;
+    uint16_t seq; //最高位为1表示本地帧,
+	uint8_t len;  // data 里面的长度
+	uint8_t data[1];
+} smart_frame_t;
+#define SMART_FRAME_HEAD (offset_of(smart_frame_t, data))
+
+typedef struct ListFrame
+{
+    list_t 	        entry;
+	rx_indicate     rx_ind;
+	tx_complete     tx_done;
+	//uint8_t         len;        // data 里面的长度
+	uint8_t         data[1];
+} list_frame_t;
+#define LIST_FRAME_HEAD (offset_of(list_frame_t, data))
+
+#pragma pack()
 /***********************************************
                function prototypes
 ***********************************************/
@@ -265,7 +292,7 @@ extern int protocolMsgUpload2		(void ** sender, unsigned char boardId, unsigned 
 extern int protocolMsgUpload3(void ** sender, unsigned char boardId, unsigned short int cmdId, const char *format, ...);
 
 /***********************************************
-									  inline
+                    inline
 ***********************************************/
 
 /***********************************************

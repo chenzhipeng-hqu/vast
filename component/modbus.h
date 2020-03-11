@@ -41,6 +41,7 @@
 #include <core/device.h>
 #include "core/croutine.h"
 #include "component/state_machine.h"
+#include "component/protocol.h"
 
 /***********************************************
                     define
@@ -56,7 +57,7 @@
 #define WRITE_SINGLE_HOLD_RES			0x06
 #define READ_INPUT_RES					0x04
 
-#define	 MODBUS_RX_MAX					64
+#define	 MODBUS_RX_MAX					128
 #define	 MODBUS_TX_MAX					512
 
 /***********************************************
@@ -87,20 +88,6 @@ typedef struct ModbusFrame
 	uint16_t data[1];
 } modbus_frame_t;
 #define MODBUS_FRAME_HEAD (offset_of(modbus_frame_t, data))
-
-typedef struct SmartFrame
-{
-	uint8_t stc;
-	rx_indicate rx_ind;
-	tx_complete tx_done;
-    uint32_t from;
-    uint32_t to;
-    list_t 	entry;
-	uint8_t len;
-	uint8_t data[1];
-} smart_frame_t;
-#define SMART_FRAME_HEAD (offset_of(smart_frame_t, data))
-
 #pragma pack()
 
 typedef struct modbus_device modbus_t;

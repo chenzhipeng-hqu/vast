@@ -3177,6 +3177,12 @@ int protocolMsgUpload2(void ** sender, unsigned char boardId, unsigned short int
 	return ret;
 }
 
+/**
+ * @brief  CLICmd_Print
+ * @param  
+ * @retval 
+ */
+
 #ifdef configUSING_CLI
 /**
  *   * @brief  CLICmd_Print
