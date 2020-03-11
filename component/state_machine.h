@@ -62,13 +62,13 @@ typedef struct sm_sta_op
 
 typedef struct _state_machine
 {
-    int cur_state, trycnt;
-    uint32_t init;
+    uint8_t cur_state, trycnt;
+    uint8_t init;
     struct soft_timer timer;
     tcb_t tcb;
-    uint8_t *buffer;
+    void *tx_data;
     size_t size_max;
-    void *data;
+    void *rx_data;
     const state_machine_state_op_t *op;
     const state_machine_state_op_t *states;
     uint8_t states_size;

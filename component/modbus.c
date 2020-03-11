@@ -80,17 +80,22 @@ static uint16_t write_modbus(modbus_t *modbus, smart_frame_t *smartframe)
 	uint16_t crc = 0;
 	modbus_frame_t *modbusframe = (modbus_frame_t *)smartframe->data;
 	crc = CheckCRC((uint8_t *)modbusframe, smartframe->len);
-	modbusframe->data[0] = le16_to_cpu(crc);
+	//modbusframe->data[0] = le16_to_cpu(crc);
+
+    uint8_t *data = smartframe->data;
+    //data[smartframe->len] = crc >> 8;
+    //data[smartframe->len+1] = crc & 0x00ff;
+    put_be_val(crc, &data[smartframe->len], 2);
 
 	smartframe->len += sizeof(crc);
-	smartframe->to = ((device_t *)modbus)->owner;
+	smartframe->to = (uint32_t)((device_t *)modbus)->owner;
 
 	list_add(&(smartframe->entry), &modbus->tx_list);
 
 	if (/*(is_sm_state(&modbus->sm, STATE_IDLE)) & */(list_is_singular(&modbus->tx_list))) {
-		modbus->sm.buffer = (void *)smartframe;
+		modbus->sm.tx_data = (void *)smartframe;
         //modbus->slave_addr = modbusframe->slave_addr;
-		smartframe = (smart_frame_t *)modbus->rx_data;
+		//smartframe = (smart_frame_t *)modbus->rx_data;
 		//smartframe->rx_ind = rx_ind;
         //smartframe->to = ((device_t *)modbus)->owner;
 		state_machine_change(&modbus->sm, STATE_EXEC);
@@ -114,6 +119,7 @@ int readInputReg2(modbus_t *modbus, uint16_t slave_addr,
 
     if (smartframe == NULL) {
         ret = 1;
+        log_w("smartframe is null");
         return ret;
     }
 
@@ -142,10 +148,12 @@ int writeMultiHoldReg2(modbus_t *modbus, uint16_t slave_addr, uint16_t start_add
 
 	smart_frame_t *smartframe = (smart_frame_t *)vast_malloc(sizeof(smart_frame_t) + sizeof(modbus_frame_t) + (reg_cnt * sizeof(reg_cnt)) + sizeof(reg_cnt)/2);
 
-    //log_d("%d", sizeof(smart_frame_t)+(reg_cnt * sizeof(reg_cnt)) + sizeof(reg_cnt)/2);
+    //log_i("%d", sizeof(smart_frame_t)+sizeof(modbus_frame_t)+(reg_cnt*sizeof(reg_cnt)) + sizeof(reg_cnt)/2);
+    //log_i("smart:%d, modbus:%d,reg_cnt:%d, %d", sizeof(smart_frame_t), sizeof(modbus_frame_t), (reg_cnt*sizeof(reg_cnt)), sizeof(reg_cnt)/2);
 
     if (smartframe == NULL) {
         ret = 1;
+        log_w("smartframe is null");
         return ret;
     }
 
@@ -163,7 +171,7 @@ int writeMultiHoldReg2(modbus_t *modbus, uint16_t slave_addr, uint16_t start_add
 
     int i = 0;
     tx_data[i] = reg_cnt * sizeof(uint16_t);
-	for (i = 1; i < tx_data[0]; i += 2k) {
+	for (i = 1; i < tx_data[0]; i += 2) {
 		tx_data[i + 0] = (*p) >> 8;
 		tx_data[i + 1] = (*p) & 0x00ff;
 		p++;
@@ -187,6 +195,7 @@ int writeSingleHoldReg2(modbus_t *modbus, uint16_t slave_addr,
 
     if (smartframe == NULL) {
         ret = 1;
+        log_w("smartframe is null");
         return ret;
     }
 
@@ -218,6 +227,7 @@ int readHoldReg2(modbus_t *modbus, uint16_t slave_addr,
 
     if (smartframe == NULL) {
         ret = 1;
+        log_w("smartframe is null");
         return ret;
     }
 
@@ -273,7 +283,7 @@ static base_t do_execute1(state_machine_t *sm, const void *arg)
 	modbus_t *modbus = container_of(sm, modbus_t, sm);
 	device_t *dev = ((device_t *)modbus);
 	smart_frame_t *smartframe = (smart_frame_t *)arg;
-	smart_frame_t *smartframe_tx = (smart_frame_t *)modbus->sm.buffer;
+	smart_frame_t *smartframe_tx = (smart_frame_t *)modbus->sm.tx_data;
     smartframe->rx_ind = smartframe_tx->rx_ind;
     smartframe->to = smartframe_tx->to;
 
@@ -307,13 +317,13 @@ static base_t do_idle1(state_machine_t *sm, const void *arg)
 
 	if (!list_empty(&modbus->tx_list)) {
 		smart_frame_t *smartframe = list_last_entry(&modbus->tx_list, smart_frame_t, entry);
-		modbus->sm.buffer = (void *)smartframe;
+		modbus->sm.tx_data = (void *)smartframe;
         //modbus_frame_t *modbusframe = (modbus_frame_t *)smartframe->data;
 		//modbus->slave_addr = modbusframe->slave_addr;
 
-		smart_frame_t *smartframe_rx = (smart_frame_t *)modbus->rx_data;
-		smartframe_rx->rx_ind = smartframe->rx_ind;
-        smartframe_rx->to = smartframe->to;
+		//smart_frame_t *smartframe_rx = (smart_frame_t *)modbus->rx_data;
+		//smartframe_rx->rx_ind = smartframe->rx_ind;
+        //smartframe_rx->to = smartframe->to;
 		//state_machine_change(&modbus->sm, STATE_EXEC);
 	    return STATE_CTR_NEXT;
 	} else {
@@ -327,8 +337,8 @@ static base_t do_idle1(state_machine_t *sm, const void *arg)
   */
 static const state_machine_state_op_t state_machine_states[] =
 {
-	state_machine_state(STATE_EXEC     , STATE_IDLE   , pdMS_TO_TICKS(100) , do_execute)    ,
-	state_machine_state(STATE_IDLE     , STATE_EXEC   , pdMS_TO_TICKS(3) , do_idle)       ,
+	state_machine_state(STATE_EXEC , STATE_IDLE , pdMS_TO_TICKS(100) , do_execute) ,
+	state_machine_state(STATE_IDLE , STATE_EXEC , pdMS_TO_TICKS(3)   , do_idle)    ,
 };
 
 //static base_t do_process0(const void *arg, uint8_t *out, size_t len)
@@ -397,7 +407,7 @@ static base_t do_process1(const void *arg)
 
 		if (ret) {
             smartframe->len = device_read(dev, 0, modbusframe, ret);
-            sm->data = (void *)smartframe;
+            sm->rx_data = (void *)smartframe;
             if (len > ret)
                 task_send_signal(&sm->tcb, SIG_DATA);
 		} else {
@@ -446,13 +456,34 @@ static error_t modbus_init(device_t *dev)
 }
 
 /**
+  * @brief  led_gpio_init.
+  * @param
+  * @retval
+  */
+static error_t modbus_control(device_t *dev, uint8_t cmd, void *args)
+{
+	modbus_t *modbus = (modbus_t *)dev;
+    error_t err = 0;
+
+    switch (cmd)
+    {
+    default:
+        err = modbus->ops->ctrl(modbus, cmd, args);
+        break;
+    }
+
+    return err;
+}
+
+/**
   * @brief  ina219_ops.
   * @param
   * @retval
   */
 static const struct device_ops modbus_ops =
 {
-	.init = modbus_init
+	.init = modbus_init,
+	.ctrl = modbus_control,
 };
 
 /**
@@ -475,7 +506,7 @@ error_t modbus_device_register(modbus_t *modbus, const char *name, uint32_t flag
     ret = device_register(dev, name, 0);
     device_open(dev, DEVICE_FLAG_DMA_RX | DEVICE_FLAG_DMA_TX | DEVICE_FLAG_FASYNC);
 
-    elog_set_filter_tag_lvl(LOG_TAG, ELOG_LVL_INFO);
+    //elog_set_filter_tag_lvl(LOG_TAG, ELOG_LVL_INFO);
 
     return ret;
 }

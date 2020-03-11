@@ -116,11 +116,9 @@ redo:
     if (sm->init)
     {
         sm->init = 0;
-        ret = sm->op->op0(sm, sm->buffer, sm->size_max);
-        if (ret > 0) {
-            if (sm->process0) {
-            	ret = sm->process0(sm, sm->buffer, ret);
-            }
+        ret = sm->op->op0(sm, sm->tx_data, sm->size_max);
+        if ((ret > 0) && (sm->process0)) {
+            ret = sm->process0(sm, sm->tx_data, ret);
         }
         if (sm->op->wait == 0) goto redo; // now: sm->init == 0
 
@@ -128,7 +126,7 @@ redo:
     }
     else
     {
-        ret = sm->op->op1(sm, sm->data);
+        ret = sm->op->op1(sm, sm->rx_data);
     }
 
     if (ret == STATE_CTR_NEXT)
@@ -164,7 +162,7 @@ static void sm_task_cb(struct task_ctrl_blk *tcb, ubase_t data)
         /* check state change or time out event */
         if (sigget(sig, SIGSTACHG) || sigget(sig, SIG_ALARM))
         {
-            sm->data = NULL;
+            sm->rx_data = NULL;
             state_machine_schedule(sm);
         }
 		/* check recvd data event */
@@ -191,7 +189,6 @@ int state_machine_init(state_machine_t *sm)
 
     sm->timer.cb = state_machine_timer_handle;
     sm->timer.data = (ubase_t)sm;
-    sm->data = (void *)sm;
 
     elog_set_filter_tag_lvl(LOG_TAG, ELOG_LVL_INFO);
 

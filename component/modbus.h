@@ -86,14 +86,6 @@ typedef struct ModbusFrame
 	};
 	uint16_t data[1];
 } modbus_frame_t;
-
-typedef struct ModbusRxFrame
-{
-	uint8_t slave_addr;
-	uint8_t opcode;
-    uint8_t reg_cnt;
-	uint16_t data[1];
-} modbus_rx_frame_t;
 #define MODBUS_FRAME_HEAD (offset_of(modbus_frame_t, data))
 
 typedef struct SmartFrame
@@ -101,7 +93,8 @@ typedef struct SmartFrame
 	uint8_t stc;
 	rx_indicate rx_ind;
 	tx_complete tx_done;
-    void *to;
+    uint32_t from;
+    uint32_t to;
     list_t 	entry;
 	uint8_t len;
 	uint8_t data[1];
@@ -118,6 +111,7 @@ typedef struct _modbus_ops_t
 	error_t	(*tx_prepare)		(struct modbus_device *modbus, void *buffer);
 	error_t	(*tx_done)		    (struct modbus_device *modbus, void *buffer);
 	error_t	(*rx_indicate)		(struct modbus_device *modbus, size_t size);
+    error_t(*ctrl)              (struct modbus_device *modbus, uint8_t cmd, void *args);
 }modbus_ops_t;
 
 struct modbus_device
