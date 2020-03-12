@@ -812,7 +812,7 @@ void elog_hexdump(const char *name, uint8_t width, uint8_t *buf, uint16_t size)
     }
 
     /* level filter */
-    if (ELOG_LVL_DEBUG > elog.filter.level) {
+    if (ELOG_LVL_VERBOSE > elog.filter.level) {
         return;
     } else if (!strstr(name, elog.filter.tag)) { /* tag filter */
         return;

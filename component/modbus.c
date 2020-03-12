@@ -418,8 +418,8 @@ static base_t do_process1(const void *arg)
     int len = 0;
     len = device_peek(dev, 0, modbusframe, MODBUS_RX_MAX);
 //    len = smartframe->len = device_read(dev, 0, modbusframe, MODBUS_RX_MAX);
-    elog_hexdump("modbus.rx", 10, (uint8_t *)modbusframe, len);
-    elog_raw("\r\n");
+    elog_hexdump("modbus.r", 10, (uint8_t *)modbusframe, len);
+    //elog_raw("\r\n");
     if (len)
     {
         int ret = check_smart_frame((const void *)sm, len);
