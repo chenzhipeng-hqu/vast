@@ -133,4 +133,10 @@ SRCS += vast/third/FreeModbus/port/portserial_m.c
 SRCS += vast/third/FreeModbus/port/porttimer_m.c
 SRCS += vast/third/FreeModbus/port/user_mb_app_m.c
 
+################ third/modbus ################
+INCS += -I./vast/third/utest
+
+SRCS += vast/third/utest/utest.c
+
+
 
