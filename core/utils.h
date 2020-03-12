@@ -104,8 +104,13 @@
 
 #define __VAST_DIM(array_) (sizeof(array_) / sizeof((array_)[0]))  //dimension
 
-#define vast_malloc             malloc
-#define vast_free               free
+#ifdef VAST_USING_MEMHEAP_AS_HEAP
+	extern void *vast_malloc(size_t size);
+	extern void vast_free(void *rmem);
+#else
+	#define vast_malloc             malloc
+	#define vast_free               free
+#endif
 
 #define set_bit(x, bit) 		((x) |= 1 << (bit))
 #define clr_bit(x, bit) 		((x) &= ~(1 << (bit)))

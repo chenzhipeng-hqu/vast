@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <core/compiler.h>
+#include "bsp.h"
 
 typedef int (*initcall_t)(void);
 
@@ -53,9 +54,15 @@ typedef int (*initcall_t)(void);
 
 #define INIT_QF_EXPORT(fn)              INIT_EXPORT(fn, 8)
 
-
+/**
+ * @brief configures IWDG and enable watchdog.
+ * @param None
+ * @retval None
+ */
 static inline void do_init_call(void)
 {
+    vast_bsp_init();
+
 #if defined(__CC_ARM)
     extern initcall_t initcall0init$$Base[];
     extern initcall_t initcall7init$$Limit[];
@@ -90,5 +97,7 @@ static inline void do_init_call(void)
 
 #endif
 }
+
+extern void vast_system_heap_init(void *begin_addr, void *end_addr);
 
 #endif  /* end of _INIT_H */

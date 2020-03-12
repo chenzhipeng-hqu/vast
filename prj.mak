@@ -39,6 +39,7 @@ SRCS += vast/component/state_machine.c
 SRCS += vast/core/croutine.c
 SRCS += vast/core/device.c
 SRCS += vast/core/heap.c
+SRCS += vast/core/memheap.c
 SRCS += vast/core/kfifo.c
 SRCS += vast/core/object.c
 SRCS += vast/core/softtimer.c
