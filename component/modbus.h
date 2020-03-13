@@ -112,6 +112,7 @@ struct modbus_device
     list_t 	tx_list;
     state_machine_t sm;
  	const modbus_ops_t 	*ops;
+    uint8_t auto_baudrate;
 };
 
 /***********************************************

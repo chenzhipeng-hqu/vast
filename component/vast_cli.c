@@ -336,7 +336,7 @@ void CLICmd_List(CLI_HandleTypeDef *pCli)
   pCli->Init.Write("Current command list:\r\n");
   while(CLI_CmdPath[cliCmdLevel][idx].cmd)
   {
-    pCli->Init.Write("\t%s\t-> %s \r\n", CLI_CmdPath[cliCmdLevel][idx].cmd, CLI_CmdPath[cliCmdLevel][idx].help);
+    pCli->Init.Write("\t%-10s-> %s \r\n", CLI_CmdPath[cliCmdLevel][idx].cmd, CLI_CmdPath[cliCmdLevel][idx].help);
     idx ++;
   }
 }
