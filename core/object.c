@@ -47,3 +47,8 @@ object_t *object_find(const char *name)
     }
     return NULL;
 }
+
+list_t *object_lists(void)
+{
+    return &object_list;
+}
