@@ -401,6 +401,15 @@ void CLICmd_History(CLI_HandleTypeDef *pCli, int argc, char *argv[])
   */
 int16_t findArgument(char *argvStr, char *argv[], char separationChar)
 {
+#if 0
+	int argc = 0;
+    argv[argc] = strtok(argvStr, " ");
+	while(argv[argc]) {
+        printf("argv[%d]:%s\r\n", argc, argv[argc]);
+        argc++;
+        argv[argc] = strtok(NULL, " ");
+    }
+#else
 	int argc = 0, idx = 0, argvStrlen = 0;
 	
 	argv[argc++] = argvStr;
@@ -436,6 +445,7 @@ int16_t findArgument(char *argvStr, char *argv[], char separationChar)
 			//CLI_PutString("0x%02x \r\n", argvStr[idx]);
 		}
 	}
+#endif
 	return argc;
 }
 
@@ -452,8 +462,16 @@ int CLI_Execute(CLI_HandleTypeDef *pCli, const char *cmd)
 	char *argv[10] = {0};
 	
 	strcpy(argvStr, cmd);
-
+#if 0
 	argc = findArgument(argvStr, argv, ASCII_SPACE);
+#else
+    argv[argc] = strtok(argvStr, " ");
+	while(argv[argc]) {
+//        printf("argv[%d]:%s\r\n", argc, argv[argc]);
+        argc++;
+        argv[argc] = strtok(NULL, " ");
+    }
+#endif
 	
 	pCmd = CLI_FindCmd(argv[0], CLI_CMD_EXE);
 	
@@ -473,7 +491,7 @@ int CLI_Execute(CLI_HandleTypeDef *pCli, const char *cmd)
   {
     CLICmd_History(pCli, argc, argv);
   }
-  else if (strcmp(argv[0], "") != 0)
+  else if ((strcmp(argv[0], "") != 0) & (argc > 0))
   {
 		pCli->Init.Write("\033[31m Command not find! argv=");
     
