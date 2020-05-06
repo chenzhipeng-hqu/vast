@@ -191,15 +191,33 @@
 #define memset    os_memset
 #define memcpy    os_memcpy
 
+#ifndef strncmp
 #define strncmp   os_strncmp
-#define strcmp    os_strcmp
-#define strlen    os_strlen
-#define strdup    os_strdup
+#endif
 
+#ifndef strcmp
+#define strcmp    os_strcmp
+#endif
+
+#ifndef strcmp
+    #define strcmp    os_strlen
+#endif
+
+#ifndef strdup
+#define strdup    os_strdup
+#endif
+
+#ifndef strchr
 #define strchr    os_strchr
+#endif
+
+#ifndef strstr
 #define strstr    os_strstr
+#endif
 //#define sscanf    os_sscanf
+#ifndef strncpy
 #define strncpy   os_strncpy
+#endif
 #define strcpy    os_strcpy
 #define memmove   os_memmove
 #define memcmp    os_memcmp
