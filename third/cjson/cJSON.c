@@ -2975,6 +2975,7 @@ CJSON_PUBLIC(void) cJSON_free(void *object)
     global_hooks.deallocate(object);
 }
 
+#if 0
 #include "stm32f4xx_hal.h"
 CJSON_PUBLIC(void) cJSON_test(void)
 {
@@ -3063,6 +3064,7 @@ CJSON_PUBLIC(void) cJSON_test(void)
 	cJSON_Delete(A);                     //删除cJSON结构体
 	cJSON_free(out);
 }
+#endif
 
 
 
