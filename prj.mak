@@ -27,6 +27,7 @@ INCS += -I./vast/third/qpc/include
 INCS += -I./vast/third/qpc/src
 INCS += -I./vast/third/qpc/ports/qv/gnu
 
+SRCS += vast/component/observer.c
 SRCS += vast/component/vast_cli.c
 #SRCS += vast/component/vast_log.c
 #SRCS += vast/component/vast_store.c
