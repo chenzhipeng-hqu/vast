@@ -355,7 +355,7 @@ static base_t do_idle1(state_machine_t *sm, const void *arg)
 static const state_machine_state_op_t state_machine_states[] =
 {
 	state_machine_state(STATE_EXEC , STATE_IDLE , pdMS_TO_TICKS(100) , do_execute) ,
-	state_machine_state(STATE_IDLE , STATE_EXEC , pdMS_TO_TICKS(3)   , do_idle)    ,
+	state_machine_state(STATE_IDLE , STATE_EXEC , pdMS_TO_TICKS(5)   , do_idle)    ,
 };
 
 //static base_t do_process0(const void *arg, uint8_t *out, size_t len)
