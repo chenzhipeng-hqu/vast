@@ -28,10 +28,12 @@
 ***********************************************/
 /*----------------------------------------------------------------------------*/
 // Register Addresses
-#define					CP8102_CHANNEL_1				(uint16_t)((x & 0x01) << 0)
-#define					CP8102_CHANNEL_2				(uint16_t)((x & 0x01) << 1)
-#define					CP8102_CHANNEL_3				(uint16_t)((x & 0x01) << 2)
-#define					CP8102_CHANNEL_4				(uint16_t)((x & 0x01) << 3)
+#define					CP8102_CHANNEL_ALL_OFF			(uint16_t)((0x00))
+#define					CP8102_CHANNEL_1				(uint16_t)((0x01) << 0)
+#define					CP8102_CHANNEL_2				(uint16_t)((0x01) << 1)
+#define					CP8102_CHANNEL_3				(uint16_t)((0x01) << 2)
+#define					CP8102_CHANNEL_4				(uint16_t)((0x01) << 3)
+#define					CP8102_CHANNEL_ALL_ON			(uint16_t)((0x0F))
 
 
 /***********************************************
