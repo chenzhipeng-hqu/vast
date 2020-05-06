@@ -3,7 +3,7 @@
 
 #include <core/list.h>
 #include <core/types.h>
-#include <sys/_timeval.h>
+#include <sys/time.h>
 
 /*
  *  These inlines deal with timer wrapping correctly. You are
