@@ -1,6 +1,7 @@
 
 #include <device/vast_ir.h>
 
+#ifdef configUSING_IR
 //
 static int InfraRed_RX_SAMSUNG_Calculate(IR_TypeDef *pIR_Obj);
 
@@ -88,4 +89,5 @@ int InfraRed_RX_SAMSUNG_Calculate(IR_TypeDef *pIR_Obj)
 	
 	return 0;
 }
+#endif /* configUSING_IR */
 

@@ -1,6 +1,7 @@
 
 #include <device/vast_ir.h>
 
+#ifdef configUSING_IR
 //
 
 //
@@ -115,4 +116,5 @@ int InfraRed_RX_JVC_Calculate(IR_TypeDef *pIR_Obj)
 	
 	return 0;
 }
+#endif /* configUSING_IR */
 

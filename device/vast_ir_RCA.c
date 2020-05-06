@@ -26,6 +26,7 @@
 /*************************************
               define
 *************************************/
+#ifdef configUSING_IR
 
 /**************************************
               typedef
@@ -157,5 +158,6 @@ void RCA_assert_failed(uint8_t* file, uint32_t line)
 /**
   * @}
   */
+#endif /* configUSING_IR */
 
 /************************ (C) COPYRIGHT chenzhipeng3472 *****END OF FILE****/

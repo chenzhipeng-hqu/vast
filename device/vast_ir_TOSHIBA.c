@@ -1,6 +1,7 @@
 
 #include <device/vast_ir.h>
 
+#ifdef configUSING_IR
 //
 //extern TIM_HandleTypeDef htim2;
 static int InfraRed_RX_TOSHIBA_Calculate(IR_TypeDef *pIR_Obj);
@@ -91,4 +92,5 @@ int InfraRed_RX_TOSHIBA_Calculate(IR_TypeDef *pIR_Obj)
 	
 	return 0;
 }
+#endif /* configUSING_IR */
 

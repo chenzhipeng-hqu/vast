@@ -4,6 +4,8 @@
 #define		__VAST_IR_H__
 
 #include "vast_common.h"
+#include "vast_config.h"
+#ifdef configUSING_IR
 #include "stm32f4xx_hal.h"
 
 
@@ -84,5 +86,6 @@ extern int InfraRed_RX_Calculate(void);
 extern int InfraRed_RX_ChangeProtocol(IRType_e IRType);
 
 
+#endif /* configUSING_IR */
 
 #endif /* __INFRA_RED_H__ */
