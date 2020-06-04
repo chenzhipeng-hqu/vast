@@ -33,8 +33,8 @@
 /***********************************************
                     define
 ***********************************************/
-#define state_machine_state(state, next_state, wait, handler) \
-                            {state, next_state, #state, wait, handler##0, handler##1}
+#define state_machine_state(state, next_state, wait, func) \
+                            {state, next_state, #state, wait, func##_action, func##_handler}
 
 /***********************************************
                     typedef
@@ -56,8 +56,8 @@ typedef struct sm_sta_op
     ubase_t state, next_state;
     const char *name;
     time_t wait;
-    base_t (*op0)(struct _state_machine *, uint8_t *out, size_t maxlen); //进入状态后执行的动作
-    base_t (*op1)(struct _state_machine *, const void *arg);             //该状态收到消息后的动作
+    base_t (*action)(struct _state_machine *, uint8_t *out, size_t maxlen); //进入状态后执行的动作
+    base_t (*handler)(struct _state_machine *, const void *arg);             //该状态收到消息后的动作
 } state_machine_state_op_t;
 
 typedef struct _state_machine
@@ -72,8 +72,8 @@ typedef struct _state_machine
     const state_machine_state_op_t *op;
     const state_machine_state_op_t *states;
     uint8_t states_size;
-    base_t (*process0)(const void *arg, uint8_t *out, size_t len);
-    base_t (*process1)(const void *arg);
+    base_t (*after_action)(const void *arg, uint8_t *out, size_t len);
+    base_t (*process_data)(const void *arg);
 } state_machine_t;
 
 /***********************************************

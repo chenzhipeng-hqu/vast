@@ -116,9 +116,9 @@ redo:
     if (sm->init)
     {
         sm->init = 0;
-        ret = sm->op->op0(sm, sm->tx_data, sm->size_max);
-        if ((ret > 0) && (sm->process0)) {
-            ret = sm->process0(sm, sm->tx_data, ret);
+        ret = sm->op->action(sm, sm->tx_data, sm->size_max);
+        if ((ret > 0) && (sm->after_action)) {
+            ret = sm->after_action(sm, sm->tx_data, ret);
         }
         if (sm->op->wait == 0) goto redo; // now: sm->init == 0
 
@@ -126,7 +126,7 @@ redo:
     }
     else
     {
-        ret = sm->op->op1(sm, sm->rx_data);
+        ret = sm->op->handler(sm, sm->rx_data);
     }
 
     if (ret == STATE_CTR_NEXT)
@@ -168,8 +168,8 @@ static void sm_task_cb(struct task_ctrl_blk *tcb, ubase_t data)
 		/* check recvd data event */
         if (sigget(sig, SIG_DATA))
         {
-            if (sm->process1) {
-                sm->process1(sm);
+            if (sm->process_data) {
+                sm->process_data(sm);
             }
             state_machine_schedule(sm);
         }

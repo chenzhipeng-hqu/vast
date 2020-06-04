@@ -252,7 +252,7 @@ int readHoldReg2(modbus_t *modbus, uint16_t slave_addr,
 /*
  * do idle
  */
-static base_t do_execute0(state_machine_t *sm, uint8_t *out, size_t maxlen)
+static base_t do_execute_action(state_machine_t *sm, uint8_t *out, size_t maxlen)
 {
 //    log_d("%s", __FUNCTION__);
 	modbus_t *modbus = container_of(sm, modbus_t, sm);
@@ -274,7 +274,7 @@ static base_t do_execute0(state_machine_t *sm, uint8_t *out, size_t maxlen)
 
     return 0;
 }
-static base_t do_execute1(state_machine_t *sm, const void *arg)
+static base_t do_execute_handler(state_machine_t *sm, const void *arg)
 {
 //    log_d("%s", __FUNCTION__);
 	modbus_t *modbus = container_of(sm, modbus_t, sm);
@@ -319,13 +319,13 @@ error:
     return STATE_CTR_NEXT;
 }
 
-static base_t do_idle0(state_machine_t *sm, uint8_t *out, size_t maxlen)
+static base_t do_idle_action(state_machine_t *sm, uint8_t *out, size_t maxlen)
 {
 //    log_d("%s", __FUNCTION__);
     return 0;
 }
 
-static base_t do_idle1(state_machine_t *sm, const void *arg)
+static base_t do_idle_handler(state_machine_t *sm, const void *arg)
 {
 //    log_d("%s", __FUNCTION__);
 	modbus_t *modbus = container_of(sm, modbus_t, sm);
@@ -405,7 +405,7 @@ static size_t check_smart_frame(const void *arg, size_t len)
     return CheckCRC((uint8_t *)modbusframe, len) ? 0 : len;
 }
 
-static base_t do_process1(const void *arg)
+static base_t do_process_data(const void *arg)
 {
 	modbus_t *modbus = container_of(arg, modbus_t, sm);
     state_machine_t *sm = (state_machine_t *)arg;
@@ -466,7 +466,7 @@ static error_t modbus_init(device_t *dev)
     INIT_LIST_HEAD(&modbus->tx_list);
 
     //modbus->sm.process0 = do_process0;
-    modbus->sm.process1 = do_process1;
+    modbus->sm.process_data = do_process_data;
     modbus->sm.states = state_machine_states;
     modbus->sm.states_size = array_size(state_machine_states);
     modbus->sm.size_max = MODBUS_TX_MAX;
