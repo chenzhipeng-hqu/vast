@@ -2,7 +2,7 @@
 #include <driver/i2c/i2c_dev.h>
 #include <errno.h>
 
-#ifdef configUSING_I2C
+#if (defined configUSING_I2C || defined VAST_USING_I2C)
 static size_t i2c_bus_device_read(device_t *dev,
                                   off_t    pos,
                                   void    *buffer,

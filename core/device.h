@@ -134,7 +134,7 @@ error_t device_set_tx_complete(device_t *dev, error_t (*tx_done)(device_t *dev, 
     ((time_t)(((time_t)(xTimeInMs)*(time_t)configHZ)/(time_t)1000))
 #endif
 
-#ifdef configUSING_SERIAL
+#if (defined configUSING_SERIAL || defined VAST_USING_SERIAL)
 	#include <driver/vast_serial.h>
 #endif
 
@@ -163,18 +163,18 @@ error_t device_set_tx_complete(device_t *dev, error_t (*tx_done)(device_t *dev, 
 	#include "drivers/net/w5500.h"
 #endif
 
-#ifdef configUSING_I2C
+#if (defined configUSING_I2C || defined VAST_USING_I2C)
 	#include <driver/i2c/i2c.h>
 	#include <driver/i2c/i2c_dev.h>
 	#include <driver/i2c/i2c-bit-ops.h>
 #endif
 
-#ifdef configUSING_INA219
+#if (defined configUSING_INA219 || defined VAST_USING_INA219)
 	#include <device/ina219.h>
 #endif
 
-#ifdef configUSING_CLI
-	#include <component/vast_cli.h>
+#if (defined configUSING_CLI || defined VAST_USING_SHELL)
+	#include <component/vast_shell.h>
 #endif
 
 #ifdef configUSING_EEPROM
@@ -185,7 +185,7 @@ error_t device_set_tx_complete(device_t *dev, error_t (*tx_done)(device_t *dev, 
 	#include <device/vast_ir.h>
 #endif
 
-#ifdef configUSING_LED
+#if (defined configUSING_LED || defined VAST_USING_LED)
 	#include <device/vast_led.h>
 #endif
 
@@ -209,21 +209,21 @@ error_t device_set_tx_complete(device_t *dev, error_t (*tx_done)(device_t *dev, 
 	#include "drivers/lcd.h"
 #endif
 
-#ifdef configUSING_MODBUS_RTU
-    #include "component/modbus_rtu.h"
-#endif
+//#ifdef configUSING_MODBUS_RTU
+    //#include "component/modbus_rtu.h"
+//#endif
 
-//#ifdef configUSING_SM
+//#if (defined configUSING_SM || defined VAST_USING_SM)
     //#include "component/state_machine.h"
 //#endif
 
-//#ifdef configUSING_MODBUS
+//#if (defined configUSING_MODBUS || defined VAST_USING_MODBUS)
     //#include "component/modbus.h"
 //#endif
 
-#ifdef configUSING_MODBUS_RTU2
-    #include "driver/modbus_rtu.h"
-#endif
+//#ifdef configUSING_MODBUS_RTU2
+    //#include "driver/modbus_rtu.h"
+//#endif
 
 
 #endif /* __DEVICE_H__ */

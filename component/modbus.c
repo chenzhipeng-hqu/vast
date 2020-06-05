@@ -28,7 +28,7 @@
 /***********************************************
                     define
 ***********************************************/
-#ifdef configUSING_MODBUS
+#if (defined configUSING_MODBUS || defined VAST_USING_MODBUS)
 
 /***********************************************
                     typedef
@@ -50,6 +50,55 @@ enum
 /***********************************************
                    function
 ***********************************************/
+double pow(double num1,double num2)   //函数定义
+{
+    double result=1;
+    int i;
+    for(i=0;i<num2;i++)
+        result*=num1;   //累乘
+    return result;
+}
+
+double fmod(double x, double y)
+{
+        return x - (int)(x / y) * y;
+}
+
+//������תΪ����
+uint16_t float2int(float value)
+{
+	uint16_t res = 0;
+	float bufValue;
+	int i = 0;
+	
+	if (value == 0)
+	{
+		return 0;
+	}
+	
+	for (i = 0; i < 9; i++)
+	{
+		bufValue = value * pow(10,i);
+		if (fmod(bufValue,1) == 0)
+		{
+			res = i * 10000 + bufValue;
+			return res;
+		}
+	}
+	
+	return 0;
+}
+
+//����תΪ������
+float int2float(uint16_t value)
+{
+	float res;
+	uint16_t bufValue;
+	
+	bufValue = value / 10000;
+	res = (value % 10000) / pow(10,bufValue);
+	return res;
+}
 static unsigned short CheckCRC(unsigned char *pData, unsigned int siLen)
 {
 	if (NULL == pData || siLen <= 0) {

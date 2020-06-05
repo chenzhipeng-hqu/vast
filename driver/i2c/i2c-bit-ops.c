@@ -2,7 +2,7 @@
 #include <core/device.h>
 #include <errno.h>
 
-#ifdef configUSING_I2C
+#if (defined configUSING_I2C || defined VAST_USING_I2C)
 
 #ifdef I2C_BIT_DEBUG
 #define bit_dbg(fmt, ...)   printk(fmt, ##__VA_ARGS__)

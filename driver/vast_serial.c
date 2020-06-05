@@ -4,7 +4,7 @@
 //#include "core/croutine.h"
 //#include <printk.h>
 
-#ifdef configUSING_SERIAL
+#if (defined configUSING_SERIAL || defined VAST_USING_SERIAL)
 
 #ifdef configUSING_FRAME_TIMEOUT_SOFT
 static void serial_tmr_cb(struct soft_timer *st)

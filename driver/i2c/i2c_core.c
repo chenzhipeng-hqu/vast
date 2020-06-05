@@ -2,7 +2,7 @@
 #include <core/device.h>
 //#include <printk.h>
 
-#ifdef configUSING_I2C
+#if (defined configUSING_I2C || defined VAST_USING_I2C)
 error_t i2c_bus_device_register(struct i2c_bus_device *bus, const char *bus_name)
 {
     error_t res = 0;

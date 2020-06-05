@@ -46,7 +46,7 @@
 /***********************************************
                     define
 ***********************************************/
-#ifdef configUSING_MODBUS
+#if (defined configUSING_MODBUS || defined VAST_USING_MODBUS)
 
 #define	MODBUS_RTU_BUFF_LEN				0x7F
 #define MAX_SLAVE_ADDR					0xFF
@@ -129,6 +129,8 @@ extern error_t read_input_reg_rx_ind(device_t *dev, size_t size);
 extern error_t read_hold_reg_rx_ind(device_t *dev, size_t size);
 extern error_t write_hold_reg_rx_ind(device_t *dev, size_t size);
 extern error_t write_holds_reg_rx_ind(device_t *dev, size_t size);
+extern float int2float(uint16_t value);
+extern uint16_t float2int(float value);
 
 /***********************************************
 					inline

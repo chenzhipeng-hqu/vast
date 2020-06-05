@@ -26,7 +26,7 @@
 /***********************************************
                     define
 ***********************************************/
-#ifdef configUSING_SM
+#if (defined configUSING_SM || defined VAST_USING_SM)
 
 #define SIGSTACHG               SIG_USR    /* state change */
 

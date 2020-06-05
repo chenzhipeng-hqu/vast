@@ -25,13 +25,13 @@
 #include <math.h>
 
 #include "core/device.h"
-#include "component/vast_cli.h"
 //#include "cmsis_os.h"
 #include "qpc_common.h"
 #include "device/cp8102.h"
 #include "device/cp8113.h"
 #include "device/im1227.h"
-#include "driver/modbus_rtu.h"
+//#include "driver/modbus_rtu.h"
+#include "component/modbus.h"
 //#include "czp_debug.h"
 //#include <component/vast_log.h>
 #include "component/protocol.h"
@@ -3183,7 +3183,7 @@ int protocolMsgUpload2(void ** sender, unsigned char boardId, unsigned short int
  * @retval 
  */
 
-#ifdef configUSING_CLI
+#if (defined configUSING_CLI || defined VAST_USING_SHELL)
 /**
  *   * @brief  CLICmd_Print
  *     * @param  

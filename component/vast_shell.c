@@ -119,9 +119,9 @@ int main(int argc, char *argv[])
 *************************************/
 #include <stdio.h>
 #include <string.h>
-#include "vast_cli.h"
+#include "vast_shell.h"
 
-#ifdef configUSING_EASYFLASH
+#if (defined configUSING_EASYFLASH || defined VAST_USING_EASYFLASH)
     #include <easyflash.h>
 #endif
 
@@ -215,7 +215,7 @@ int16_t CLI_Initialize(CLI_HandleTypeDef *pCli)
 	if(pCli != NULL)
 	{
 		pCli->pCLIProcess(pCli, CLI_FUNC_INIT);
-    #ifdef configUSING_EASYFLASH
+    #if (defined configUSING_EASYFLASH || defined VAST_USING_EASYFLASH)
         char cmd_tag[5] = {0};
         for(int i=0; i<CLI_HISTORY_SIZE; i++)
         {
@@ -525,7 +525,7 @@ int CLI_Enter(CLI_HandleTypeDef *pCli)
 	
 	if(0 == CLI_Execute(pCli, (const char *)CLI_Buffer[g_CLI_CurrentIdx]))
 	{
-    #ifdef configUSING_EASYFLASH
+    #if (defined configUSING_EASYFLASH || defined VAST_USING_EASYFLASH)
 	    char cmd_tag[5] = {0};
         sprintf(cmd_tag, "cmd%d", g_CLI_CurrentIdx);
         ef_set_env(cmd_tag, (const char *)CLI_Buffer[g_CLI_CurrentIdx]);
