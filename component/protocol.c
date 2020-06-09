@@ -26,7 +26,6 @@
 
 #include "core/device.h"
 //#include "cmsis_os.h"
-#include "qpc_common.h"
 #include "device/cp8102.h"
 #include "device/cp8113.h"
 #include "device/im1227.h"
@@ -326,6 +325,7 @@ static int inline getData(unsigned char *pSrcBuf, unsigned char *pDestBuf)
 	//return ret;
 //}
 
+#if 0
 /**
   * @brief  protocolMsgDispatch.
   * @param  
@@ -3073,7 +3073,9 @@ int protocolMsgDispatch(void * sender, ProtMsg_TypeDef *pProtMsg)
 	
 	return ret;
 }
+#endif
 
+#if 0
 /**
   * @brief  protocolMsgDispatch.
   * @param  
@@ -3136,8 +3138,11 @@ int protocolMsgUpload3(void ** sender, unsigned char boardId, unsigned short int
 	
 	return ret;
 }
+#endif
 
 
+#if (defined VAST_USING_QPC)
+#include "qpc_common.h"
 /**
   * @brief  protocolMsgDispatch.
   * @param  
@@ -3176,6 +3181,7 @@ int protocolMsgUpload2(void ** sender, unsigned char boardId, unsigned short int
 	
 	return ret;
 }
+#endif
 
 /**
  * @brief  CLICmd_Print
@@ -3183,7 +3189,8 @@ int protocolMsgUpload2(void ** sender, unsigned char boardId, unsigned short int
  * @retval 
  */
 
-#if (defined configUSING_CLI || defined VAST_USING_SHELL)
+//#if (defined configUSING_CLI || defined VAST_USING_SHELL)
+#if 0
 /**
  *   * @brief  CLICmd_Print
  *     * @param  
