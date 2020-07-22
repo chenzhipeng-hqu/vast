@@ -28,6 +28,7 @@
 ***********************************************/
 #include <core/types.h>
 #include <vast_common.h>
+#include <vast_config.h>
 
 /***********************************************
 				 define

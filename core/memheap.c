@@ -725,9 +725,10 @@ struct vast_object_information
     size_t                 object_size;              /**< object size */
 };
 
+//static uint32_t malloc_cnt = 0;
 void *vast_malloc(size_t size)
 {
-    void *ptr;
+    void *ptr = NULL;
 
     /* try to allocate in system heap */
     ptr = vast_memheap_alloc(&_heap, size);
@@ -762,6 +763,8 @@ void *vast_malloc(size_t size)
         }
     #endif
     }
+    //malloc_cnt++;
+    //printf("[%ld]malloc:%p\r\n", malloc_cnt, ptr);
 
     return ptr;
 }
@@ -769,7 +772,10 @@ void *vast_malloc(size_t size)
 
 void vast_free(void *rmem)
 {
+    //static uint32_t free_cnt = 0;
     vast_memheap_free(rmem);
+    //malloc_cnt--;
+    //printf("[%ld]free:%p\r\n", malloc_cnt, rmem);
 }
 //VASTM_EXPOVAST(vast_free);
 

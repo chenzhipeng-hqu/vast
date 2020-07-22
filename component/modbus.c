@@ -166,6 +166,7 @@ int readInputReg2(modbus_t *modbus, uint16_t slave_addr,
 
 	list_frame_t *listframe = (list_frame_t *)vast_malloc(sizeof(list_frame_t) + sizeof(smart_frame_t) + sizeof(modbus_frame_t));
     smart_frame_t *smartframe = (smart_frame_t *)listframe->data;
+    //printf("%s malloc:%p\r\n", __FUNCTION__, listframe);
     //log_d("%d %d", sizeof(smart_frame_t), sizeof(modbus_frame_t));
 
     if (listframe == NULL) {
@@ -198,6 +199,7 @@ int writeMultiHoldReg2(modbus_t *modbus, uint16_t slave_addr, uint16_t start_add
     int ret = 0;
 
 	list_frame_t *listframe = (list_frame_t *)vast_malloc(sizeof(list_frame_t) + sizeof(smart_frame_t) + sizeof(modbus_frame_t) + (reg_cnt * sizeof(reg_cnt)) + sizeof(reg_cnt)/2);
+    //printf("%s malloc:%p\r\n", __FUNCTION__, listframe);
     smart_frame_t *smartframe = (smart_frame_t *)listframe->data;
     //log_i("%d", sizeof(smart_frame_t)+sizeof(modbus_frame_t)+(reg_cnt*sizeof(reg_cnt)) + sizeof(reg_cnt)/2);
     //log_i("smart:%d, modbus:%d,reg_cnt:%d, %d", sizeof(smart_frame_t), sizeof(modbus_frame_t), (reg_cnt*sizeof(reg_cnt)), sizeof(reg_cnt)/2);
@@ -244,6 +246,7 @@ int writeSingleHoldReg2(modbus_t *modbus, uint16_t slave_addr,
 
 	list_frame_t *listframe = (list_frame_t *)vast_malloc(sizeof(list_frame_t) + sizeof(smart_frame_t) + sizeof(modbus_frame_t));
     smart_frame_t *smartframe = (smart_frame_t *)listframe->data;
+    //printf("%s malloc:%p\r\n", __FUNCTION__, listframe);
 
     if (listframe == NULL) {
         ret = 1;
@@ -276,6 +279,7 @@ int readHoldReg2(modbus_t *modbus, uint16_t slave_addr,
     int ret = 0;
 
 	list_frame_t *listframe = (list_frame_t *)vast_malloc(sizeof(list_frame_t) + sizeof(smart_frame_t) + sizeof(modbus_frame_t));
+    //printf("%s malloc:%p\r\n", __FUNCTION__, listframe);
     smart_frame_t *smartframe = (smart_frame_t *)listframe->data;
 
     if (listframe == NULL) {
@@ -362,6 +366,7 @@ error:
 	listframe = list_last_entry(&modbus->tx_list, list_frame_t, entry);
 	if (listframe) {
 		list_del(&listframe->entry);
+        //printf("%s free:%p\r\n", __FUNCTION__, listframe);
 		vast_free(listframe);
 	}
 
