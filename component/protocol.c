@@ -3155,7 +3155,7 @@ int protocolMsgUpload2(void ** sender, unsigned char boardId, unsigned short int
 		
 	if(sender_ == NULL)
 	{
-		log_d("sender_ is NULL!");
+		log_v("sender_ is NULL!");
 		return ERR_SENDER;
 	}
 	

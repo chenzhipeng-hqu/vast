@@ -580,7 +580,7 @@ error_t modbus_device_register(modbus_t *modbus, const char *name, uint32_t flag
     ret = device_register(dev, name, 0);
     device_open(dev, DEVICE_FLAG_DMA_RX | DEVICE_FLAG_DMA_TX | DEVICE_FLAG_FASYNC);
 
-    //elog_set_filter_tag_lvl(LOG_TAG, ELOG_LVL_INFO);
+    elog_set_filter_tag_lvl(LOG_TAG, ELOG_LVL_WARN);
 
     return ret;
 }
