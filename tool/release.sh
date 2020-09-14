@@ -2,8 +2,8 @@
 
 #grep 'SW_VERSION' application/bsp/bsp.c | sed -n '1p' | cut -d '"' -f 2
 version=`find . -name "bsp.c" | xargs grep 'SW_VERSION' | sed -n '1p' | cut -d '"' -f 2`
-A=`date`
-echo ${A}
+#A=`date`
+#echo ${A}
 
 src_bin=${1}
 #dir_path=${2}
