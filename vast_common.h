@@ -33,7 +33,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <stdarg.h>
-#include <cmsis_gcc.h>
+#include "cmsis_gcc.h"
 #include <assert.h>
 #include "core/utils.h"
 #include "core/init.h"

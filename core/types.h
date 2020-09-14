@@ -60,7 +60,7 @@ struct device_blk_geometry
 typedef struct _data_t
 {
 	size_t 		len;
-	uint8_t		buf[0];
+	uint8_t		buf[1];
 }data_t;
 
 #endif  /* end of _TYPES_H */
