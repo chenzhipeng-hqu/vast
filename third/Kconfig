@@ -1,0 +1,3 @@
+config ARCH_CPU_64BIT
+    bool
+

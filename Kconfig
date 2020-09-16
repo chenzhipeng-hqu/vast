@@ -1,0 +1,3 @@
+source "$vast_third/Kconfig"
+#source "$RTT_DIR/libcpu/Kconfig"
+#source "$RTT_DIR/components/Kconfig"
