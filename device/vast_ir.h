@@ -4,7 +4,7 @@
 #define		__VAST_IR_H__
 
 #include "vast_common.h"
-#include "vast_config.h"
+//#include "vast_config.h"
 #ifdef configUSING_IR
 #include "stm32f4xx_hal.h"
 

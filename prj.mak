@@ -20,42 +20,22 @@ export VAST_ROOT ?=
 
 DEFS += -DVAST_MODULE_ENABLED
 
-################ vast ################
+################### vast ###################
 INCS += -I./$(VAST_ROOT)
 #INCS += -I./$(VAST_ROOT)/core
 #INCS += -I./$(VAST_ROOT)/driver
 #INCS += -I./$(VAST_ROOT)/device
 #INCS += -I./$(VAST_ROOT)/component
-ifeq (true, $(VAST_USING_OBSERIVER))
-	DEFS += -DVAST_USING_OBSERIVER
-	SRCS += $(VAST_ROOT)/component/observer.c
-endif
 
-ifeq (true, $(VAST_USING_SHELL))
-	DEFS += -DVAST_USING_SHELL
-	SRCS += $(VAST_ROOT)/component/vast_shell.c
+#$(error $(VAST_SYS_CLOCK))
+#ifeq ($(VAST_SYS_CLOCK), )
+ifndef $(VAST_SYS_CLOCK)
+	#$(error 2222222222222)
+	DEFS += -DconfigHZ=$(VAST_SYS_CLOCK)
 endif
-#SRCS += $(VAST_ROOT)/component/$(VAST_ROOT)_log.c
-#SRCS += $(VAST_ROOT)/component/vast_store.c
-#SRCS += $(VAST_ROOT)/component/vast_simulatite_eeprom.c
-ifeq (true, $(VAST_USING_PROTOCOL))
-	DEFS += -DVAST_USING_PROTOCOL
-	SRCS += $(VAST_ROOT)/component/protocol.c
-endif
+#$(error 3333333333333)
 
-ifeq (true, $(VAST_USING_MODBUS))
-	DEFS += -DVAST_USING_MODBUS
-	#SRCS += vast/component/modbus_rtu.c
-	SRCS += $(VAST_ROOT)/component/modbus.c
-	#SRCS += $(VAST_ROOT)/driver/modbus_rtu.c
-
-endif
-
-ifeq (true, $(VAST_USING_SM))
-	DEFS += -DVAST_USING_SM
-	SRCS += $(VAST_ROOT)/component/state_machine.c
-endif
-
+################### core ###################
 ifeq (true, $(VAST_USING_CORE))
 	DEFS += -DVAST_USING_CORE
 	SRCS += $(VAST_ROOT)/core/croutine.c
@@ -66,9 +46,27 @@ ifeq (true, $(VAST_USING_CORE))
 	SRCS += $(VAST_ROOT)/core/object.c
 	SRCS += $(VAST_ROOT)/core/softtimer.c
 	SRCS += $(VAST_ROOT)/core/utils.c
+	#SRCS += $(VAST_ROOT)/core/alloter.c
 endif
-#SRCS += $(VAST_ROOT)/core/alloter.c
 
+################## driver ##################
+ifeq (true, $(VAST_USING_I2C))
+	DEFS += -DVAST_USING_I2C
+	SRCS += $(VAST_ROOT)/driver/i2c/i2c_core.c
+	SRCS += $(VAST_ROOT)/driver/i2c/i2c_dev.c
+	SRCS += $(VAST_ROOT)/driver/i2c/i2c-bit-ops.c
+endif
+
+ifeq (true, $(VAST_USING_SERIAL_DMA))
+	DEFS += -DVAST_USING_SERIAL_DMA
+endif
+
+ifeq (true, $(VAST_USING_SERIAL))
+	DEFS += -DVAST_USING_SERIAL
+	SRCS += $(VAST_ROOT)/driver/vast_serial.c
+endif
+
+################## device ##################
 ifeq (true, $(VAST_USING_INA219))
 	DEFS += -DVAST_USING_INA219
 	SRCS += $(VAST_ROOT)/device/ina219.c
@@ -113,18 +111,36 @@ ifeq (true, $(VAST_USING_IM1227))
 endif
 #SRCS += $(VAST_ROOT)/device/ssr_v220.c
 
-ifeq (true, $(VAST_USING_I2C))
-	DEFS += -DVAST_USING_I2C
-	SRCS += $(VAST_ROOT)/driver/i2c/i2c_core.c
-	SRCS += $(VAST_ROOT)/driver/i2c/i2c_dev.c
-	SRCS += $(VAST_ROOT)/driver/i2c/i2c-bit-ops.c
+################# component ################
+ifeq (true, $(VAST_USING_OBSERIVER))
+	DEFS += -DVAST_USING_OBSERIVER
+	SRCS += $(VAST_ROOT)/component/observer.c
 endif
 
-ifeq (true, $(VAST_USING_SERIAL))
-	DEFS += -DVAST_USING_SERIAL
-	SRCS += $(VAST_ROOT)/driver/vast_serial.c
+ifeq (true, $(VAST_USING_SHELL))
+	DEFS += -DVAST_USING_SHELL
+	SRCS += $(VAST_ROOT)/component/vast_shell.c
 endif
 
+ifeq (true, $(VAST_USING_PROTOCOL))
+	DEFS += -DVAST_USING_PROTOCOL
+	SRCS += $(VAST_ROOT)/component/protocol.c
+endif
+
+ifeq (true, $(VAST_USING_MODBUS))
+	DEFS += -DVAST_USING_MODBUS
+	#SRCS += vast/component/modbus_rtu.c
+	SRCS += $(VAST_ROOT)/component/modbus.c
+	#SRCS += $(VAST_ROOT)/driver/modbus_rtu.c
+
+endif
+
+ifeq (true, $(VAST_USING_SM))
+	DEFS += -DVAST_USING_SM
+	SRCS += $(VAST_ROOT)/component/state_machine.c
+endif
+
+################### third ##################
 ################ third/json ################
 ifeq (true, $(VAST_USING_JSON))
 	DEFS += -DVAST_USING_JSON
@@ -166,6 +182,7 @@ ifeq (true, $(VAST_USING_QPC_SPY))
 	SRCS += src/qs/qs_64bit.c
 endif
 
+################ third/CmBacktrace ################
 ifeq (true, $(VAST_USING_CMBACKTRACE))
 	DEFS += -DVAST_USING_CMBACKTRACE
 	INCS += -I./$(VAST_ROOT)/third/CmBacktrace/cm_backtrace
@@ -173,6 +190,7 @@ ifeq (true, $(VAST_USING_CMBACKTRACE))
 	SRCS += $(VAST_ROOT)/third/CmBacktrace/cm_backtrace/fault_handler/gcc/cmb_fault.s
 endif
 
+################ third/EasyLogger ################
 ifeq (true, $(VAST_USING_EASYLOG))
 	DEFS += -DVAST_USING_EASYLOG
 
@@ -184,6 +202,7 @@ ifeq (true, $(VAST_USING_EASYLOG))
 	SRCS += $(VAST_ROOT)/third/EasyLogger/easylogger/src/elog_utils.c
 endif
 
+################ third/EasyFlash ################
 ifeq (true, $(VAST_USING_EASYFLASH))
 	DEFS += -DVAST_USING_EASYFLASH
 
@@ -191,7 +210,6 @@ ifeq (true, $(VAST_USING_EASYFLASH))
 
 	SRCS_DIRS += $(VAST_ROOT)/third/EasyFlash/easyflash/src
 endif
-
 
 ################ third/modbus ################
 ifeq (true, $(VAST_USING_FREEMODBUS))

@@ -60,7 +60,7 @@ static error_t serial_open(struct device *dev, uint16_t oflag)
     }
 #endif
 
-#ifdef configUSING_SERIAL_DMA
+#if (defined configUSING_SERIAL_DMA || defined VAST_USING_SERIAL_DMA)
     if (oflag & DEVICE_FLAG_DMA_RX)
     {
         INIT_KFIFO(serial->rx_kfifo);
@@ -96,7 +96,7 @@ static error_t serial_close(struct device *dev)
     }
 #endif
 
-#ifdef configUSING_SERIAL_DMA
+#if (defined configUSING_SERIAL_DMA || defined VAST_USING_SERIAL_DMA)
     if (dev->open_flag & DEVICE_FLAG_DMA_RX)
     {
         dev->open_flag &= ~DEVICE_FLAG_DMA_RX;
@@ -125,7 +125,7 @@ static size_t serial_read(struct device *dev, off_t pos, void *buffer, size_t si
     }
 #endif
 
-#ifdef configUSING_SERIAL_DMA
+#if (defined configUSING_SERIAL_DMA || defined VAST_USING_SERIAL_DMA)
     if (dev->open_flag & DEVICE_FLAG_DMA_RX)
     {
         //if(!kfifo_is_empty(&serial->rx_kfifo))
@@ -149,7 +149,7 @@ static size_t serial_peek(struct device *dev, off_t pos, void *buffer, size_t si
     }
 #endif
 
-#ifdef configUSING_SERIAL_DMA
+#if (defined configUSING_SERIAL_DMA || defined VAST_USING_SERIAL_DMA)
     if (dev->open_flag & DEVICE_FLAG_DMA_RX)
     {
         return kfifo_out_peek(&serial->rx_kfifo, buffer, size);
@@ -188,7 +188,7 @@ static size_t serial_write(struct device *dev, off_t pos, const void *buffer, si
     }
 #endif
 
-#ifdef configUSING_SERIAL_DMA
+#if (defined configUSING_SERIAL_DMA || defined VAST_USING_SERIAL_DMA)
     if (dev->open_flag & DEVICE_FLAG_DMA_TX)
     {
         int inv = 0, priority = 0;
@@ -296,7 +296,7 @@ void serial_device_isr(struct serial_device *dev, int event)
         }
         break;
 #endif
-#ifdef configUSING_SERIAL_DMA
+#if (defined configUSING_SERIAL_DMA || defined VAST_USING_SERIAL_DMA)
     case SERIAL_EVENT_TX_DMADONE: {
             unsigned int len = kfifo_out(&dev->tx_kfifo, (uint8_t *)&(dev->tx_dma_buff), sizeof(&dev->tx_dma_buff));
             if (len > 0)

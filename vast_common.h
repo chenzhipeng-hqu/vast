@@ -37,7 +37,7 @@
 #include <assert.h>
 #include "core/utils.h"
 #include "core/init.h"
-#include "vast_config.h"
+//#include "vast_config.h"
  //#include "vast_log.h"
 
 /***********************************************

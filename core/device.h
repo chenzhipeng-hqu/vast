@@ -5,7 +5,7 @@
 #include <core/object.h>
 #include <core/softtimer.h>
 #include <core/types.h>
-#include "vast_config.h"
+//#include "vast_config.h"
 
 /**
  * device (I/O) class type

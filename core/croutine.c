@@ -1,7 +1,7 @@
 #include <core/softtimer.h>
 #include <core/croutine.h>
 //#include <third/croutine/port.h>
-#include "vast_config.h"
+//#include "vast_config.h"
 
 static LIST_HEAD(task_list);
 static tcb_t *current;

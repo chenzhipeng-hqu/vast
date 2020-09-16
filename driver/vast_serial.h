@@ -102,7 +102,7 @@ struct serial_device
 #endif
     //DECLARE_KFIFO_PTR(serial_rx, unsigned char);
     //DECLARE_KFIFO_PTR(serial_tx, unsigned char);
-#ifdef configUSING_SERIAL_DMA
+#if (defined configUSING_SERIAL_DMA || defined VAST_USING_SERIAL_DMA)
     DECLARE_KFIFO(rx_kfifo, unsigned char, KFIFO_RX_BUFFER_SIZE);
     DECLARE_KFIFO(tx_kfifo, unsigned char, KFIFO_TX_BUFFER_SIZE);
     unsigned char tx_dma_buff[KFIFO_TX_BUFFER_SIZE/4];
