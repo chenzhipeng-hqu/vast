@@ -120,6 +120,8 @@ send_error(const ip_addr_t *addr, u16_t port, enum tftp_error code, const char *
   int str_length = strlen(str);
   struct pbuf* p;
   u16_t* payload;
+
+  printf("[%08ld] tftp err: code:%d, %s\r\n", HAL_GetTick(), code, str);
   
   p = pbuf_alloc(PBUF_TRANSPORT, (u16_t)(TFTP_HEADER_LENGTH + str_length + 1), PBUF_RAM);
   if(p == NULL) {
@@ -307,6 +309,7 @@ recv(void *arg, struct udp_pcb *upcb, struct pbuf *p, const ip_addr_t *addr, u16
       }
 
       if (p->tot_len < TFTP_MAX_PAYLOAD_SIZE) {
+            //printf("[%08ld] recv last data\r\n", HAL_GetTick());
         close_handle();
       }
       break;
@@ -344,6 +347,7 @@ recv(void *arg, struct udp_pcb *upcb, struct pbuf *p, const ip_addr_t *addr, u16
         send_data();
       } else {
         close_handle();
+          //printf("[%08ld] send last data\r\n", HAL_GetTick());
       }
 
       break;
@@ -377,6 +381,7 @@ tftp_tmr(void* arg)
       tftp_state.retries++;
     } else {
       LWIP_DEBUGF(TFTP_DEBUG | LWIP_DBG_STATE, ("tftp: timeout\n"));
+          printf("[%08ld] tftp: timeout\r\n", HAL_GetTick());
       close_handle();
     }
   }

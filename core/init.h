@@ -82,7 +82,7 @@ static inline void do_init_call(void)
     	const struct init_desc *desc = &__initcall_start;
 
 		do{
-	        printf("init %s", desc->fn_name);
+	        printf("init %s ", desc->fn_name);
 	        printf(":%d done\r\n", desc->fn());
 		}while(desc++ < &__initcall_end);
 	#else
