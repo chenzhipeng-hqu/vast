@@ -21,7 +21,7 @@ export VAST_ROOT ?=
 DEFS += -DVAST_MODULE_ENABLED
 
 ################### vast ###################
-INCS += -I./$(VAST_ROOT)
+INCS += -I$(VAST_ROOT)
 #INCS += -I./$(VAST_ROOT)/core
 #INCS += -I./$(VAST_ROOT)/driver
 #INCS += -I./$(VAST_ROOT)/device
@@ -144,7 +144,7 @@ endif
 ################ third/json ################
 ifeq (true, $(VAST_USING_JSON))
 	DEFS += -DVAST_USING_JSON
-	INCS += -I./$(VAST_ROOT)/third/cjson
+	INCS += -I$(VAST_ROOT)/third/cjson
 	SRCS += $(VAST_ROOT)/third/cjson/cJSON.c
 endif
 
@@ -152,9 +152,9 @@ endif
 ifeq (true, $(VAST_USING_QPC))
 	DEFS += -DVAST_USING_QPC
 
-	INCS += -I./$(VAST_ROOT)/third/qpc/include
-	INCS += -I./$(VAST_ROOT)/third/qpc/src
-	INCS += -I./$(VAST_ROOT)/third/qpc/ports/qv/gnu
+	INCS += -I$(VAST_ROOT)/third/qpc/include
+	INCS += -I$(VAST_ROOT)/third/qpc/src
+	INCS += -I$(VAST_ROOT)/third/qpc/ports/qv/gnu
 
 	SRCS += $(VAST_ROOT)/third/qpc/src/
 	SRCS += $(VAST_ROOT)/third/qpc/src/qf/qep_hsm.c
@@ -185,7 +185,7 @@ endif
 ################ third/CmBacktrace ################
 ifeq (true, $(VAST_USING_CMBACKTRACE))
 	DEFS += -DVAST_USING_CMBACKTRACE
-	INCS += -I./$(VAST_ROOT)/third/CmBacktrace/cm_backtrace
+	INCS += -I$(VAST_ROOT)/third/CmBacktrace/cm_backtrace
 	SRCS += $(VAST_ROOT)/third/CmBacktrace/cm_backtrace/cm_backtrace.c
 	SRCS += $(VAST_ROOT)/third/CmBacktrace/cm_backtrace/fault_handler/gcc/cmb_fault.s
 endif
@@ -194,7 +194,7 @@ endif
 ifeq (true, $(VAST_USING_EASYLOG))
 	DEFS += -DVAST_USING_EASYLOG
 
-	INCS += -I./$(VAST_ROOT)/third/EasyLogger/easylogger/inc
+	INCS += -I$(VAST_ROOT)/third/EasyLogger/easylogger/inc
 
 	SRCS += $(VAST_ROOT)/third/EasyLogger/easylogger/src/elog.c
 	SRCS += $(VAST_ROOT)/third/EasyLogger/easylogger/src/elog_async.c
@@ -206,7 +206,7 @@ endif
 ifeq (true, $(VAST_USING_EASYFLASH))
 	DEFS += -DVAST_USING_EASYFLASH
 
-	INCS += -I./$(VAST_ROOT)/third/EasyFlash/easyflash/inc
+	INCS += -I$(VAST_ROOT)/third/EasyFlash/easyflash/inc
 
 	SRCS_DIRS += $(VAST_ROOT)/third/EasyFlash/easyflash/src
 endif
@@ -215,10 +215,10 @@ endif
 ifeq (true, $(VAST_USING_FREEMODBUS))
 	DEFS += -DVAST_USING_FREEMODBUS
 
-	INCS += -I./$(VAST_ROOT)/third/FreeModbus/modbus/include
-	INCS += -I./$(VAST_ROOT)/third/FreeModbus/modbus/rtu
-	INCS += -I./$(VAST_ROOT)/third/FreeModbus/modbus/ascii
-	INCS += -I./$(VAST_ROOT)/third/FreeModbus/port
+	INCS += -I$(VAST_ROOT)/third/FreeModbus/modbus/include
+	INCS += -I$(VAST_ROOT)/third/FreeModbus/modbus/rtu
+	INCS += -I$(VAST_ROOT)/third/FreeModbus/modbus/ascii
+	INCS += -I$(VAST_ROOT)/third/FreeModbus/port
 
 	SRCS += $(VAST_ROOT)/third/FreeModbus/modbus/functions/mbfuncdiag.c
 	SRCS += $(VAST_ROOT)/third/FreeModbus/modbus/functions/mbutils.c
@@ -241,7 +241,7 @@ endif
 ifeq (true, $(VAST_USING_UTEST))
 	DEFS += -DVAST_USING_UTEST
 
-	INCS += -I./$(VAST_ROOT)/third/utest
+	INCS += -I$(VAST_ROOT)/third/utest
 
 	SRCS += $(VAST_ROOT)/third/utest/utest.c
 endif
@@ -250,17 +250,17 @@ endif
 ifeq (true, $(VAST_USING_LWIP))
 	DEFS += -DVAST_USING_LWIP
 
-	INCS += -I./$(VAST_ROOT)/third/lwip/src/include/netif/ppp
-	INCS += -I./$(VAST_ROOT)/third/lwip/src/include/posix
-	INCS += -I./$(VAST_ROOT)/third/lwip/src/include/posix/sys
-	INCS += -I./$(VAST_ROOT)/third/lwip/system/arch
-	INCS += -I./$(VAST_ROOT)/third/lwip/src/include
-	INCS += -I./$(VAST_ROOT)/third/lwip/src/include/lwip
-	INCS += -I./$(VAST_ROOT)/third/lwip/system
-	INCS += -I./$(VAST_ROOT)/third/lwip/src/include/lwip/priv
-	INCS += -I./$(VAST_ROOT)/third/lwip/src/include/lwip/prot
-	INCS += -I./$(VAST_ROOT)/third/lwip/src/include/lwip/apps
-	INCS += -I./$(VAST_ROOT)/third/lwip/src/include/netif
+	INCS += -I$(VAST_ROOT)/third/lwip/src/include/netif/ppp
+	INCS += -I$(VAST_ROOT)/third/lwip/src/include/posix
+	INCS += -I$(VAST_ROOT)/third/lwip/src/include/posix/sys
+	INCS += -I$(VAST_ROOT)/third/lwip/system/arch
+	INCS += -I$(VAST_ROOT)/third/lwip/src/include
+	INCS += -I$(VAST_ROOT)/third/lwip/src/include/lwip
+	INCS += -I$(VAST_ROOT)/third/lwip/system
+	INCS += -I$(VAST_ROOT)/third/lwip/src/include/lwip/priv
+	INCS += -I$(VAST_ROOT)/third/lwip/src/include/lwip/prot
+	INCS += -I$(VAST_ROOT)/third/lwip/src/include/lwip/apps
+	INCS += -I$(VAST_ROOT)/third/lwip/src/include/netif
 
 	SRCS += $(VAST_ROOT)/third/lwip/src/api/api_lib.c
 	SRCS += $(VAST_ROOT)/third/lwip/src/api/api_msg.c
