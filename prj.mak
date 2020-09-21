@@ -109,6 +109,10 @@ ifeq (true, $(VAST_USING_IM1227))
 	DEFS += -DVAST_USING_IM1227
 	SRCS += $(VAST_ROOT)/device/im1227.c
 endif
+ifeq (true, $(VAST_USING_IM1275))
+	DEFS += -DVAST_USING_IM1275
+	SRCS += $(VAST_ROOT)/device/im1275.c
+endif
 #SRCS += $(VAST_ROOT)/device/ssr_v220.c
 
 ################# component ################
