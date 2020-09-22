@@ -189,10 +189,11 @@ int state_machine_init(state_machine_t *sm)
 
     sm->timer.cb = state_machine_timer_handle;
     sm->timer.data = (ubase_t)sm;
+    sm->timer.name = sm->name;
 
     elog_set_filter_tag_lvl(LOG_TAG, ELOG_LVL_INFO);
 
-	task_create(&sm->tcb, sm_task_cb, (ubase_t)sm);
+	task_create(&sm->tcb, sm_task_cb, sm->name, (ubase_t)sm);
 
 	return ret;
 }

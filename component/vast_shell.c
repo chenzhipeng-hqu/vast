@@ -329,7 +329,7 @@ CLICmdTypedef const *CLI_FindCmd(const char *cmd, CLI_CMD_Type mask)
   * @param  
   * @retval 
   */
-void CLICmd_List(CLI_HandleTypeDef *pCli)
+static void CLICmd_List(CLI_HandleTypeDef *pCli)
 {
   uint16_t idx = 0;
 	

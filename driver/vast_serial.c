@@ -382,6 +382,7 @@ void serial_device_isr(struct serial_device *dev, int event)
             struct soft_timer *st = &dev->rxto;
             soft_timer_del(st);
             st->expires = jiffies + configSERIAL_RX_TO;
+	        st->name = "serial";
             soft_timer_add(st);
         }
         #endif

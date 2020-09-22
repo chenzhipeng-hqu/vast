@@ -6,8 +6,8 @@
 
 typedef struct object
 {
-    const char *name;
     struct list_head entry;
+    const char *name;
 } object_t;
 
 error_t     object_attach(struct object *o, const char *name);

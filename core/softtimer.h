@@ -43,6 +43,7 @@ typedef struct soft_timer
     time_t              expires;
     ubase_t    			data;
     void (*cb)(struct soft_timer *st);
+    const char          *name;
 }soft_timer_t;
 
 extern volatile time_t jiffies;
@@ -50,6 +51,7 @@ extern volatile time_t jiffies;
 void soft_timer_add(struct soft_timer *st);
 void soft_timer_del(struct soft_timer *st);
 void soft_timer_mod(struct soft_timer *st, time_t expires);
+list_t *timer_lists(void);
 
 //int setup_soft_timer_service(void);
 //void soft_timer_task(void);

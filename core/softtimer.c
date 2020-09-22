@@ -62,9 +62,9 @@ static void soft_timer_task(void)
 			//if (iter->cb)
 			iter->cb(iter);
 
-			if(jiffies - start_jiffies > 2)
-				printf("soft time task spent %ldms at %#lx\r\n",
-						(uint32_t)(jiffies-start_jiffies), (uint32_t)iter->cb);
+			if(jiffies - start_jiffies > 3)
+				printf("timer %s spent %ldms\r\n",
+						iter->name, (uint32_t)(jiffies-start_jiffies));
 		}
 	}
 }
@@ -82,12 +82,18 @@ static void soft_timer_task_callback(struct task_ctrl_blk *tcb, ubase_t data)
     tEND();
 }
 
-static tcb_t soft_timer_crcb;
+static tcb_t soft_timer_tcb;
 
 int setup_soft_timer_service(void)
 {
-    task_create(&soft_timer_crcb, soft_timer_task_callback, 0);
+    task_create(&soft_timer_tcb, soft_timer_task_callback, "softtimer", 0);
 
     return 0;
 }
 late_initcall(setup_soft_timer_service);
+
+list_t *timer_lists(void)
+{
+    return &timer_list;
+}
+

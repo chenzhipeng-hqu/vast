@@ -29,11 +29,13 @@ typedef struct task_ctrl_blk
     u16              state;
     ubase_t          signal;
     ubase_t          expire;
+    const char       *name;
 } tcb_t;
 
-void task_create(tcb_t *tcb, void (*tcb_cb)(struct task_ctrl_blk *, ubase_t), ubase_t data);
+void task_create(tcb_t *tcb, void (*tcb_cb)(struct task_ctrl_blk *, ubase_t), const char *name, ubase_t data);
 tcb_t *task_get_current_task_handle(void);
 void task_schedule(void);
+list_t *task_lists(void);
 
 #define corINITIAL_STATE    (0)
 

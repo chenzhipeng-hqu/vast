@@ -23,12 +23,13 @@ static void check_delayed_list(void)
     }
 }
 
-void task_create(tcb_t *tcb, void (*tcb_cb)(struct task_ctrl_blk *, ubase_t), ubase_t data)
+void task_create(tcb_t *tcb, void (*tcb_cb)(struct task_ctrl_blk *, ubase_t), const char *name, ubase_t data)
 {
     tcb->state  = corINITIAL_STATE;
     tcb->data   = data;
     tcb->tcb_cb = tcb_cb;
     tcb->status = TS_READY;
+    tcb->name = name;
 
     list_add_tail(&tcb->entry, &task_list);
 }
@@ -103,9 +104,15 @@ void task_schedule(void)
             current->tcb_cb(current, current->data);
 
             if(jiffies - start_jiffies > 10)
-				printf("task %ldms at %#lx\r\n", (uint32_t)(jiffies-start_jiffies), (uint32_t)current->tcb_cb);
+				printf("task %s spent %ldms\r\n", current->name, (uint32_t)(jiffies-start_jiffies));
 
         }
     }
+}
+
+
+list_t *task_lists(void)
+{
+    return &task_list;
 }
 

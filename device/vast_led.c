@@ -108,6 +108,7 @@ static error_t led_init(device_t *dev)
 	st->cb = led_tmr_cb;
 	st->data = (ubase_t)led;
 	st->expires = INITIAL_JIFFIES;
+	st->name = dev->parent.name;
 
 	return 0;
 }

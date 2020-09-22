@@ -65,6 +65,7 @@ typedef struct _state_machine
     uint8_t cur_state, trycnt;
     uint8_t init;
     struct soft_timer timer;
+    const char *name;
     tcb_t tcb;
     void *tx_data;
     size_t size_max;
