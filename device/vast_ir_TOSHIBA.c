@@ -1,7 +1,7 @@
 
 #include <device/vast_ir.h>
 
-#ifdef configUSING_IR
+#ifdef VAST_USING_IR
 //
 //extern TIM_HandleTypeDef htim2;
 static int InfraRed_RX_TOSHIBA_Calculate(IR_TypeDef *pIR_Obj);
@@ -83,7 +83,7 @@ int InfraRed_RX_TOSHIBA_Calculate(IR_TypeDef *pIR_Obj)
 				pIR_Obj->value.address = val[0]<<8 | val[1];
 				pIR_Obj->value.command = val[2];
 				pIR_Obj->value.command_check = val[3];
-				HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_9);	
+				//HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_9);	
 			}		
 		}
 		IR_Obj.state = CAPTURE_STAT_IDLE;
@@ -92,5 +92,5 @@ int InfraRed_RX_TOSHIBA_Calculate(IR_TypeDef *pIR_Obj)
 	
 	return 0;
 }
-#endif /* configUSING_IR */
+#endif /* VAST_USING_IR */
 

@@ -26,7 +26,7 @@
 /*************************************
               define
 *************************************/
-#ifdef configUSING_IR
+#ifdef VAST_USING_IR
 
 /**************************************
               typedef
@@ -128,7 +128,7 @@ int InfraRed_RX_PANASONIC_Calculate(IR_TypeDef *pIR_Obj)
 				pIR_Obj->value.address = val[5]<<8 | val[7]<<4 | val[6];
 				pIR_Obj->value.command = val[8] | (val[9]<<4);
 				pIR_Obj->value.command_check = val[10] | (val[11]<<4);
-				HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_9);	
+				//HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_9);	
 			}		
 		}
 		IR_Obj.state = CAPTURE_STAT_IDLE;
@@ -162,6 +162,6 @@ void PANASONIC_assert_failed(uint8_t* file, uint32_t line)
 /**
   * @}
   */
-#endif /* configUSING_IR */
+#endif /* VAST_USING_IR */
 
 /************************ (C) COPYRIGHT chenzhipeng3472 *****END OF FILE****/

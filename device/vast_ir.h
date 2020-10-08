@@ -5,9 +5,11 @@
 
 #include "vast_common.h"
 //#include "vast_config.h"
-#ifdef configUSING_IR
-#include "stm32f4xx_hal.h"
+#ifdef VAST_USING_IR
+//#include "stm32f4xx_hal.h"
+//#include "stm32f1xx_hal.h"
 
+#define     INFRARED_BUFF_SIZE      256
 
 typedef enum _IRType_e  //don't change sequence, add after last, before IRType_MAX
 {
@@ -47,8 +49,8 @@ typedef struct _IR_DataTypeDef
 
 typedef struct _IR_BufTypeDef
 {
-	uint16_t timer;
-	IR_PIN_State pin_state;
+    uint16_t timer;
+    IR_PIN_State pin_state;
 }IR_BufTypeDef;
 
 
@@ -59,12 +61,16 @@ typedef struct _IR_BufTypeDef
 
 typedef struct _IR_TypeDef
 {
-	__IO uint8_t state;   // bit7: capture complete，bit6：is_capture_high, bit5:falling flag after high level, bit4~0: hight_level timer overflow times
-	__IO IR_BufTypeDef rx_buf[128];
-	__IO uint8_t len;
+	volatile uint8_t state;   // bit7: capture complete，bit6：is_capture_high, bit5:falling flag after high level, bit4~0: hight_level timer overflow times
+	volatile IR_BufTypeDef rx_buf[128];
+	volatile IR_BufTypeDef tx_buf[128];
+	volatile uint8_t tx_bufIdx;
+	volatile uint8_t tx_bufLen;
+	volatile uint8_t len;
 	IR_DataTypeDef value;
 	uint16_t carry_freq;
 	const IR_BufTypeDef *pHead;
+	uint8_t idle;
 	uint8_t protocol_size;
 	uint8_t RepeatInterval;  //ms
 	IRType_e IRType;
@@ -72,11 +78,11 @@ typedef struct _IR_TypeDef
 }IR_TypeDef;
 
 
-#define	IR_RX_PORT			GPIOB
-#define IR_RX_PIN				GPIO_PIN_10
+//#define	IR_RX_PORT			GPIOB
+//#define IR_RX_PIN				GPIO_PIN_10
 //#define	IR_RX_GET_PIN()	IR_RX_PIN
 //#define	IR_RX_OFF()			SETB(LED0_PORT,LED0_PIN)
-#define	IR_RX_GET_PIN_STATE()	HAL_GPIO_ReadPin(IR_RX_PORT, IR_RX_PIN)
+//#define	IR_RX_GET_PIN_STATE()	HAL_GPIO_ReadPin(IR_RX_PORT, IR_RX_PIN)
 //#define	IR_RX_OFF()			SETB(LED0_PORT,LED0_PIN)
 
 extern IR_TypeDef IR_Obj;
@@ -84,8 +90,10 @@ extern IR_TypeDef IR_Obj;
 extern int InfraRed_RX_Init(void);
 extern int InfraRed_RX_Calculate(void);
 extern int InfraRed_RX_ChangeProtocol(IRType_e IRType);
+extern void ir_rx_irq_callback(uint32_t cnt, IR_PIN_State pin_state);
+extern int ir_tx_push_data(const IR_BufTypeDef *pData, uint32_t len);
 
 
-#endif /* configUSING_IR */
+#endif /* VAST_USING_IR */
 
 #endif /* __INFRA_RED_H__ */

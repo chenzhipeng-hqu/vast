@@ -1,7 +1,7 @@
 
 #include <device/vast_ir.h>
 
-#ifdef configUSING_IR
+#ifdef VAST_USING_IR
 //
 
 //
@@ -108,7 +108,7 @@ int InfraRed_RX_JVC_Calculate(IR_TypeDef *pIR_Obj)
 				pIR_Obj->value.command = val[1];							
 			}						
 			
-			HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_9);	
+			//HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_9);	
 		}
 		IR_Obj.state = CAPTURE_STAT_IDLE;
 		pIR_Obj->len = 0;
@@ -116,5 +116,5 @@ int InfraRed_RX_JVC_Calculate(IR_TypeDef *pIR_Obj)
 	
 	return 0;
 }
-#endif /* configUSING_IR */
+#endif /* VAST_USING_IR */
 

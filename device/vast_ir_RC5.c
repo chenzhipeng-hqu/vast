@@ -26,7 +26,7 @@
 /*************************************
               define
 *************************************/
-#ifdef configUSING_IR
+#ifdef VAST_USING_IR
 
 /**************************************
               typedef
@@ -149,7 +149,7 @@ static int InfraRed_RX_RC5_Calculate(IR_TypeDef *pIR_Obj)
 			pIR_Obj->value.address = val[0]&0x1f;
 			pIR_Obj->value.command = ((~val[0]&0x40) + (val[1]>>1))&0x3f;
 			pIR_Obj->value.command_check = (val[0]&0x20)?1:0;
-			HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_9);	
+			//HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_9);	
 		}
 		IR_Obj.state = CAPTURE_STAT_IDLE;
 		pIR_Obj->len = 0;
@@ -182,6 +182,6 @@ void RC5_assert_failed(uint8_t* file, uint32_t line)
 /**
   * @}
   */
-#endif /* configUSING_IR */
+#endif /* VAST_USING_IR */
 
 /************************ (C) COPYRIGHT chenzhipeng3472 *****END OF FILE****/

@@ -1,7 +1,7 @@
 
 #include <device/vast_ir.h>
 
-#ifdef configUSING_IR
+#ifdef VAST_USING_IR
 //
 //extern TIM_HandleTypeDef htim2;
 static int InfraRed_RX_NEC_Calculate(IR_TypeDef *pIR_Obj);
@@ -28,6 +28,20 @@ const IR_BufTypeDef IR_NEC_Repeat[] = {
 	{560, IR_PIN_HIGH},
 };
 
+const IR_BufTypeDef ir_head_nec[] = {
+  {168, 1},// 9/2ms
+  {168, 1},// 9/2ms
+  {168, 0},// 4.5ms
+  {21, 1},// 560us
+};
+const IR_BufTypeDef ir_1_nec[] = {
+  {63, 0},
+  {21, 1},
+};
+const IR_BufTypeDef ir_0_nec[] = {
+  {21, 0},
+  {21, 1},
+};
 
 //
 int InfraRed_RX_NEC_Init(IR_TypeDef *pIR_Obj)
@@ -37,6 +51,46 @@ int InfraRed_RX_NEC_Init(IR_TypeDef *pIR_Obj)
 	pIR_Obj->state = CAPTURE_STAT_IDLE;
 	pIR_Obj->pInfraRed_RX_Calculate = InfraRed_RX_NEC_Calculate;
 	return 0;
+}
+
+//
+int InfraRed_TX_NEC(IR_TypeDef *pIR_Obj, uint16_t head, uint8_t code, uint8_t check)
+{
+  uint8_t ret;
+  uint32_t idx;
+  uint8_t data[4];
+  uint8_t bit;
+  if(pIR_Obj->idle)
+  {
+    pIR_Obj->tx_bufLen = 0;
+    ir_tx_push_data(ir_head_nec, sizeof(ir_head_nec)/sizeof(ir_head_nec[0]));
+    data[0] = head>>8;
+    data[1] = head&0x0ff;
+    data[2] = code;
+    data[3] = check;
+    for(idx=0; idx<4; idx++)
+    {
+      for(bit=1; bit!=0; bit<<=1)
+      {
+        if(data[idx] & bit)
+        {
+          ir_tx_push_data(ir_1_nec, sizeof(ir_1_nec)/sizeof(ir_1_nec[0]));
+        }
+        else
+        {
+          ir_tx_push_data(ir_0_nec, sizeof(ir_0_nec)/sizeof(ir_0_nec[0]));
+        }
+      }
+    }
+
+    //io_irStartTim();
+    ret = 0;
+  }
+  else
+  {
+    ret = -1;
+  }
+  return ret;
 }
 
 //
@@ -57,7 +111,6 @@ int InfraRed_RX_NEC_Calculate(IR_TypeDef *pIR_Obj)
 		{			
 			if((pIR_Obj->rx_buf[idx].timer >= min0) && (pIR_Obj->rx_buf[idx].timer <= max0))
 			{
-				
 			}
 			else if((pIR_Obj->rx_buf[idx].timer >= min1) && (pIR_Obj->rx_buf[idx].timer <= max1))
 			{
@@ -65,6 +118,7 @@ int InfraRed_RX_NEC_Calculate(IR_TypeDef *pIR_Obj)
 			}
 			else
 			{
+				printf("min0:%d, max0%d, min1:%d, max1:%d, pin:%d, rx_buf[%d]:%d\r\n", min0, max0, min1, max1, pIR_Obj->rx_buf[idx].pin_state, idx, pIR_Obj->rx_buf[idx].timer);
 				break;
 			}
 			_bit <<= 1;
@@ -78,12 +132,12 @@ int InfraRed_RX_NEC_Calculate(IR_TypeDef *pIR_Obj)
 		
 		if(idx >= pIR_Obj->protocol_size)
 		{
-			if( 0xFF == (val[2]|val[3]))
+//			if( 0xFF == (val[2]|val[3]))
 			{
 				pIR_Obj->value.address = val[0]<<8 | val[1];
 				pIR_Obj->value.command = val[2];
 				pIR_Obj->value.command_check = val[3];
-				HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_9);	
+//				HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_9);
 			}		
 		}
 		IR_Obj.state = CAPTURE_STAT_IDLE;
@@ -93,4 +147,4 @@ int InfraRed_RX_NEC_Calculate(IR_TypeDef *pIR_Obj)
 	return 0;
 }
 
-#endif /* configUSING_IR */
+#endif /* VAST_USING_IR */
