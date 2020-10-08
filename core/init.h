@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <core/compiler.h>
-#include "bsp.h"
+//#include "bsp.h"
 
 typedef int (*initcall_t)(void);
 
@@ -61,7 +61,7 @@ typedef int (*initcall_t)(void);
  */
 static inline void do_init_call(void)
 {
-    vast_bsp_init();
+    //vast_bsp_init();
 
 #if defined(__CC_ARM)
     extern initcall_t initcall0init$$Base[];
@@ -84,7 +84,8 @@ static inline void do_init_call(void)
 		do{
 	        printf("init %s ", desc->fn_name);
 	        printf(":%d done\r\n", desc->fn());
-		}while(desc++ < &__initcall_end);
+		}while(++desc < &__initcall_end);
+        printf("init end.\n\r");
 	#else
 		extern initcall_t __initcall_start, __initcall_end; /*申明外部变量,在ld的脚本文件中定义*/
 
