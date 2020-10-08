@@ -12,4 +12,11 @@ for d in list:
     if os.path.isfile(os.path.join(path, 'SConscript')):
         objs = objs + SConscript(os.path.join(d, 'SConscript'))
 
-Return('objs')
+#Return('objs')
+
+src = []
+path =  [cwd]
+CPPDEFINES = ['VAST']
+group = DefineGroup('vast', src, depend = [''], CPPPATH = path, CPPDEFINES = CPPDEFINES)
+
+Return('objs', 'group')
