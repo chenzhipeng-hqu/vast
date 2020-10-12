@@ -70,7 +70,8 @@ typedef struct _infrared_device_t
     uint16_t                rx_len;
     uint16_t                tx_len;
     tcb_t                   tcb;
-    struct soft_timer       tmr;
+    struct soft_timer       rx_tmr;
+    struct soft_timer       tx_tmr;
 }infrared_device_t;
 
 /***********************************************
@@ -78,7 +79,8 @@ typedef struct _infrared_device_t
 ***********************************************/
 error_t infrared_device_register(infrared_device_t *infrared, 
                                     const char *name, uint32_t flag, void *data);
-error_t infrared_isr_handler(infrared_device_t *infrared, uint8_t level, uint16_t us);
+error_t infrared_rx_isr_handler(infrared_device_t *infrared, uint8_t level, uint16_t us);
+error_t infrared_tx_isr_handler(infrared_device_t *infrared);
 
 /***********************************************
 	      		    inline

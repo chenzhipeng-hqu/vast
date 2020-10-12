@@ -45,6 +45,12 @@ const IR_BufTypeDef ir_0_nec[] = {
   {21, 0},
   {21, 1},
 };
+const IR_BufTypeDef ir_repeat_nec[] = {
+  {168, 1},// 9/2ms
+  {168, 1},// 9/2ms
+  {84, 0},// 4.5ms
+  {21, 1},// 560us
+};
 
 //
 int InfraRed_TX_NEC_Encoder(IR_TypeDef *pIR_Obj, const void *buffer, size_t size)
@@ -85,6 +91,14 @@ int InfraRed_TX_NEC_Encoder(IR_TypeDef *pIR_Obj, const void *buffer, size_t size
     ret = -1;
   }
   return ret;
+}
+
+//
+int InfraRed_TX_NEC_RepeatEncoder(IR_TypeDef *pIR_Obj, const void *buffer, size_t size)
+{
+    pIR_Obj->tx_bufLen = 0;
+    ir_tx_push_data(ir_repeat_nec, sizeof(ir_repeat_nec)/sizeof(ir_repeat_nec[0]));
+    return 0;
 }
 
 //
@@ -148,8 +162,10 @@ int InfraRed_NEC_Init(IR_TypeDef *pIR_Obj)
 	pIR_Obj->protocol_size = 66; //4*8*2+2
 	pIR_Obj->carry_freq = carry_freq;
 	pIR_Obj->state = CAPTURE_STAT_IDLE;
+	pIR_Obj->RepeatInterval = 110;
 	pIR_Obj->pInfraRed_RX_Decoder = InfraRed_RX_NEC_Decoder;
 	pIR_Obj->pInfraRed_TX_Encoder = InfraRed_TX_NEC_Encoder;
+	pIR_Obj->pInfraRed_TX_RepeatEncoder = InfraRed_TX_NEC_RepeatEncoder;
 	return 0;
 }
 

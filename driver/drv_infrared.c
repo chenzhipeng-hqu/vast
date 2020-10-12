@@ -24,7 +24,14 @@
 /***********************************************
                     define
 ***********************************************/
-#define     INFRARED_RX_TIMEOUT     100
+#ifdef VAST_USING_EASYLOG
+    #define LOG_LVL ELOG_LVL_INFO
+    #define LOG_TAG "drv.ir"
+    #include "elog.h"
+#else
+#endif
+
+#define     INFRARED_RX_TIMEOUT     110
 
 /***********************************************
                     typedef
@@ -81,6 +88,14 @@ static size_t infrared_write(struct device *dev, off_t pos, const void *buffer, 
     InfraRed_TX_Encoder(&IR_Obj, buffer, size);
 
     infrared->ops->tx_start(infrared);
+
+    if (IR_Obj.RepeatCnt > 0)
+    {
+        log_d("RepeatInterval:%d", IR_Obj.RepeatInterval);
+        soft_timer_mod(&infrared->tx_tmr, jiffies + IR_Obj.RepeatInterval);
+        IR_Obj.RepeatCnt--;
+    }
+
     return ret;
 }
 
@@ -158,6 +173,7 @@ static void infrared_task_cb(struct task_ctrl_blk *tcb, ubase_t data)
             }
             else
             {
+                IR_Obj.len = 0;
                 printf("infrared receive fail, len:%d\r\n", IR_Obj.len);
             }
         }
@@ -171,11 +187,21 @@ static void infrared_task_cb(struct task_ctrl_blk *tcb, ubase_t data)
   * @param
   * @retval
   */
-error_t infrared_isr_handler(infrared_device_t *infrared, uint8_t level, uint16_t us)
+error_t infrared_rx_isr_handler(infrared_device_t *infrared, uint8_t level, uint16_t us)
 {
     ir_rx_irq_callback(us, level);
-    soft_timer_mod(&infrared->tmr, jiffies + INFRARED_RX_TIMEOUT);
+    soft_timer_mod(&infrared->rx_tmr, jiffies + INFRARED_RX_TIMEOUT);
 
+    return 0;
+}
+
+/**
+  * @brief  infrared_isr_handler.
+  * @param
+  * @retval
+  */
+error_t infrared_tx_isr_handler(infrared_device_t *infrared)
+{
     return 0;
 }
 
@@ -192,6 +218,27 @@ static void infrared_rx_tmr_cb(struct soft_timer *st)
     {
         task_send_signal(infrared->parent.owner, SIG_DATA);
     }
+}
+
+/**
+  * @brief  infrared_rx_tmr_cb.
+  * @param
+  * @retval
+  */
+static void infrared_tx_tmr_cb(struct soft_timer *st)
+{
+    infrared_device_t *infrared = (infrared_device_t *)st->data;
+
+    log_d("tx_tmr_repeat:%d", IR_Obj.RepeatCnt);
+
+    if (IR_Obj.RepeatCnt > 0)
+    {
+        soft_timer_mod(st, jiffies + IR_Obj.RepeatInterval);
+        IR_Obj.RepeatCnt--;
+    }
+
+    InfraRed_TX_RepeatEncoder(&IR_Obj, NULL, 0);
+    infrared->ops->tx_start(infrared);
 }
 
 /**
@@ -221,9 +268,13 @@ error_t infrared_device_register(infrared_device_t *infrared,
     dev->user_data  = data;
     dev->owner      = &infrared->tcb;
 
-    struct soft_timer *st = &infrared->tmr;
-
+    struct soft_timer *st = &infrared->rx_tmr;
     st->cb      = infrared_rx_tmr_cb;
+    st->data    = (ubase_t)infrared;
+    st->expires = INITIAL_JIFFIES;
+
+    st = &infrared->tx_tmr;
+    st->cb      = infrared_tx_tmr_cb;
     st->data    = (ubase_t)infrared;
     st->expires = INITIAL_JIFFIES;
 

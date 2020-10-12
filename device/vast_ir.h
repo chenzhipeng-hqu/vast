@@ -74,9 +74,11 @@ typedef struct _IR_TypeDef
 	uint8_t idle;
 	uint8_t protocol_size;
 	uint8_t RepeatInterval;  //ms
+	uint8_t RepeatCnt;  //ms
 	IRType_e IRType;
 	int (*pInfraRed_RX_Decoder)(struct _IR_TypeDef *);
 	int (*pInfraRed_TX_Encoder)(struct _IR_TypeDef *, const void *buffer, size_t size);
+	int (*pInfraRed_TX_RepeatEncoder)(struct _IR_TypeDef *, const void *buffer, size_t size);
 }IR_TypeDef;
 
 
@@ -103,6 +105,7 @@ extern int InfraRed_KONKA_Init(IR_TypeDef *pIR_Obj);
 extern int InfraRed_Init(IRType_e IRType);
 extern int InfraRed_RX_Decoder(void);
 extern int InfraRed_TX_Encoder(struct _IR_TypeDef *, const void *buffer, size_t size);
+extern int InfraRed_TX_RepeatEncoder(struct _IR_TypeDef *pIr, const void *buffer, size_t size);
 //extern int InfraRed_RX_ChangeProtocol(IRType_e IRType);
 extern void ir_rx_irq_callback(uint32_t cnt, IR_PIN_State pin_state);
 extern int ir_tx_push_data(const IR_BufTypeDef *pData, uint32_t len);

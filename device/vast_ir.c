@@ -137,6 +137,20 @@ int InfraRed_TX_Encoder(struct _IR_TypeDef *pIr, const void *buffer, size_t size
 }
 
 /**
+  * @brief  InfraRed_TX_Encoder
+  * @param  
+  * @retval 
+  */
+int InfraRed_TX_RepeatEncoder(struct _IR_TypeDef *pIr, const void *buffer, size_t size)
+{
+	if (NULL != pIr->pInfraRed_TX_RepeatEncoder)
+	{
+		pIr->pInfraRed_TX_RepeatEncoder(&IR_Obj, buffer, size);
+	}
+	return 0;
+}
+
+/**
   * @brief  Push ir data to send buf.
   * @param  data.
   * @retval Success or fail.
