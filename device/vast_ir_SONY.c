@@ -28,12 +28,12 @@ const IR_BufTypeDef IR_SONY_Repeat[] = {
 
 
 //
-int InfraRed_RX_SONY_Init(IR_TypeDef *pIR_Obj)
+int InfraRed_SONY_Init(IR_TypeDef *pIR_Obj)
 {
 	pIR_Obj->pHead = IR_SONY_Head;
 	pIR_Obj->protocol_size = 25;
 	pIR_Obj->state = CAPTURE_STAT_IDLE;
-	pIR_Obj->pInfraRed_RX_Calculate = InfraRed_RX_SONY_Calculate;
+	pIR_Obj->pInfraRed_RX_Decoder = InfraRed_RX_SONY_Calculate;
 	return 0;
 }
 

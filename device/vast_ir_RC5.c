@@ -69,13 +69,13 @@ static int InfraRed_RX_RC5_Calculate(IR_TypeDef *pIR_Obj);
   * @param  
   * @retval 
   */
-int InfraRed_RX_RC5_Init(IR_TypeDef *pIR_Obj)
+int InfraRed_RC5_Init(IR_TypeDef *pIR_Obj)
 {
 	pIR_Obj->pHead = IR_RC5_Head;
 	pIR_Obj->protocol_size = 30;
 	pIR_Obj->state = CAPTURE_STAT_IDLE;
 	pIR_Obj->RepeatInterval = 114;	
-	pIR_Obj->pInfraRed_RX_Calculate = InfraRed_RX_RC5_Calculate;
+	pIR_Obj->pInfraRed_RX_Decoder = InfraRed_RX_RC5_Calculate;
 	return 0;
 }
 

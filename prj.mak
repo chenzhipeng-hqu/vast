@@ -79,6 +79,7 @@ endif
 
 ifeq (true, $(VAST_USING_IR))
 	DEFS += -DVAST_USING_IR
+	SRCS += $(VAST_ROOT)/device/vast_ir_KONKA.c
 	SRCS += $(VAST_ROOT)/device/vast_ir_JVC.c
 	SRCS += $(VAST_ROOT)/device/vast_ir_MI.c
 	SRCS += $(VAST_ROOT)/device/vast_ir_NEC.c
@@ -90,6 +91,7 @@ ifeq (true, $(VAST_USING_IR))
 	SRCS += $(VAST_ROOT)/device/vast_ir_SONY.c
 	SRCS += $(VAST_ROOT)/device/vast_ir_TOSHIBA.c
 	SRCS += $(VAST_ROOT)/device/vast_ir.c
+	SRCS += $(VAST_ROOT)/driver/drv_infrared.c
 endif
 
 ifeq (true, $(VAST_USING_LED))

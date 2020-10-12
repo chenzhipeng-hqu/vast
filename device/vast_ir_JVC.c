@@ -28,7 +28,7 @@ const IR_BufTypeDef IR_JVC_Repeat[] = {
 
 
 //
-int InfraRed_RX_JVC_Init(IR_TypeDef *pIR_Obj)
+int InfraRed_JVC_Init(IR_TypeDef *pIR_Obj)
 {
 	pIR_Obj->pHead = IR_JVC_Head;
 	pIR_Obj->protocol_size = 25;

@@ -32,22 +32,12 @@
 typedef struct _IR_TypeList_t
 {
 	IRType_e IRType;
-	int (*pInfraRed_RX_Init)(struct _IR_TypeDef *);
+	int (*pInfraRed_Init)(struct _IR_TypeDef *);
 }IR_FuncList_t;
 
 /*************************************
          function prototypes
 *************************************/
-extern int InfraRed_RX_NEC_Init(IR_TypeDef *pIR_Obj);
-extern int InfraRed_TX_NEC(IR_TypeDef *pIR_Obj, uint16_t head, uint8_t code, uint8_t check);
-extern int InfraRed_RX_SONY_Init(IR_TypeDef *pIR_Obj);
-extern int InfraRed_RX_SAMSUNG_Init(IR_TypeDef *pIR_Obj);
-extern int InfraRed_RX_PANASONIC_Init(IR_TypeDef *pIR_Obj);
-extern int InfraRed_RX_RC5_Init(IR_TypeDef *pIR_Obj);
-extern int InfraRed_RX_RC6_Init(IR_TypeDef *pIR_Obj);
-extern int InfraRed_RX_RCA_Init(IR_TypeDef *pIR_Obj);
-extern int InfraRed_RX_MI_Init(IR_TypeDef *pIR_Obj);
-extern int InfraRed_RX_TOSHIBA_Init(IR_TypeDef *pIR_Obj);
 
 /*************************************
               variable
@@ -60,22 +50,23 @@ IR_TypeDef IR_Obj = {0};
  */
 const IR_FuncList_t IR_FuncList[] = { 	//don't change sequence, add after last
 //	{IRType_NONE, 			NULL},
-	{IRType_NEC, 				InfraRed_RX_NEC_Init},
-	{IRType_RC5, 				InfraRed_RX_RC5_Init},
-	{IRType_RC6, 				InfraRed_RX_RC6_Init},
-	{IRType_RCA, 				InfraRed_RX_RCA_Init},
+	{IRType_NEC, 				InfraRed_NEC_Init},
+	{IRType_RC5, 				InfraRed_RC5_Init},
+	{IRType_RC6, 				InfraRed_RC6_Init},
+	{IRType_RCA, 				InfraRed_RCA_Init},
 //	{IRType_JVC, 				NULL},
 //	{IRType_TRC, 				NULL},
-	{IRType_SONY, 			InfraRed_RX_SONY_Init},
+	{IRType_SONY, 			InfraRed_SONY_Init},
 //	{IRType_SHARP, 			NULL},
 //	{IRType_MIT, 				NULL},
 //	{IRType_KONK, 			NULL},
-	{IRType_MI, 				InfraRed_RX_MI_Init},
+	{IRType_MI, 				InfraRed_MI_Init},
 //	{IRType_NEC_WB, 		NULL},
 //	{IRType_TOP, 				NULL},
-	{IRType_SAMSUNG, 		InfraRed_RX_SAMSUNG_Init},
-	{IRType_PANASONIC, 	InfraRed_RX_PANASONIC_Init},
-	{IRType_TOSHIBA, 	InfraRed_RX_TOSHIBA_Init},
+	{IRType_SAMSUNG, 		InfraRed_SAMSUNG_Init},
+	{IRType_PANASONIC, 	InfraRed_PANASONIC_Init},
+	{IRType_TOSHIBA, 	InfraRed_TOSHIBA_Init},
+	{IRType_KONKA, 	InfraRed_KONKA_Init},
 	
 };
 /*
@@ -87,20 +78,20 @@ const IR_FuncList_t IR_FuncList[] = { 	//don't change sequence, add after last
 *************************************/
 
 /**
-  * @brief  InfraRed_RX_Init
+  * @brief  InfraRed_Init
   * @param  
   * @retval 
   */
-int InfraRed_RX_Init(void)
+int InfraRed_Init(IRType_e IRType)
 {
-	uint8_t IR_Typex;
-	IR_Obj.IRType = IRType_NEC;
+	uint8_t idx;
 	
-	for (IR_Typex=0; IR_Typex<sizeof(IR_FuncList)/sizeof(IR_FuncList[0]); IR_Typex++)
+	for (idx=0; idx<sizeof(IR_FuncList)/sizeof(IR_FuncList[0]); idx++)
 	{
-		if(IR_FuncList[IR_Typex].IRType == IR_Obj.IRType)
+		if(IR_FuncList[idx].IRType == IRType)
 		{
-			IR_FuncList[IR_Typex].pInfraRed_RX_Init(&IR_Obj);
+			IR_FuncList[idx].pInfraRed_Init(&IR_Obj);
+            IR_Obj.IRType = IRType;
 		}
 	}	
 	
@@ -111,31 +102,36 @@ int InfraRed_RX_Init(void)
   * @param  
   * @retval 
   */
-int InfraRed_RX_ChangeProtocol(IRType_e IRType)
+int InfraRed_SetProtocol(IRType_e IRType)
 {
-	uint8_t IR_Typex;
-	
-	IR_Obj.IRType = IRType;
-	
-	for (IR_Typex=0; IR_Typex<sizeof(IR_FuncList)/sizeof(IR_FuncList[0]); IR_Typex++)
-	{
-		if(IR_FuncList[IR_Typex].IRType == IR_Obj.IRType)
-		{
-			IR_FuncList[IR_Typex].pInfraRed_RX_Init(&IR_Obj);
-		}
-	}	
+    InfraRed_Init(IRType);
 	return 0;
 }
+
 /**
-  * @brief  InfraRed_RX_Calculate
+  * @brief  InfraRed_RX_Decoder
   * @param  
   * @retval 
   */
-int InfraRed_RX_Calculate(void)
+int InfraRed_RX_Decoder(void)
 {
-	if( NULL != IR_Obj.pInfraRed_RX_Calculate)
+	if( NULL != IR_Obj.pInfraRed_RX_Decoder)
 	{
-		IR_Obj.pInfraRed_RX_Calculate(&IR_Obj);
+		IR_Obj.pInfraRed_RX_Decoder(&IR_Obj);
+	}
+	return 0;
+}
+
+/**
+  * @brief  InfraRed_TX_Encoder
+  * @param  
+  * @retval 
+  */
+int InfraRed_TX_Encoder(struct _IR_TypeDef *pIr, const void *buffer, size_t size)
+{
+	if( NULL != pIr->pInfraRed_TX_Encoder)
+	{
+		pIr->pInfraRed_TX_Encoder(&IR_Obj, buffer, size);
 	}
 	return 0;
 }
@@ -283,11 +279,22 @@ void ir_rx_irq_callback(uint32_t cnt, IR_PIN_State pin_state)
 
 #endif
 #if 0
+void EXTI15_10_IRQHandler(void)
+{
+  if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_10) != RESET)
+  {
+    LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_10);
+    ir_rx_irq_callback(LL_TIM_GetCounter(TIM6), IR_RX_GET_PIN_STATE());
+    LL_TIM_SetCounter(TIM6, 0);
+  }
+}
 int main(int argc, char *argv[])
 {
-
-	MX_TIM2_Init(); // PB10 TIM2_CH3
-	HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_3);
+    MX_GPIO_Init();  // set PB10 rising/falling edge
+    MX_TIM6_Init();
+    //printf("SystemCoreClock:%ld\r\n", (SystemCoreClock/1000000) - 1);
+    LL_TIM_SetPrescaler(TIM6, (SystemCoreClock/1000000) - 1); // div to 1us
+    LL_TIM_EnableCounter(TIM6);
 	InfraRed_RX_Init();
 
 	while(1)

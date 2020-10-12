@@ -181,8 +181,9 @@ error_t device_set_tx_complete(device_t *dev, error_t (*tx_done)(device_t *dev, 
 	#include <component/vast_simulatite_eeprom.h>
 #endif
 
-#ifdef configUSING_IR
+#if (defined configUSING_IR || defined VAST_USING_IR)
 	#include <device/vast_ir.h>
+    #include "driver/drv_infrared.h"
 #endif
 
 #if (defined configUSING_LED || defined VAST_USING_LED)
