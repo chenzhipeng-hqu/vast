@@ -63,8 +63,8 @@ typedef struct _IR_BufTypeDef
 typedef struct _IR_TypeDef
 {
 	volatile uint8_t state;   // bit7: capture complete，bit6：is_capture_high, bit5:falling flag after high level, bit4~0: hight_level timer overflow times
-	volatile IR_BufTypeDef rx_buf[128];
-	volatile IR_BufTypeDef tx_buf[128];
+	volatile IR_BufTypeDef rx_buf[INFRARED_BUFF_SIZE];
+	volatile IR_BufTypeDef tx_buf[INFRARED_BUFF_SIZE];
 	volatile uint8_t tx_bufIdx;
 	volatile uint8_t tx_bufLen;
 	volatile uint8_t len;
@@ -75,6 +75,7 @@ typedef struct _IR_TypeDef
 	uint8_t protocol_size;
 	uint8_t RepeatInterval;  //ms
 	uint8_t RepeatCnt;  //ms
+	uint8_t RxRepeat;
 	IRType_e IRType;
 	int (*pInfraRed_RX_Decoder)(struct _IR_TypeDef *);
 	int (*pInfraRed_TX_Encoder)(struct _IR_TypeDef *, const void *buffer, size_t size);

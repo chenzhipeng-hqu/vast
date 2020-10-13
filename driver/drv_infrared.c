@@ -89,6 +89,8 @@ static size_t infrared_write(struct device *dev, off_t pos, const void *buffer, 
 
     infrared->ops->tx_start(infrared);
 
+    IR_Obj.RepeatCnt = pos;
+
     if (IR_Obj.RepeatCnt > 0)
     {
         log_d("RepeatInterval:%d", IR_Obj.RepeatInterval);
@@ -149,33 +151,6 @@ static void infrared_task_cb(struct task_ctrl_blk *tcb, ubase_t data)
         /* check recvd data event */
         if (sigget(sig, SIG_DATA))
         {
-            if(IR_Obj.state & CAPTURE_STAT_CAPTURE_DONE)
-            {
-                for (uint16_t i = 0; i < IR_Obj.len; i++)
-                {
-                    printf("IR_Obj[%d]: %d, %d, len=%d\r\n", i,
-                           IR_Obj.rx_buf[i].timer, IR_Obj.rx_buf[i].pin_state, IR_Obj.len);
-                    break;
-                }
-
-                /* invoke callback */
-                if ((infrared->parent.rx_indicate)) 
-                {
-                    infrared->parent.rx_indicate(&(infrared->parent), IR_Obj.len);
-                }
-
-                InfraRed_RX_Decoder();
-
-                printf("ir receive: 0x%04X, 0x%02X, 0x%02X\r\n",
-                       IR_Obj.value.address, IR_Obj.value.command, IR_Obj.value.command_check);
-
-                //IR_Obj.len = 0;
-            }
-            else
-            {
-                IR_Obj.len = 0;
-                printf("infrared receive fail, len:%d\r\n", IR_Obj.len);
-            }
         }
 
     }
@@ -214,9 +189,39 @@ static void infrared_rx_tmr_cb(struct soft_timer *st)
 {
     infrared_device_t *infrared = (infrared_device_t *)st->data;
 
-    if (infrared->parent.owner)
+    //if (infrared->parent.owner)
+    //{
+    //task_send_signal(infrared->parent.owner, SIG_DATA);
+    //}
+
+    //IR_Obj.state |= CAPTURE_STAT_CAPTURE_DONE;
+    //if (IR_Obj.state & CAPTURE_STAT_CAPTURE_DONE)
+    if (IR_Obj.len > 10)
     {
-        task_send_signal(infrared->parent.owner, SIG_DATA);
+        for (uint16_t i = 0; i < IR_Obj.len; i++)
+        {
+            log_d("IR_Obj[%d]: %d, %d, len=%d", i,
+                   IR_Obj.rx_buf[i].timer, IR_Obj.rx_buf[i].pin_state, IR_Obj.len);
+            break;
+        }
+
+        /* invoke callback */
+        if ((infrared->parent.rx_indicate))
+        {
+            infrared->parent.rx_indicate(&(infrared->parent), IR_Obj.len);
+        }
+
+        InfraRed_RX_Decoder();
+
+        log_i("ir receive: 0x%04X, 0x%02X, 0x%02X, repeat:%d",
+               IR_Obj.value.address, IR_Obj.value.command, IR_Obj.value.command_check, IR_Obj.RxRepeat);
+
+        //IR_Obj.len = 0;
+    }
+    else
+    {
+        IR_Obj.len = 0;
+        log_w("infrared receive fail, len:%d", IR_Obj.len);
     }
 }
 

@@ -115,6 +115,7 @@ int InfraRed_SetProtocol(IRType_e IRType)
   */
 int InfraRed_RX_Decoder(void)
 {
+    IR_Obj.RxRepeat = 0;
 	if( NULL != IR_Obj.pInfraRed_RX_Decoder)
 	{
 		IR_Obj.pInfraRed_RX_Decoder(&IR_Obj);
@@ -234,7 +235,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 		}
 	}
 }
-#else
+#elif 0
 /**
   * @brief  Input Capture callback in non blocking mode 
   * @param  htim: pointer to a TIM_HandleTypeDef structure that contains
@@ -288,6 +289,22 @@ void ir_rx_irq_callback(uint32_t cnt, IR_PIN_State pin_state)
     {
         IR_Obj.len = 0;
         IR_Obj.state = CAPTURE_STAT_IDLE;
+    }
+}
+#else
+/**
+  * @brief  Input Capture callback in non blocking mode 
+  * @param  htim: pointer to a TIM_HandleTypeDef structure that contains
+  *                the configuration information for TIM module.
+  * @retval None
+  */
+void ir_rx_irq_callback(uint32_t cnt, IR_PIN_State pin_state)
+{
+    if (IR_Obj.len < INFRARED_BUFF_SIZE)
+    {
+        IR_Obj.rx_buf[IR_Obj.len].timer = cnt;			
+        IR_Obj.rx_buf[IR_Obj.len].pin_state = pin_state;
+        IR_Obj.len++;
     }
 }
 
