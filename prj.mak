@@ -188,6 +188,14 @@ ifeq (true, $(VAST_USING_QPC_SPY))
 	SRCS += src/qs/qs_64bit.c
 endif
 
+ifeq (true, $(VAST_USING_QPN))
+	DEFS += -DVAST_USING_QPN
+	INCS += -I$(VAST_ROOT)/third/qpn/include
+	SRCS += $(VAST_ROOT)/third/qpn/src/qfn/qepn.c
+	SRCS += $(VAST_ROOT)/third/qpn/src/qfn/qfn.c
+	SRCS += $(VAST_ROOT)/third/qpn/src/qvn/qvn.c
+endif
+
 ################ third/CmBacktrace ################
 ifeq (true, $(VAST_USING_CMBACKTRACE))
 	DEFS += -DVAST_USING_CMBACKTRACE
