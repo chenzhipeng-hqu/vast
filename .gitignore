@@ -2,3 +2,4 @@ cscope.*
 tags
 buildtags.sh
 .ycm_extra_conf.py
+*.o
