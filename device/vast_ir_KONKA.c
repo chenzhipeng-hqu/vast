@@ -1,6 +1,13 @@
 
 #include <device/vast_ir.h>
 
+#ifdef VAST_USING_EASYLOG
+    #define LOG_LVL ELOG_LVL_DEBUG
+    #define LOG_TAG "ir.konka"
+    #include "elog.h"
+#else
+#endif
+
 #ifdef VAST_USING_IR
 static const uint16_t carry_freq = 38000;
 //
@@ -105,6 +112,7 @@ int InfraRed_RX_KONKA_Decoder(IR_TypeDef *pIR_Obj)
     uint8_t idx = 0, byte = 0, _bit = 0x80;
     uint16_t min0, max0, min1, max1;
     uint8_t val[4] = {0};
+    volatile IR_BufTypeDef *rx_buf = pIR_Obj->rx_buf;
 
     min0 = IR_KONKA_Zero[1].timer * 0.8;
     max0 = IR_KONKA_Zero[1].timer * 1.2;
@@ -113,7 +121,26 @@ int InfraRed_RX_KONKA_Decoder(IR_TypeDef *pIR_Obj)
 
     if (pIR_Obj->len != 0)
     {
-        for (idx = sizeof(IR_KONKA_Head) / sizeof(IR_KONKA_Head[0]) + 1; idx < pIR_Obj->len - 3; idx += 2)
+        // find head
+        for (idx = 0; idx < 10; idx++)
+        {
+            if ((rx_buf[idx].timer > IR_KONKA_Head[0].timer * 0.8)
+                    && (rx_buf[idx].timer < IR_KONKA_Head[0].timer * 1.2)
+                    && (rx_buf[idx].pin_state == IR_KONKA_Head[0].pin_state))
+            {
+                if ((rx_buf[idx + 1].timer > IR_KONKA_Head[1].timer * 0.8)
+                        && (rx_buf[idx + 1].timer < IR_KONKA_Head[1].timer * 1.2)
+                        && (rx_buf[idx + 1].pin_state == IR_KONKA_Head[1].pin_state))
+                {
+                    log_d("find konka head, idx=%d", idx);
+                    //rx_buf += idx;
+                    break;
+                }
+            }
+        }
+
+        // find code
+        for (idx = idx + sizeof(IR_KONKA_Head) / sizeof(IR_KONKA_Head[0]) + 1; idx < pIR_Obj->len - 3; idx += 2)
         {
             if ((pIR_Obj->rx_buf[idx].timer >= min0) && (pIR_Obj->rx_buf[idx].timer <= max0))
             {
