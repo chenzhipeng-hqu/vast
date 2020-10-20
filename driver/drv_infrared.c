@@ -70,7 +70,7 @@ static error_t infrared_init(device_t *dev)
   */
 static size_t infrared_read(struct device *dev, off_t pos, void *buffer, size_t size)
 {
-    infrared_device_t *infrared = (infrared_device_t *)dev;
+    //infrared_device_t *infrared = (infrared_device_t *)dev;
 
     return 0;
 }
@@ -133,7 +133,7 @@ static error_t infrared_ctrl(device_t *dev, uint8_t cmd, void *args)
   */
 static void infrared_task_cb(struct task_ctrl_blk *tcb, ubase_t data)
 {
-    infrared_device_t *infrared = (infrared_device_t *)data;
+    //infrared_device_t *infrared = (infrared_device_t *)data;
 
     tSTART(tcb);
 
@@ -283,7 +283,7 @@ error_t infrared_device_register(infrared_device_t *infrared,
     st->data    = (ubase_t)infrared;
     st->expires = INITIAL_JIFFIES;
 
-    task_create(&infrared->tcb, infrared_task_cb, "name", (ubase_t)infrared);
+    task_create(&infrared->tcb, infrared_task_cb, name, (ubase_t)infrared);
 
     return device_register(dev, name, flag);
 }
