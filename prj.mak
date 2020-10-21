@@ -133,6 +133,11 @@ ifeq (true, $(VAST_USING_PROTOCOL))
 	SRCS += $(VAST_ROOT)/component/protocol.c
 endif
 
+ifeq (true, $(VAST_USING_SMARTFRAME))
+	DEFS += -DVAST_USING_SMARTFRAME
+	SRCS += $(VAST_ROOT)/component/smartframe.c
+endif
+
 ifeq (true, $(VAST_USING_MODBUS))
 	DEFS += -DVAST_USING_MODBUS
 	#SRCS += vast/component/modbus_rtu.c
