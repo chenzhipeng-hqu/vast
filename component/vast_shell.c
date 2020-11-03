@@ -1051,7 +1051,7 @@ float str2float(const char *str)
   return flag?((float)fractional/flag + data):(float)data;
 #else	
 	float num = 0.0f;
-	sscanf(pCh, "%f", &num);
+	sscanf(pCh, "%f", &num); // @suppress("Float formatting support")
 	return num;
 #endif
 }
