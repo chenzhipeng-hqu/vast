@@ -24,6 +24,13 @@
 /*************************************
               define
 *************************************/
+#ifdef VAST_USING_EASYLOG
+    #define LOG_LVL ELOG_LVL_DEBUG
+    #define LOG_TAG "ir.dev"
+    #include "elog.h"
+#else
+#endif
+
 #ifdef VAST_USING_IR
 
 /**************************************
@@ -120,6 +127,10 @@ int InfraRed_RX_Decoder(void)
 	{
 		IR_Obj.pInfraRed_RX_Decoder(&IR_Obj);
 	}
+    else
+    {
+        log_w("didn't set ir decoder");
+    }
 	return 0;
 }
 
@@ -134,6 +145,10 @@ int InfraRed_TX_Encoder(struct _IR_TypeDef *pIr, const void *buffer, size_t size
 	{
 		pIr->pInfraRed_TX_Encoder(&IR_Obj, buffer, size);
 	}
+    else
+    {
+        log_w("didn't set ir encoder");
+    }
 	return 0;
 }
 

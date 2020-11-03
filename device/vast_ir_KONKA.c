@@ -186,6 +186,7 @@ int InfraRed_KONKA_Init(IR_TypeDef *pIR_Obj)
     pIR_Obj->protocol_size = 36; //2*8*2+2+3
     pIR_Obj->state = CAPTURE_STAT_IDLE;
 	pIR_Obj->carry_freq = carry_freq;
+	pIR_Obj->RepeatInterval = 0;	
     pIR_Obj->pInfraRed_RX_Decoder = InfraRed_RX_KONKA_Decoder;
     pIR_Obj->pInfraRed_TX_Encoder = InfraRed_TX_KONKA_Encoder;
     return 0;
