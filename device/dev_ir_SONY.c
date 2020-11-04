@@ -1,5 +1,5 @@
 
-#include <device/vast_ir.h>
+#include <device/dev_ir.h>
 
 #ifdef VAST_USING_EASYLOG
     #define LOG_LVL ELOG_LVL_DEBUG

@@ -135,16 +135,11 @@ error_t device_set_tx_complete(device_t *dev, error_t (*tx_done)(device_t *dev, 
 #endif
 
 #if (defined configUSING_SERIAL || defined VAST_USING_SERIAL)
-	#include <driver/vast_serial.h>
+	#include <driver/serial.h>
 #endif
 
 #ifdef OS_USING_HEAP
 	#include <core/heap.h>
-#endif
-
-
-#ifdef configUSING_EASY_KEY
-	#include <vast_key.h>
 #endif
 
 #ifdef configUSING_SPI
@@ -174,7 +169,7 @@ error_t device_set_tx_complete(device_t *dev, error_t (*tx_done)(device_t *dev, 
 #endif
 
 #if (defined configUSING_CLI || defined VAST_USING_SHELL)
-	#include <component/vast_shell.h>
+	#include <component/shell.h>
 #endif
 
 #ifdef configUSING_EEPROM
@@ -182,12 +177,12 @@ error_t device_set_tx_complete(device_t *dev, error_t (*tx_done)(device_t *dev, 
 #endif
 
 #if (defined configUSING_IR || defined VAST_USING_IR)
-	#include <device/vast_ir.h>
+	#include <device/dev_ir.h>
     #include "driver/drv_infrared.h"
 #endif
 
 #if (defined configUSING_LED || defined VAST_USING_LED)
-	#include <device/vast_led.h>
+	#include <driver/drv_led.h>
 #endif
 
 #ifdef configUSING_RX8025

@@ -63,7 +63,7 @@ endif
 
 ifeq (true, $(VAST_USING_SERIAL))
 	DEFS += -DVAST_USING_SERIAL
-	SRCS += $(VAST_ROOT)/driver/vast_serial.c
+	SRCS += $(VAST_ROOT)/driver/serial.c
 endif
 
 ################## device ##################
@@ -74,29 +74,29 @@ endif
 
 ifeq (true, $(VAST_USING_KEY))
 	DEFS += -DVAST_USING_KEY
-	SRCS += $(VAST_ROOT)/device/vast_key.c
+	SRCS += $(VAST_ROOT)/device/dev_key.c
 endif
 
 ifeq (true, $(VAST_USING_IR))
 	DEFS += -DVAST_USING_IR
-	SRCS += $(VAST_ROOT)/device/vast_ir_KONKA.c
-	SRCS += $(VAST_ROOT)/device/vast_ir_JVC.c
-	SRCS += $(VAST_ROOT)/device/vast_ir_MI.c
-	SRCS += $(VAST_ROOT)/device/vast_ir_NEC.c
-	SRCS += $(VAST_ROOT)/device/vast_ir_PANASONIC.c
-	SRCS += $(VAST_ROOT)/device/vast_ir_RC5.c
-	SRCS += $(VAST_ROOT)/device/vast_ir_RC6.c
-	SRCS += $(VAST_ROOT)/device/vast_ir_RCA.c
-	SRCS += $(VAST_ROOT)/device/vast_ir_SAMSUNG.c
-	SRCS += $(VAST_ROOT)/device/vast_ir_SONY.c
-	SRCS += $(VAST_ROOT)/device/vast_ir_TOSHIBA.c
-	SRCS += $(VAST_ROOT)/device/vast_ir.c
+	SRCS += $(VAST_ROOT)/device/dev_ir_KONKA.c
+	SRCS += $(VAST_ROOT)/device/dev_ir_JVC.c
+	SRCS += $(VAST_ROOT)/device/dev_ir_MI.c
+	SRCS += $(VAST_ROOT)/device/dev_ir_NEC.c
+	SRCS += $(VAST_ROOT)/device/dev_ir_PANASONIC.c
+	SRCS += $(VAST_ROOT)/device/dev_ir_RC5.c
+	SRCS += $(VAST_ROOT)/device/dev_ir_RC6.c
+	SRCS += $(VAST_ROOT)/device/dev_ir_RCA.c
+	SRCS += $(VAST_ROOT)/device/dev_ir_SAMSUNG.c
+	SRCS += $(VAST_ROOT)/device/dev_ir_SONY.c
+	SRCS += $(VAST_ROOT)/device/dev_ir_TOSHIBA.c
+	SRCS += $(VAST_ROOT)/device/dev_ir.c
 	SRCS += $(VAST_ROOT)/driver/drv_infrared.c
 endif
 
 ifeq (true, $(VAST_USING_LED))
 	DEFS += -DVAST_USING_LED
-	SRCS += $(VAST_ROOT)/device/vast_led.c
+	SRCS += $(VAST_ROOT)/driver/drv_led.c
 endif
 
 ifeq (true, $(VAST_USING_CP8102))
@@ -125,7 +125,7 @@ endif
 
 ifeq (true, $(VAST_USING_SHELL))
 	DEFS += -DVAST_USING_SHELL
-	SRCS += $(VAST_ROOT)/component/vast_shell.c
+	SRCS += $(VAST_ROOT)/component/shell.c
 endif
 
 ifeq (true, $(VAST_USING_PROTOCOL))

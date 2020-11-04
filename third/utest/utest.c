@@ -15,7 +15,7 @@
 #include "utest.h"
 #include <utest_log.h>
 
-#include "component/vast_shell.h"
+#include "component/shell.h"
 
 #ifdef configUSING_UTEST
 

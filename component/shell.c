@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
 *************************************/
 #include <stdio.h>
 #include <string.h>
-#include "vast_shell.h"
+#include "shell.h"
 
 #if (defined configUSING_EASYFLASH || defined VAST_USING_EASYFLASH)
     #include <easyflash.h>

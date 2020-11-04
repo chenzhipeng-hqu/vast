@@ -1,13 +1,26 @@
+/**
+ ******************************************************************************
+ * @file    demo.h
+ * @author  chenzhipeng3472
+ * @version V1.0.0
+ * @date    10-sep-2018
+ * @brief   
+ ******************************************************************************
+ * @attention
+ * 
+ ******************************************************************************
+ */
+    
+/** @addtogroup Project
+  * @{
+  */ 
 
-
-#ifndef		__VAST_IR_H__
-#define		__VAST_IR_H__
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef		__DEV_IR_H__
+#define		__DEV_IR_H__
 
 #include "vast_common.h"
-//#include "vast_config.h"
 #ifdef VAST_USING_IR
-//#include "stm32f4xx_hal.h"
-//#include "stm32f1xx_hal.h"
 
 #define     INFRARED_BUFF_SIZE      256
 
@@ -41,6 +54,29 @@ typedef enum _IR_PIN_State
 	IR_PIN_HIGH
 }IR_PIN_State;
 
+struct data_nec
+{
+    uint16_t addr;
+    uint8_t key;
+    uint8_t repeat;
+};
+
+struct data_mi
+{
+    uint8_t addr;
+    uint8_t key;
+    uint8_t repeat;
+};
+
+typedef struct data_ir
+{
+    union 
+    {
+        struct data_nec    nec;          /* Temperature.         unit: dCelsius    */
+        struct data_mi    mi;          /* Temperature.         unit: dCelsius    */
+    }data;
+}data_ir_t;
+
 typedef struct _IR_DataTypeDef
 {
 	uint16_t address;
@@ -69,6 +105,7 @@ typedef struct _IR_TypeDef
 	volatile uint8_t tx_bufLen;
 	volatile uint8_t len;
 	IR_DataTypeDef value;
+    data_ir_t data;
 	uint16_t carry_freq;
 	const IR_BufTypeDef *pHead;
 	uint8_t idle;
@@ -114,4 +151,4 @@ extern int ir_tx_push_data(const IR_BufTypeDef *pData, uint32_t len);
 
 #endif /* VAST_USING_IR */
 
-#endif /* __INFRA_RED_H__ */
+#endif /* __DEV_IR_H__ */

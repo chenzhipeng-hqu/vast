@@ -1,5 +1,5 @@
 
-#include <device/vast_ir.h>
+#include <device/dev_ir.h>
 
 #ifdef VAST_USING_EASYLOG
     #define LOG_LVL ELOG_LVL_DEBUG
@@ -196,11 +196,14 @@ int InfraRed_RX_NEC_Decoder(IR_TypeDef *pIR_Obj)
             }
         }
 
-
         //if(idx >= pIR_Obj->protocol_size)
         {
 //          if( 0xFF == (val[2]|val[3]))
             {
+                pIR_Obj->data.data.nec.addr = val[0] << 8 | val[1];
+                pIR_Obj->data.data.nec.key = val[2];
+                pIR_Obj->data.data.nec.repeat = pIR_Obj->RxRepeat;
+
                 pIR_Obj->value.address = val[0] << 8 | val[1];
                 pIR_Obj->value.command = val[2];
                 pIR_Obj->value.command_check = val[3];

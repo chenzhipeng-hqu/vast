@@ -21,7 +21,7 @@
 /*************************************
               include
 *************************************/
-#include <device/vast_ir.h>
+#include <device/dev_ir.h>
 #include "vast_common.h"
 
 /*************************************
