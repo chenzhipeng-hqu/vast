@@ -103,23 +103,23 @@ int InfraRed_RX_SONY_Calculate(IR_TypeDef *pIR_Obj)
 	static uint8_t repeat_cnt = 0 , old_val[2] = {0};
     volatile IR_BufTypeDef *rx_buf = pIR_Obj->rx_buf;
 	
-	min0 = IR_SONY_Zero[0].timer * 0.8;
-	max0 = IR_SONY_Zero[0].timer * 1.2;
-	min1 = IR_SONY_One[0].timer * 0.8;
-	max1 = IR_SONY_One[0].timer * 1.2;
+	min0 = IR_SONY_Zero[0].us * 0.8;
+	max0 = IR_SONY_Zero[0].us * 1.2;
+	min1 = IR_SONY_One[0].us * 0.8;
+	max1 = IR_SONY_One[0].us * 1.2;
 	
-	if(pIR_Obj->len != 0)
+	if(pIR_Obj->rx_len != 0)
 	{
         // find head
         for (idx = 0; idx < 10; idx++)
         {
-            if ((rx_buf[idx].timer > IR_SONY_Head[0].timer * 0.8)
-                    && (rx_buf[idx].timer < IR_SONY_Head[0].timer * 1.2)
-                    && (rx_buf[idx].pin_state == IR_SONY_Head[0].pin_state))
+            if ((rx_buf[idx].us > IR_SONY_Head[0].us * 0.8)
+                    && (rx_buf[idx].us < IR_SONY_Head[0].us * 1.2)
+                    && (rx_buf[idx].level == IR_SONY_Head[0].level))
             {
-                if ((rx_buf[idx + 1].timer > IR_SONY_Head[1].timer * 0.8)
-                        && (rx_buf[idx + 1].timer < IR_SONY_Head[1].timer * 1.2)
-                        && (rx_buf[idx + 1].pin_state == IR_SONY_Head[1].pin_state))
+                if ((rx_buf[idx + 1].us > IR_SONY_Head[1].us * 0.8)
+                        && (rx_buf[idx + 1].us < IR_SONY_Head[1].us * 1.2)
+                        && (rx_buf[idx + 1].level == IR_SONY_Head[1].level))
                 {
                     log_d("find sony head, idx=%d", idx);
                     //rx_buf += idx;
@@ -129,13 +129,13 @@ int InfraRed_RX_SONY_Calculate(IR_TypeDef *pIR_Obj)
         }
 
         // find code
-		for(idx=idx + sizeof(IR_SONY_Head)/sizeof(IR_SONY_Head[0]); idx<pIR_Obj->len; idx+=2)
+		for(idx=idx + sizeof(IR_SONY_Head)/sizeof(IR_SONY_Head[0]); idx<pIR_Obj->rx_len; idx+=2)
 		{			
-			if((pIR_Obj->rx_buf[idx].timer >= min0) && (pIR_Obj->rx_buf[idx].timer <= max0))
+			if((pIR_Obj->rx_buf[idx].us >= min0) && (pIR_Obj->rx_buf[idx].us <= max0))
 			{
 				
 			}
-			else if((pIR_Obj->rx_buf[idx].timer >= min1) && (pIR_Obj->rx_buf[idx].timer <= max1))
+			else if((pIR_Obj->rx_buf[idx].us >= min1) && (pIR_Obj->rx_buf[idx].us <= max1))
 			{
 				val[byte] |= _bit; 
 			}
@@ -188,8 +188,8 @@ int InfraRed_RX_SONY_Calculate(IR_TypeDef *pIR_Obj)
 			
 			//HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_9);	
 		}
-		IR_Obj.state = CAPTURE_STAT_IDLE;
-		pIR_Obj->len = 0;
+		//IR_Obj.state = CAPTURE_STAT_IDLE;
+		pIR_Obj->rx_len = 0;
 	}	
 	
 	return 0;
@@ -200,7 +200,7 @@ int InfraRed_SONY_Init(IR_TypeDef *pIR_Obj)
 {
 	pIR_Obj->pHead = IR_SONY_Head;
 	pIR_Obj->protocol_size = 25;
-	pIR_Obj->state = CAPTURE_STAT_IDLE;
+	//pIR_Obj->state = CAPTURE_STAT_IDLE;
 	pIR_Obj->pInfraRed_RX_Decoder = InfraRed_RX_SONY_Calculate;
 	pIR_Obj->carry_freq = carry_freq;
     pIR_Obj->pInfraRed_TX_Encoder = InfraRed_TX_SONY_Encoder;

@@ -114,23 +114,23 @@ int InfraRed_RX_KONKA_Decoder(IR_TypeDef *pIR_Obj)
     uint8_t val[4] = {0};
     volatile IR_BufTypeDef *rx_buf = pIR_Obj->rx_buf;
 
-    min0 = IR_KONKA_Zero[1].timer * 0.8;
-    max0 = IR_KONKA_Zero[1].timer * 1.2;
-    min1 = IR_KONKA_One[1].timer * 0.8;
-    max1 = IR_KONKA_One[1].timer * 1.2;
+    min0 = IR_KONKA_Zero[1].us * 0.8;
+    max0 = IR_KONKA_Zero[1].us * 1.2;
+    min1 = IR_KONKA_One[1].us * 0.8;
+    max1 = IR_KONKA_One[1].us * 1.2;
 
-    if (pIR_Obj->len != 0)
+    if (pIR_Obj->rx_len != 0)
     {
         // find head
         for (idx = 0; idx < 10; idx++)
         {
-            if ((rx_buf[idx].timer > IR_KONKA_Head[0].timer * 0.8)
-                    && (rx_buf[idx].timer < IR_KONKA_Head[0].timer * 1.2)
-                    && (rx_buf[idx].pin_state == IR_KONKA_Head[0].pin_state))
+            if ((rx_buf[idx].us > IR_KONKA_Head[0].us * 0.8)
+                    && (rx_buf[idx].us < IR_KONKA_Head[0].us * 1.2)
+                    && (rx_buf[idx].level == IR_KONKA_Head[0].level))
             {
-                if ((rx_buf[idx + 1].timer > IR_KONKA_Head[1].timer * 0.8)
-                        && (rx_buf[idx + 1].timer < IR_KONKA_Head[1].timer * 1.2)
-                        && (rx_buf[idx + 1].pin_state == IR_KONKA_Head[1].pin_state))
+                if ((rx_buf[idx + 1].us > IR_KONKA_Head[1].us * 0.8)
+                        && (rx_buf[idx + 1].us < IR_KONKA_Head[1].us * 1.2)
+                        && (rx_buf[idx + 1].level == IR_KONKA_Head[1].level))
                 {
                     log_d("find konka head, idx=%d", idx);
                     //rx_buf += idx;
@@ -140,19 +140,19 @@ int InfraRed_RX_KONKA_Decoder(IR_TypeDef *pIR_Obj)
         }
 
         // find code
-        for (idx = idx + sizeof(IR_KONKA_Head) / sizeof(IR_KONKA_Head[0]) + 1; idx < pIR_Obj->len - 3; idx += 2)
+        for (idx = idx + sizeof(IR_KONKA_Head) / sizeof(IR_KONKA_Head[0]) + 1; idx < pIR_Obj->rx_len - 3; idx += 2)
         {
-            if ((pIR_Obj->rx_buf[idx].timer >= min0) && (pIR_Obj->rx_buf[idx].timer <= max0))
+            if ((pIR_Obj->rx_buf[idx].us >= min0) && (pIR_Obj->rx_buf[idx].us <= max0))
             {
 
             }
-            else if ((pIR_Obj->rx_buf[idx].timer >= min1) && (pIR_Obj->rx_buf[idx].timer <= max1))
+            else if ((pIR_Obj->rx_buf[idx].us >= min1) && (pIR_Obj->rx_buf[idx].us <= max1))
             {
                 val[byte] |= _bit;
             }
             else
             {
-                printf("min0:%d, max0:%d, min1:%d, max1:%d, pin:%d, rx_buf[%d]:%d\r\n", min0, max0, min1, max1, pIR_Obj->rx_buf[idx].pin_state, idx, pIR_Obj->rx_buf[idx].timer);
+                printf("min0:%d, max0:%d, min1:%d, max1:%d, pin:%d, rx_buf[%d]:%d\r\n", min0, max0, min1, max1, pIR_Obj->rx_buf[idx].level, idx, pIR_Obj->rx_buf[idx].us);
                 break;
             }
             _bit >>= 1;
@@ -172,8 +172,8 @@ int InfraRed_RX_KONKA_Decoder(IR_TypeDef *pIR_Obj)
                 pIR_Obj->value.command = val[1];
             }
         }
-        IR_Obj.state = CAPTURE_STAT_IDLE;
-        pIR_Obj->len = 0;
+        //IR_Obj.state = CAPTURE_STAT_IDLE;
+        pIR_Obj->rx_len = 0;
     }
 
     return 0;
@@ -184,7 +184,7 @@ int InfraRed_KONKA_Init(IR_TypeDef *pIR_Obj)
 {
     pIR_Obj->pHead = IR_KONKA_Head;
     pIR_Obj->protocol_size = 36; //2*8*2+2+3
-    pIR_Obj->state = CAPTURE_STAT_IDLE;
+    //pIR_Obj->state = CAPTURE_STAT_IDLE;
 	pIR_Obj->carry_freq = carry_freq;
 	pIR_Obj->RepeatInterval = 0;	
     pIR_Obj->pInfraRed_RX_Decoder = InfraRed_RX_KONKA_Decoder;

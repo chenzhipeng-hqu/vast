@@ -200,24 +200,24 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
     {
 		if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3)
         {
-			IR_Obj.rx_buf[IR_Obj.len].timer = __HAL_TIM_GET_COMPARE(htim, TIM_CHANNEL_3);			
-			IR_Obj.rx_buf[IR_Obj.len].pin_state = (IR_PIN_State)IR_RX_GET_PIN_STATE();
+			IR_Obj.rx_buf[IR_Obj.len].us = __HAL_TIM_GET_COMPARE(htim, TIM_CHANNEL_3);			
+			IR_Obj.rx_buf[IR_Obj.len].level = (IR_PIN_State)IR_RX_GET_PIN_STATE();
 			
 			if( (IR_Obj.state == CAPTURE_STAT_IDLE)
-					&& (IR_Obj.rx_buf[0].timer > IR_Obj.pHead[0].timer*0.8) 
-					&& (IR_Obj.rx_buf[0].timer < IR_Obj.pHead[0].timer*1.2)
-					&& (IR_Obj.rx_buf[0].pin_state == IR_Obj.pHead[0].pin_state)
+					&& (IR_Obj.rx_buf[0].us > IR_Obj.pHead[0].us*0.8) 
+					&& (IR_Obj.rx_buf[0].us < IR_Obj.pHead[0].us*1.2)
+					&& (IR_Obj.rx_buf[0].level == IR_Obj.pHead[0].level)
 			)
 			{
 				if (IR_Obj.len == 0)
 				{
 					IR_Obj.len++;
-					IR_Obj.rx_buf[1].timer = 0;
+					IR_Obj.rx_buf[1].us = 0;
 				}	
 				else if((IR_Obj.state == CAPTURE_STAT_IDLE)
-					&& (IR_Obj.rx_buf[1].timer > IR_Obj.pHead[1].timer*0.8) 
-					&& (IR_Obj.rx_buf[1].timer < IR_Obj.pHead[1].timer*1.2)
-					&& (IR_Obj.rx_buf[1].pin_state == IR_Obj.pHead[1].pin_state)
+					&& (IR_Obj.rx_buf[1].us > IR_Obj.pHead[1].us*0.8) 
+					&& (IR_Obj.rx_buf[1].us < IR_Obj.pHead[1].us*1.2)
+					&& (IR_Obj.rx_buf[1].level == IR_Obj.pHead[1].level)
 				)
 				{
 					IR_Obj.state |= CAPTURE_STAT_CAPTURE_HEAD_FLAG;
@@ -257,26 +257,26 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
   *                the configuration information for TIM module.
   * @retval None
   */
-void ir_rx_irq_callback(uint32_t cnt, IR_PIN_State pin_state)
+void ir_rx_irq_callback(uint32_t cnt, IR_PIN_State level)
 {
-    IR_Obj.rx_buf[IR_Obj.len].timer = cnt;			
-    IR_Obj.rx_buf[IR_Obj.len].pin_state = pin_state;
+    IR_Obj.rx_buf[IR_Obj.len].us = cnt;			
+    IR_Obj.rx_buf[IR_Obj.len].level = level;
 
     if( (IR_Obj.state == CAPTURE_STAT_IDLE)
-            && (IR_Obj.rx_buf[0].timer > IR_Obj.pHead[0].timer*0.8) 
-            && (IR_Obj.rx_buf[0].timer < IR_Obj.pHead[0].timer*1.2)
-            && (IR_Obj.rx_buf[0].pin_state == IR_Obj.pHead[0].pin_state)
+            && (IR_Obj.rx_buf[0].us > IR_Obj.pHead[0].us*0.8) 
+            && (IR_Obj.rx_buf[0].us < IR_Obj.pHead[0].us*1.2)
+            && (IR_Obj.rx_buf[0].level == IR_Obj.pHead[0].level)
       )
     {
         if (IR_Obj.len == 0)
         {
             IR_Obj.len++;
-            IR_Obj.rx_buf[1].timer = 0;
+            IR_Obj.rx_buf[1].us = 0;
         }	
         else if((IR_Obj.state == CAPTURE_STAT_IDLE)
-                && (IR_Obj.rx_buf[1].timer > IR_Obj.pHead[1].timer*0.8) 
-                && (IR_Obj.rx_buf[1].timer < IR_Obj.pHead[1].timer*1.2)
-                && (IR_Obj.rx_buf[1].pin_state == IR_Obj.pHead[1].pin_state)
+                && (IR_Obj.rx_buf[1].us > IR_Obj.pHead[1].us*0.8) 
+                && (IR_Obj.rx_buf[1].us < IR_Obj.pHead[1].us*1.2)
+                && (IR_Obj.rx_buf[1].level == IR_Obj.pHead[1].level)
                )
         {
             IR_Obj.state |= CAPTURE_STAT_CAPTURE_HEAD_FLAG;
@@ -313,13 +313,13 @@ void ir_rx_irq_callback(uint32_t cnt, IR_PIN_State pin_state)
   *                the configuration information for TIM module.
   * @retval None
   */
-void ir_rx_irq_callback(uint32_t cnt, IR_PIN_State pin_state)
+void ir_rx_irq_callback(uint32_t cnt, IR_PIN_State level)
 {
-    if (IR_Obj.len < INFRARED_BUFF_SIZE)
+    if (IR_Obj.rx_len < INFRARED_BUFF_SIZE)
     {
-        IR_Obj.rx_buf[IR_Obj.len].timer = cnt;			
-        IR_Obj.rx_buf[IR_Obj.len].pin_state = pin_state;
-        IR_Obj.len++;
+        IR_Obj.rx_buf[IR_Obj.rx_len].us = cnt;			
+        IR_Obj.rx_buf[IR_Obj.rx_len].level = level;
+        IR_Obj.rx_len++;
     }
 }
 
@@ -350,7 +350,7 @@ int main(int argc, char *argv[])
 			for(i=0; i<IR_Obj.len; i++)
 			{
 					printf("IR_Obj[%d]: %d, %d, len=%d\r\n", i,
-							IR_Obj.rx_buf[i].timer, IR_Obj.rx_buf[i].pin_state, IR_Obj.len);
+							IR_Obj.rx_buf[i].us, IR_Obj.rx_buf[i].level, IR_Obj.len);
 
 			}
 

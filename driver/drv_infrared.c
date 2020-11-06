@@ -196,19 +196,19 @@ static void infrared_rx_tmr_cb(struct soft_timer *st)
 
     //IR_Obj.state |= CAPTURE_STAT_CAPTURE_DONE;
     //if (IR_Obj.state & CAPTURE_STAT_CAPTURE_DONE)
-    if (IR_Obj.len > 10)
+    if (IR_Obj.rx_len > 10)
     {
-        for (uint16_t i = 0; i < IR_Obj.len; i++)
+        for (uint16_t i = 0; i < IR_Obj.rx_len; i++)
         {
             log_d("IR_Obj[%d]: %d, %d, len=%d", i,
-                   IR_Obj.rx_buf[i].timer, IR_Obj.rx_buf[i].pin_state, IR_Obj.len);
+                   IR_Obj.rx_buf[i].us, IR_Obj.rx_buf[i].level, IR_Obj.rx_len);
             break;
         }
 
         /* invoke callback */
         if ((infrared->parent.rx_indicate))
         {
-            infrared->parent.rx_indicate(&(infrared->parent), IR_Obj.len);
+            infrared->parent.rx_indicate(&(infrared->parent), IR_Obj.rx_len);
         }
 
         InfraRed_RX_Decoder();
@@ -220,8 +220,8 @@ static void infrared_rx_tmr_cb(struct soft_timer *st)
     }
     else
     {
-        IR_Obj.len = 0;
-        log_w("infrared receive fail, len:%d", IR_Obj.len);
+        IR_Obj.rx_len = 0;
+        log_w("infrared receive fail, len:%d", IR_Obj.rx_len);
     }
 }
 

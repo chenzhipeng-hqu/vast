@@ -68,13 +68,10 @@ struct data_mi
     uint8_t repeat;
 };
 
-typedef struct data_ir
+typedef union data_ir
 {
-    union 
-    {
-        struct data_nec    nec;          /* Temperature.         unit: dCelsius    */
-        struct data_mi    mi;          /* Temperature.         unit: dCelsius    */
-    }data;
+    struct data_nec   nec;          /* Temperature.         unit: dCelsius    */
+    struct data_mi    mi;          /* Temperature.         unit: dCelsius    */
 }data_ir_t;
 
 typedef struct _IR_DataTypeDef
@@ -86,24 +83,24 @@ typedef struct _IR_DataTypeDef
 
 typedef struct _IR_BufTypeDef
 {
-    uint16_t timer;
-    IR_PIN_State pin_state;
+    uint16_t us;
+    IR_PIN_State level;
 }IR_BufTypeDef;
 
 
-#define	CAPTURE_STAT_IDLE 						(0)
-#define	CAPTURE_STAT_CAPTURE_HEAD_FLAG			(1<<6)
-#define CAPTURE_STAT_CAPTURE_DONE				(1<<7)
-#define CAPTURE_STAT_CAPTURE_TIMES				(0x0f)
+//#define	CAPTURE_STAT_IDLE 						(0)
+//#define	CAPTURE_STAT_CAPTURE_HEAD_FLAG			(1<<6)
+//#define CAPTURE_STAT_CAPTURE_DONE				(1<<7)
+//#define CAPTURE_STAT_CAPTURE_TIMES				(0x0f)
 
 typedef struct _IR_TypeDef
 {
-	volatile uint8_t state;   // bit7: capture complete，bit6：is_capture_high, bit5:falling flag after high level, bit4~0: hight_level timer overflow times
+	//volatile uint8_t state;   // bit7: capture complete，bit6：is_capture_high, bit5:falling flag after high level, bit4~0: hight_level us overflow times
 	volatile IR_BufTypeDef rx_buf[INFRARED_BUFF_SIZE];
 	volatile IR_BufTypeDef tx_buf[INFRARED_BUFF_SIZE];
 	volatile uint8_t tx_bufIdx;
 	volatile uint8_t tx_bufLen;
-	volatile uint8_t len;
+	volatile uint8_t rx_len;
 	IR_DataTypeDef value;
     data_ir_t data;
 	uint16_t carry_freq;
@@ -145,7 +142,7 @@ extern int InfraRed_RX_Decoder(void);
 extern int InfraRed_TX_Encoder(struct _IR_TypeDef *, const void *buffer, size_t size);
 extern int InfraRed_TX_RepeatEncoder(struct _IR_TypeDef *pIr, const void *buffer, size_t size);
 //extern int InfraRed_RX_ChangeProtocol(IRType_e IRType);
-extern void ir_rx_irq_callback(uint32_t cnt, IR_PIN_State pin_state);
+extern void ir_rx_irq_callback(uint32_t cnt, IR_PIN_State level);
 extern int ir_tx_push_data(const IR_BufTypeDef *pData, uint32_t len);
 
 

@@ -124,23 +124,23 @@ int InfraRed_RX_NEC_Decoder(IR_TypeDef *pIR_Obj)
     uint8_t val[4] = {0};
     volatile IR_BufTypeDef *rx_buf = pIR_Obj->rx_buf;
 
-    min0 = IR_NEC_Zero[1].timer * 0.8;
-    max0 = IR_NEC_Zero[1].timer * 1.2;
-    min1 = IR_NEC_One[1].timer * 0.8;
-    max1 = IR_NEC_One[1].timer * 1.2;
+    min0 = IR_NEC_Zero[1].us * 0.8;
+    max0 = IR_NEC_Zero[1].us * 1.2;
+    min1 = IR_NEC_One[1].us * 0.8;
+    max1 = IR_NEC_One[1].us * 1.2;
 
-    if (pIR_Obj->len != 0)
+    if (pIR_Obj->rx_len != 0)
     {
         // find head
         for (idx = 0; idx < 10; idx++)
         {
-            if ((rx_buf[idx].timer > IR_NEC_Head[0].timer * 0.8)
-                    && (rx_buf[idx].timer < IR_NEC_Head[0].timer * 1.2)
-                    && (rx_buf[idx].pin_state == IR_NEC_Head[0].pin_state))
+            if ((rx_buf[idx].us > IR_NEC_Head[0].us * 0.8)
+                    && (rx_buf[idx].us < IR_NEC_Head[0].us * 1.2)
+                    && (rx_buf[idx].level == IR_NEC_Head[0].level))
             {
-                if ((rx_buf[idx + 1].timer > IR_NEC_Head[1].timer * 0.8)
-                        && (rx_buf[idx + 1].timer < IR_NEC_Head[1].timer * 1.2)
-                        && (rx_buf[idx + 1].pin_state == IR_NEC_Head[1].pin_state))
+                if ((rx_buf[idx + 1].us > IR_NEC_Head[1].us * 0.8)
+                        && (rx_buf[idx + 1].us < IR_NEC_Head[1].us * 1.2)
+                        && (rx_buf[idx + 1].level == IR_NEC_Head[1].level))
                 {
                     log_d("find nec head, idx=%d", idx);
                     //rx_buf += idx;
@@ -150,18 +150,18 @@ int InfraRed_RX_NEC_Decoder(IR_TypeDef *pIR_Obj)
         }
 
         // find code
-        for (idx = idx + sizeof(IR_NEC_Head) / sizeof(IR_NEC_Head[0]) + 1; idx < pIR_Obj->len; idx += 2)
+        for (idx = idx + sizeof(IR_NEC_Head) / sizeof(IR_NEC_Head[0]) + 1; idx < pIR_Obj->rx_len; idx += 2)
         {
-            if ((rx_buf[idx].timer >= min0) && (rx_buf[idx].timer <= max0))
+            if ((rx_buf[idx].us >= min0) && (rx_buf[idx].us <= max0))
             {
             }
-            else if ((rx_buf[idx].timer >= min1) && (rx_buf[idx].timer <= max1))
+            else if ((rx_buf[idx].us >= min1) && (rx_buf[idx].us <= max1))
             {
                 val[byte] |= _bit;
             }
             else
             {
-                log_d("min0:%d, max0:%d, min1:%d, max1:%d, pin:%d, rx_buf[%d]:%d", min0, max0, min1, max1, rx_buf[idx].pin_state, idx, rx_buf[idx].timer);
+                log_d("min0:%d, max0:%d, min1:%d, max1:%d, pin:%d, rx_buf[%d]:%d", min0, max0, min1, max1, rx_buf[idx].level, idx, rx_buf[idx].us);
                 break;
             }
             _bit <<= 1;
@@ -174,19 +174,19 @@ int InfraRed_RX_NEC_Decoder(IR_TypeDef *pIR_Obj)
         }
 
         //find repeat
-        for (idx = idx; idx + 2 < pIR_Obj->len; idx++)
+        for (idx = idx; idx + 2 < pIR_Obj->rx_len; idx++)
         {
-            if ((rx_buf[idx].timer > IR_NEC_Repeat[0].timer * 0.8)
-                    && (rx_buf[idx].timer < IR_NEC_Repeat[0].timer * 1.2)
-                    && (rx_buf[idx].pin_state == IR_NEC_Repeat[0].pin_state))
+            if ((rx_buf[idx].us > IR_NEC_Repeat[0].us * 0.8)
+                    && (rx_buf[idx].us < IR_NEC_Repeat[0].us * 1.2)
+                    && (rx_buf[idx].level == IR_NEC_Repeat[0].level))
             {
-                if ((rx_buf[idx + 1].timer > IR_NEC_Repeat[1].timer * 0.8)
-                        && (rx_buf[idx + 1].timer < IR_NEC_Repeat[1].timer * 1.2)
-                        && (rx_buf[idx + 1].pin_state == IR_NEC_Repeat[1].pin_state))
+                if ((rx_buf[idx + 1].us > IR_NEC_Repeat[1].us * 0.8)
+                        && (rx_buf[idx + 1].us < IR_NEC_Repeat[1].us * 1.2)
+                        && (rx_buf[idx + 1].level == IR_NEC_Repeat[1].level))
                 {
-                    if ((rx_buf[idx + 2].timer > IR_NEC_Repeat[2].timer * 0.8)
-                            && (rx_buf[idx + 2].timer < IR_NEC_Repeat[2].timer * 1.2)
-                            && (rx_buf[idx + 2].pin_state == IR_NEC_Repeat[2].pin_state))
+                    if ((rx_buf[idx + 2].us > IR_NEC_Repeat[2].us * 0.8)
+                            && (rx_buf[idx + 2].us < IR_NEC_Repeat[2].us * 1.2)
+                            && (rx_buf[idx + 2].level == IR_NEC_Repeat[2].level))
                     {
                         log_d("find nec repeat, idx=%d", idx);
                         pIR_Obj->RxRepeat++;
@@ -200,9 +200,9 @@ int InfraRed_RX_NEC_Decoder(IR_TypeDef *pIR_Obj)
         {
 //          if( 0xFF == (val[2]|val[3]))
             {
-                pIR_Obj->data.data.nec.addr = val[0] << 8 | val[1];
-                pIR_Obj->data.data.nec.key = val[2];
-                pIR_Obj->data.data.nec.repeat = pIR_Obj->RxRepeat;
+                pIR_Obj->data.nec.addr = val[0] << 8 | val[1];
+                pIR_Obj->data.nec.key = val[2];
+                pIR_Obj->data.nec.repeat = pIR_Obj->RxRepeat;
 
                 pIR_Obj->value.address = val[0] << 8 | val[1];
                 pIR_Obj->value.command = val[2];
@@ -211,7 +211,7 @@ int InfraRed_RX_NEC_Decoder(IR_TypeDef *pIR_Obj)
             }
         }
         //IR_Obj.state = CAPTURE_STAT_IDLE;
-        pIR_Obj->len = 0;
+        pIR_Obj->rx_len = 0;
     }
 
     return 0;
@@ -223,7 +223,7 @@ int InfraRed_NEC_Init(IR_TypeDef *pIR_Obj)
     pIR_Obj->pHead = IR_NEC_Head;
     pIR_Obj->protocol_size = 66; //4*8*2+2
     pIR_Obj->carry_freq = carry_freq;
-    pIR_Obj->state = CAPTURE_STAT_IDLE;
+    //pIR_Obj->state = CAPTURE_STAT_IDLE;
     pIR_Obj->RepeatInterval = 110;
     pIR_Obj->pInfraRed_RX_Decoder = InfraRed_RX_NEC_Decoder;
     pIR_Obj->pInfraRed_TX_Encoder = InfraRed_TX_NEC_Encoder;

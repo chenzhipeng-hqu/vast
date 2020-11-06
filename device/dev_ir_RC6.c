@@ -74,7 +74,7 @@ int InfraRed_RC6_Init(IR_TypeDef *pIR_Obj)
 {
 	pIR_Obj->pHead = IR_RC6_Head;
 	pIR_Obj->protocol_size = 40;
-	pIR_Obj->state = CAPTURE_STAT_IDLE;
+	//pIR_Obj->state = CAPTURE_STAT_IDLE;
 	pIR_Obj->RepeatInterval = 110;	
 	pIR_Obj->pInfraRed_RX_Decoder = InfraRed_RX_RC6_Calculate;
 	return 0;
@@ -92,18 +92,18 @@ static int InfraRed_RX_RC6_Calculate(IR_TypeDef *pIR_Obj)
 	uint8_t tog = 0, prev = 1;
 	uint8_t val[5] = {0};
 	
-	minS = IR_RC6_Zero[0].timer * 0.8;
-	maxS = IR_RC6_Zero[0].timer * 1.2;
+	minS = IR_RC6_Zero[0].us * 0.8;
+	maxS = IR_RC6_Zero[0].us * 1.2;
 	minT = minS * 2;
 	maxT = maxS * 2;
 	minTrailer = minS * 3;
 	maxTrailer = maxS * 3;
 	
-	if(pIR_Obj->len != 0)
+	if(pIR_Obj->rx_len != 0)
 	{
-		for(idx=sizeof(IR_RC6_Head)/sizeof(IR_RC6_Head[0]); idx<pIR_Obj->len; idx++)
+		for(idx=sizeof(IR_RC6_Head)/sizeof(IR_RC6_Head[0]); idx<pIR_Obj->rx_len; idx++)
 		{			
-			if((pIR_Obj->rx_buf[idx].timer >= minS) && (pIR_Obj->rx_buf[idx].timer <= maxS))
+			if((pIR_Obj->rx_buf[idx].us >= minS) && (pIR_Obj->rx_buf[idx].us <= maxS))
 			{
 				tog += 1;
 				if(idx == 8)
@@ -116,15 +116,15 @@ static int InfraRed_RX_RC6_Calculate(IR_TypeDef *pIR_Obj)
 					printf("1. idx=%d, prev=%d, tog=%d, _bit=0x%02x \r\n", idx, prev, tog, _bit);
 				}
 			}
-			else if((pIR_Obj->rx_buf[idx].timer >= minT) && (pIR_Obj->rx_buf[idx].timer <= maxT))
+			else if((pIR_Obj->rx_buf[idx].us >= minT) && (pIR_Obj->rx_buf[idx].us <= maxT))
 			{
 				tog += 4;
 			}
-			else if((pIR_Obj->rx_buf[idx].timer >= minTrailer) && (pIR_Obj->rx_buf[idx].timer <= maxTrailer))
+			else if((pIR_Obj->rx_buf[idx].us >= minTrailer) && (pIR_Obj->rx_buf[idx].us <= maxTrailer))
 			{
 				tog += 6;		
 			}
-			else if((pIR_Obj->rx_buf[idx].timer >= minTrailer) && (pIR_Obj->rx_buf[idx].timer <= maxTrailer))
+			else if((pIR_Obj->rx_buf[idx].us >= minTrailer) && (pIR_Obj->rx_buf[idx].us <= maxTrailer))
 			{
 				tog += 6;		
 			}
@@ -207,8 +207,8 @@ static int InfraRed_RX_RC6_Calculate(IR_TypeDef *pIR_Obj)
 			pIR_Obj->value.command_check = val[4];
 			//HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_9);	
 		}
-		IR_Obj.state = CAPTURE_STAT_IDLE;
-		pIR_Obj->len = 0;
+		//IR_Obj.state = CAPTURE_STAT_IDLE;
+		pIR_Obj->rx_len = 0;
 	}	
 	
 	return 0;

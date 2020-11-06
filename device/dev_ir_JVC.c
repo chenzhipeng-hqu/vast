@@ -32,7 +32,7 @@ int InfraRed_JVC_Init(IR_TypeDef *pIR_Obj)
 {
 	pIR_Obj->pHead = IR_JVC_Head;
 	pIR_Obj->protocol_size = 25;
-	pIR_Obj->state = CAPTURE_STAT_IDLE;
+	//pIR_Obj->state = CAPTURE_STAT_IDLE;
 	return 0;
 }
 
@@ -44,20 +44,20 @@ int InfraRed_RX_JVC_Calculate(IR_TypeDef *pIR_Obj)
 	uint8_t val[2] = {0};
 	static uint8_t repeat_cnt = 0 , old_val[2] = {0};
 	
-	min0 = IR_JVC_Zero[1].timer * 0.8;
-	max0 = IR_JVC_Zero[1].timer * 1.2;
-	min1 = IR_JVC_One[1].timer * 0.8;
-	max1 = IR_JVC_One[1].timer * 1.2;
+	min0 = IR_JVC_Zero[1].us * 0.8;
+	max0 = IR_JVC_Zero[1].us * 1.2;
+	min1 = IR_JVC_One[1].us * 0.8;
+	max1 = IR_JVC_One[1].us * 1.2;
 	
-	if(pIR_Obj->len != 0)
+	if(pIR_Obj->rx_len != 0)
 	{
-		for(idx=sizeof(IR_JVC_Head)/sizeof(IR_JVC_Head[0])+1; idx<pIR_Obj->len; idx+=2)
+		for(idx=sizeof(IR_JVC_Head)/sizeof(IR_JVC_Head[0])+1; idx<pIR_Obj->rx_len; idx+=2)
 		{			
-			if((pIR_Obj->rx_buf[idx].timer >= min0) && (pIR_Obj->rx_buf[idx].timer <= max0))
+			if((pIR_Obj->rx_buf[idx].us >= min0) && (pIR_Obj->rx_buf[idx].us <= max0))
 			{
 				
 			}
-			else if((pIR_Obj->rx_buf[idx].timer >= min1) && (pIR_Obj->rx_buf[idx].timer <= max1))
+			else if((pIR_Obj->rx_buf[idx].us >= min1) && (pIR_Obj->rx_buf[idx].us <= max1))
 			{
 				val[byte] |= _bit; 
 			}
@@ -110,8 +110,8 @@ int InfraRed_RX_JVC_Calculate(IR_TypeDef *pIR_Obj)
 			
 			//HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_9);	
 		}
-		IR_Obj.state = CAPTURE_STAT_IDLE;
-		pIR_Obj->len = 0;
+		//IR_Obj.state = CAPTURE_STAT_IDLE;
+		pIR_Obj->rx_len = 0;
 	}	
 	
 	return 0;

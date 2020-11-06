@@ -73,7 +73,7 @@ int InfraRed_RC5_Init(IR_TypeDef *pIR_Obj)
 {
 	pIR_Obj->pHead = IR_RC5_Head;
 	pIR_Obj->protocol_size = 30;
-	pIR_Obj->state = CAPTURE_STAT_IDLE;
+	//pIR_Obj->state = CAPTURE_STAT_IDLE;
 	pIR_Obj->RepeatInterval = 114;	
 	pIR_Obj->pInfraRed_RX_Decoder = InfraRed_RX_RC5_Calculate;
 	return 0;
@@ -91,20 +91,20 @@ static int InfraRed_RX_RC5_Calculate(IR_TypeDef *pIR_Obj)
 	uint8_t tog = 0, prev = 1;
 	uint8_t val[4] = {0};
 	
-	minS = IR_RC5_Zero[0].timer * 0.8;
-	maxS = IR_RC5_Zero[0].timer * 1.2;
+	minS = IR_RC5_Zero[0].us * 0.8;
+	maxS = IR_RC5_Zero[0].us * 1.2;
 	minT = minS * 2;
 	maxT = maxS * 2;
 	
-	if(pIR_Obj->len != 0)
+	if(pIR_Obj->rx_len != 0)
 	{
-		for(idx=0; idx<pIR_Obj->len; idx++)
+		for(idx=0; idx<pIR_Obj->rx_len; idx++)
 		{			
-			if((pIR_Obj->rx_buf[idx].timer >= minS) && (pIR_Obj->rx_buf[idx].timer <= maxS))
+			if((pIR_Obj->rx_buf[idx].us >= minS) && (pIR_Obj->rx_buf[idx].us <= maxS))
 			{
 				tog += 1;
 			}
-			else if((pIR_Obj->rx_buf[idx].timer >= minT) && (pIR_Obj->rx_buf[idx].timer <= maxT))
+			else if((pIR_Obj->rx_buf[idx].us >= minT) && (pIR_Obj->rx_buf[idx].us <= maxT))
 			{
 				tog += 4;
 			}
@@ -151,8 +151,8 @@ static int InfraRed_RX_RC5_Calculate(IR_TypeDef *pIR_Obj)
 			pIR_Obj->value.command_check = (val[0]&0x20)?1:0;
 			//HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_9);	
 		}
-		IR_Obj.state = CAPTURE_STAT_IDLE;
-		pIR_Obj->len = 0;
+        //IR_Obj.state = CAPTURE_STAT_IDLE;
+		pIR_Obj->rx_len = 0;
 	}	
 	
 	return 0;

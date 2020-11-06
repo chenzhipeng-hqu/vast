@@ -173,27 +173,27 @@ static int InfraRed_RX_MI_Calculate(IR_TypeDef *pIR_Obj)
 	uint8_t val[3] = {0};
     volatile IR_BufTypeDef *rx_buf = pIR_Obj->rx_buf;
 	
-	min00 = IR_MI_ZeroZero[1].timer * 0.9;
-	max00 = IR_MI_ZeroZero[1].timer * 1.1;
-	min01 = IR_MI_ZeroOne[1].timer * 0.9;
-	max01 = IR_MI_ZeroOne[1].timer * 1.1;
-	min10 = IR_MI_OneZero[1].timer * 0.9;
-	max10 = IR_MI_OneZero[1].timer * 1.1;
-	min11 = IR_MI_OneOne[1].timer * 0.9;
-	max11 = IR_MI_OneOne[1].timer * 1.1;
+	min00 = IR_MI_ZeroZero[1].us * 0.9;
+	max00 = IR_MI_ZeroZero[1].us * 1.1;
+	min01 = IR_MI_ZeroOne[1].us * 0.9;
+	max01 = IR_MI_ZeroOne[1].us * 1.1;
+	min10 = IR_MI_OneZero[1].us * 0.9;
+	max10 = IR_MI_OneZero[1].us * 1.1;
+	min11 = IR_MI_OneOne[1].us * 0.9;
+	max11 = IR_MI_OneOne[1].us * 1.1;
 	
-	if(pIR_Obj->len != 0)
+	if(pIR_Obj->rx_len != 0)
 	{
         // find head
         for (idx = 0; idx < 10; idx++)
         {
-            if ((rx_buf[idx].timer > IR_MI_Head[0].timer * 0.8)
-                    && (rx_buf[idx].timer < IR_MI_Head[0].timer * 1.2)
-                    && (rx_buf[idx].pin_state == IR_MI_Head[0].pin_state))
+            if ((rx_buf[idx].us > IR_MI_Head[0].us * 0.8)
+                    && (rx_buf[idx].us < IR_MI_Head[0].us * 1.2)
+                    && (rx_buf[idx].level == IR_MI_Head[0].level))
             {
-                if ((rx_buf[idx + 1].timer > IR_MI_Head[1].timer * 0.8)
-                        && (rx_buf[idx + 1].timer < IR_MI_Head[1].timer * 1.2)
-                        && (rx_buf[idx + 1].pin_state == IR_MI_Head[1].pin_state))
+                if ((rx_buf[idx + 1].us > IR_MI_Head[1].us * 0.8)
+                        && (rx_buf[idx + 1].us < IR_MI_Head[1].us * 1.2)
+                        && (rx_buf[idx + 1].level == IR_MI_Head[1].level))
                 {
                     log_d("find mi head, idx=%d", idx);
                     //rx_buf += idx;
@@ -203,21 +203,21 @@ static int InfraRed_RX_MI_Calculate(IR_TypeDef *pIR_Obj)
         }
 
         // find code
-		for(idx=idx + sizeof(IR_MI_Head)/sizeof(IR_MI_Head[0])+1; idx<pIR_Obj->len; idx+=2)
+		for(idx=idx + sizeof(IR_MI_Head)/sizeof(IR_MI_Head[0])+1; idx<pIR_Obj->rx_len; idx+=2)
 		{			
-			if((pIR_Obj->rx_buf[idx].timer >= min00) && (pIR_Obj->rx_buf[idx].timer <= max00))
+			if((pIR_Obj->rx_buf[idx].us >= min00) && (pIR_Obj->rx_buf[idx].us <= max00))
 			{
 				val[byte] |= 0x00;
 			}
-			else if((pIR_Obj->rx_buf[idx].timer >= min01) && (pIR_Obj->rx_buf[idx].timer <= max01))
+			else if((pIR_Obj->rx_buf[idx].us >= min01) && (pIR_Obj->rx_buf[idx].us <= max01))
 			{
 				val[byte] |= 0x01; 
 			}
-			else if((pIR_Obj->rx_buf[idx].timer >= min10) && (pIR_Obj->rx_buf[idx].timer <= max10))
+			else if((pIR_Obj->rx_buf[idx].us >= min10) && (pIR_Obj->rx_buf[idx].us <= max10))
 			{
 				val[byte] |= 0x02; 
 			}
-			else if((pIR_Obj->rx_buf[idx].timer >= min11) && (pIR_Obj->rx_buf[idx].timer <= max11))
+			else if((pIR_Obj->rx_buf[idx].us >= min11) && (pIR_Obj->rx_buf[idx].us <= max11))
 			{
 				val[byte] |= 0x03; 
 			}
@@ -250,8 +250,8 @@ static int InfraRed_RX_MI_Calculate(IR_TypeDef *pIR_Obj)
 			pIR_Obj->value.command_check = val[2];
 			//HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_9);	
 		}
-		IR_Obj.state = CAPTURE_STAT_IDLE;
-		pIR_Obj->len = 0;
+		//IR_Obj.state = CAPTURE_STAT_IDLE;
+		pIR_Obj->rx_len = 0;
 	}	
 	
 	return 0;
@@ -266,7 +266,7 @@ int InfraRed_MI_Init(IR_TypeDef *pIR_Obj)
 {
 	pIR_Obj->pHead = IR_MI_Head;
 	pIR_Obj->protocol_size = 23;
-	pIR_Obj->state = CAPTURE_STAT_IDLE;
+	//pIR_Obj->state = CAPTURE_STAT_IDLE;
 	pIR_Obj->RepeatInterval = 30;	
 	pIR_Obj->pInfraRed_RX_Decoder = InfraRed_RX_MI_Calculate;
 	pIR_Obj->carry_freq = carry_freq;
