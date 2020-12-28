@@ -41,7 +41,8 @@
 #include <core/device.h>
 #include "core/croutine.h"
 #include "component/state_machine.h"
-#include "component/protocol.h"
+//#include "component/protocol.h"
+#include "component/smartframe.h"
 
 /***********************************************
                     define
@@ -124,11 +125,13 @@ int writeMultiHoldReg2(modbus_t *modbus, uint16_t slave_addr, uint16_t reg_addr,
 int writeSingleHoldReg2(modbus_t *modbus, uint16_t slave_addr, uint16_t reg_addr, uint16_t reg_val, rx_indicate rx_ind);
 //int readHoldReg2(modbus_t *modbus, uint16_t slave_addr, uint16_t reg_addr, uint16_t reg_cnt);
 int readHoldReg2(modbus_t *modbus, uint16_t slave_addr, uint16_t start_addr, uint16_t reg_cnt, rx_indicate rx_ind);
+int sendScpiCmd(modbus_t *modbus, uint8_t slave_addr, const char *cmd, rx_indicate rx_ind);
 
 extern error_t read_input_reg_rx_ind(device_t *dev, size_t size);
 extern error_t read_hold_reg_rx_ind(device_t *dev, size_t size);
 extern error_t write_hold_reg_rx_ind(device_t *dev, size_t size);
 extern error_t write_holds_reg_rx_ind(device_t *dev, size_t size);
+extern error_t scpi_rx_ind(device_t *dev, size_t size);
 extern float int2float(uint16_t value);
 extern uint16_t float2int(float value);
 

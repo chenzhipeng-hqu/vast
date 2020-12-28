@@ -49,6 +49,7 @@ enum device_class_type
 #define DEVICE_CTRL_GET_RX_DMA_LEN   0x1d       /* get receive dma length */
 #define DEVICE_CTRL_SET_IP           0x1e
 #define DEVICE_CTRL_GET_IP           0x1f
+#define DEVICE_CTRL_SET_BAUD         0x20
 
 #define DEVICE_CTRL_BLK_GETGEOME     0x10       /**< get geometry information   */
 #define DEVICE_CTRL_BLK_SYNC         0x11       /**< flush data to block device */

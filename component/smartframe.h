@@ -38,6 +38,7 @@
 ***********************************************/
 #include <stdint.h>
 #include <stdbool.h>
+#include <core/device.h>
 
 /***********************************************
                     define
@@ -46,7 +47,7 @@
 #define		LOCAL_STC					    0xFE
 #define		PROT_RX_LEN_MAX					0x7F
 
-#define		PROT_DEBUG(fmt, ...)            
+//#define		PROT_DEBUG(fmt, ...)            
 															
 /***********************************************
                     typedef
@@ -78,15 +79,16 @@ typedef struct LocalFrame
 
 typedef struct ListFrame
 {
-    //list_t 	        entry;
-	//rx_indicate     rx_ind;
-	//tx_complete     tx_done;
-	//uint8_t         len;        // data 里面的长度
+    list_t 	        entry;
+    rx_indicate     rx_ind;
+    tx_complete     tx_done;
+    uint8_t         len;        // data 里面的长度
 	uint8_t         data[1];
 } list_frame_t;
 #define LIST_FRAME_HEAD (offsetof(list_frame_t, data))
 
 #pragma pack()
+
 /***********************************************
                function prototypes
 ***********************************************/

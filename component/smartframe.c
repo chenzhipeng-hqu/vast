@@ -69,7 +69,6 @@ enum {
                    variable
 ***********************************************/
 
-
 /***********************************************
                    function
 ***********************************************/
@@ -358,12 +357,13 @@ int code_local_frame(const uint32_t from, const uint32_t to, int seq, uint8_t cm
 	//pframe->seq = seq;
 	pframe->cmd = cmd;
 
-	pframe->len = LOCAL_FRAME_HEAD + len + 2;  //add crc16 len
+	//pframe->len = LOCAL_FRAME_HEAD + len + 2;  //add crc16 len
+	pframe->len = LOCAL_FRAME_HEAD + len;
     memmove(&pframe->data[0], data, len);
 
-    uint16_t crc16 = check_crc16((uint8_t *)pframe, LOCAL_FRAME_HEAD + len);
-    pframe->data[len] = (crc16) & 0xff;
-    pframe->data[len+1] = (crc16>>8) & 0xff;
+    //uint16_t crc16 = check_crc16((uint8_t *)pframe, LOCAL_FRAME_HEAD + len);
+    //pframe->data[len] = (crc16) & 0xff;
+    //pframe->data[len+1] = (crc16>>8) & 0xff;
 
     //rt_exit_critical();
 
