@@ -1,0 +1,14 @@
+vast/
+.settings/
+Debug/
+.mxproject
+.ycm_extra_conf.py
+ATS9*.launch
+ATS9?Debug.*
+buildtags.sh
+cscope.*
+tags
+Session.vim
+build/
+application/bin/ats9_merge.bin
+application/bin/ats9.bin
