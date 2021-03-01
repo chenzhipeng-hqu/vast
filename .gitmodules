@@ -1,0 +1,3 @@
+[submodule "vanca"]
+	path = vanca
+	url = git@github.com:chenzhipeng-hqu/vast.git
