@@ -5,6 +5,10 @@
 			"type": "shell",
 			"label": "C/C++: gcc-8 build active file",
 			"command": "make",
+			"args": [
+				"-j8",
+				"all"
+			],
 			// "args": [
 			// 	"-g",
 			// 	"${file}",

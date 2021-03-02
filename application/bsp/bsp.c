@@ -32,13 +32,8 @@
 * mailto:info@state-machine.com
 *****************************************************************************/
 #include <stdio.h>
-#include <signal.h>
-#include <time.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <unistd.h>
 
-#include "core/init.h"
+//#include "core/init.h"
 
 #include "bsp.h"
 //#include <core/softtimer.h>
@@ -83,40 +78,6 @@ static int startCheck(void)
 }
 //postcore_initcall(startCheck);
 
-static int counter = 0;
-/**
- * @brief configures IWDG and enable watchdog.
- * @param None
- * @retval None
- */
-void sig_alm_handler(int sig_num)
-{
-    //printf("%s, signal number:%d, counter:%d\n", __FUNCTION__, sig_num, counter);
-    if(sig_num = SIGALRM)
-    {
-        counter++;
-    }
-}
-
-/*typedef void (*__sighandler_t) (int);*/
-
-static int core_tick_init(void)
-{
-     //拦截定时器信号。
-    __sighandler_t *pre = signal(SIGALRM, sig_alm_handler);
-    assert(!pre);
-    //printf("pre-sighandler address:%p\n", pre); //pre应该是NULL.
-
-    struct itimerval olditv;
-    struct itimerval itv;
-    itv.it_interval.tv_sec = 0; //定时周期为1ms。
-    itv.it_interval.tv_usec = 1000;
-    itv.it_value.tv_sec = 1; //定时器启动以后将在1秒又100微秒以后正式开始计时。
-    itv.it_value.tv_usec = 100;
-    // setitimer(ITIMER_REAL, &itv, &olditv);
-
-    return 0;
-}
 
 /**
  * @brief configures IWDG and enable watchdog.
@@ -126,7 +87,6 @@ static int core_tick_init(void)
 static int bsp_init(void)
 {
     //vast_uart_bsp_init();
-    core_tick_init();
 
     startCheck();
 

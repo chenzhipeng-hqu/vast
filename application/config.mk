@@ -17,7 +17,7 @@
 
 
 ################### core ####################
-#VANCA_USING_CORE = true
+VANCA_USING_CORE = true
 #VANCA_SYS_CLOCK = 1000
 
 ################## driver ##################

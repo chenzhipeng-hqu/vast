@@ -43,9 +43,10 @@ SRCS += application/bsp/bsp.c
 
 ################ port ################
 INCS += -I./application/port/easylogger
-
 SRCS += application/port/easylogger/elog_port.c
 
+INCS += -I./application/port/core
+SRCS += application/port/core/core_port.c
 
 ################ task ################
 INCS += -I./application/task
