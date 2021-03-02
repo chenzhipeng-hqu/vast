@@ -39,13 +39,14 @@ endif
 ifeq (true, $(VANCA_USING_CORE))
 	DEFS += -DVANCA_USING_CORE
 	SRCS += $(VANCA_ROOT)/core/croutine.c
-	SRCS += $(VANCA_ROOT)/core/device.c
+	#SRCS += $(VANCA_ROOT)/core/device.c
 	#SRCS += $(VANCA_ROOT)/core/heap.c
-	SRCS += $(VANCA_ROOT)/core/memheap.c
-	SRCS += $(VANCA_ROOT)/core/kfifo.c
+	#SRCS += $(VANCA_ROOT)/core/memheap.c
+	#SRCS += $(VANCA_ROOT)/core/kfifo.c
+	SRCS += $(VANCA_ROOT)/core/core.c
 	SRCS += $(VANCA_ROOT)/core/object.c
-	SRCS += $(VANCA_ROOT)/core/softtimer.c
-	SRCS += $(VANCA_ROOT)/core/utils.c
+	SRCS += $(VANCA_ROOT)/core/softimer.c
+	#SRCS += $(VANCA_ROOT)/core/utils.c
 	#SRCS += $(VANCA_ROOT)/core/alloter.c
 endif
 
